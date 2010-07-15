@@ -1,0 +1,74 @@
+TAPEUTAPE
+
+Tapeutape is a midi-controlled virtual sampler.It is highly configurable,lets you create instruments/kits/setups and is designed for live performance.It works on Gnu/Linux with the jack sound server. It can be build as both gui and command-line versions.
+It is released under the Gnu General Public Licence (see the COPYING file).
+
+by Florent Berthaut : postmaster_AT_tardigrade-inc.com 
+
+for more information (screenshots, audio examples, tutorials) see the website at :
+	http://tardigrade-inc.com/index/En/Tapeutape
+
+FEATURES
+	**easy-to-use gui
+	**command-line version
+	**build setups/kits/instruments/variations
+	**kit selection with midi CC 
+	**3 play modes (normal, trigger, repeat)
+	**as many audio stereo outputs as you want, choose the output for each instrument
+	**polyphony for each instrument
+	**samples triggered by midi notes
+	**velocity layers (variations) for each instrument
+	**loads wav,aiff,flac files (and all the audiofile formats handled by libsndfile)
+	**high quality resampling (using libsamplerate)
+	**lash support
+
+INSTALLATION
+	Tapeutape uses the scons build system. 
+	You also need the following libraries:
+		-fltk (if gui is enabled)
+		-libxml2 
+		-alsa
+		-jack
+		-libsamplerate
+		-libsndfile
+		-lash (if lash is enabled)
+
+	To build Tapeutape, type the following commands followed by enter:
+		tar zxf tapeutape-0.1.0.tar.gz
+		cd tapeutape-0.1.0/
+		scons -h (or scons -h lang=fr for a french version)
+	Then follow the instructions. 
+
+EXECUTION
+
+	Make sure you have the jack server running.
+
+	GUI VERSION:
+		double-click on the tapeutape file in the tapeutape directory, or select tapeutape 
+		from your desktop environnement's menu (usually in the multimedia section)
+
+	COMMAND-LINE VERSION:
+		Then just type ./tapeutape in the tapeutape directory, or directly tapeutape if it was installed in /usr/bin.
+		You can specify a .tap file to be loaded like this : tapeutape example.tap. 
+		See the example.tap file in this directory for comments on editing the tap files
+
+HOW DOES IT WORK ?
+	
+	Tapeutape lets you create instruments which correspond to a range of notes. Within each instrument, you can define one or several "variations" which correspond to a range of velocities associated with a sample. Then you create kits with as many instruments as you want. 
+Kits are then organized in setups. You can have for example several drumkits (with the same ranges of notes and midi channels for the instruments) in the same setup and you can change the selected kit of the setup with a midi CC.
+But you can also simply create 1 kit and 1 setup and use many instruments with different midi notes and channels.
+You can create as many audio stereo outputs as you want and choose the output for each instrument. 
+
+
+ENJOY !
+
+	I hope you'll enjoy this program, feel free to ask for new features (and of course bugs corrections !!) 
+	I'd really like to know how you use this program and what kind of music you make with it.
+
+	Flo
+
+
+
+
+
+

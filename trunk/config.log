@@ -1,0 +1,93 @@
+file /home/flo/INFO/TARDIGRADE/Software/TAPEUTAPE/tapeutape-100131/SConstruct,line 18:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C header file jack/jack.h... 
+scons: Configure: ".sconf_temp/conftest_0.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_0.c <-
+  |  |
+  |  |#include "jack/jack.h"
+  |  |
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_0.o" is up to date.
+scons: Configure: The original builder output was:
+  |gcc -o .sconf_temp/conftest_0.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_0.c
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C header file alsa/asoundlib.h... 
+scons: Configure: ".sconf_temp/conftest_1.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_1.c <-
+  |  |
+  |  |#include "alsa/asoundlib.h"
+  |  |
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_1.o" is up to date.
+scons: Configure: The original builder output was:
+  |gcc -o .sconf_temp/conftest_1.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_1.c
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C header file sndfile.h... 
+scons: Configure: ".sconf_temp/conftest_2.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_2.c <-
+  |  |
+  |  |#include "sndfile.h"
+  |  |
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_2.o" is up to date.
+scons: Configure: The original builder output was:
+  |gcc -o .sconf_temp/conftest_2.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_2.c
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C header file samplerate.h... 
+scons: Configure: ".sconf_temp/conftest_3.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_3.c <-
+  |  |
+  |  |#include "samplerate.h"
+  |  |
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_3.o" is up to date.
+scons: Configure: The original builder output was:
+  |gcc -o .sconf_temp/conftest_3.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_3.c
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C header file libxml2/libxml/parser.h... 
+scons: Configure: ".sconf_temp/conftest_4.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_4.c <-
+  |  |
+  |  |#include "libxml2/libxml/parser.h"
+  |  |
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_4.o" is up to date.
+scons: Configure: The original builder output was:
+  |gcc -o .sconf_temp/conftest_4.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_4.c
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ header file FL/Fl.H... 
+scons: Configure: ".sconf_temp/conftest_5.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_5.cpp <-
+  |  |
+  |  |#include "FL/Fl.H"
+  |  |
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_5.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_5.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_5.cpp
+  |
+scons: Configure: (cached) yes
+
+

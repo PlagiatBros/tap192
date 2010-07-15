@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tapeutape version="0.1.0">
+  <options globalvolume="0.800000" max_polyphony="128">
+    <jack-output name="inst1"/>
+    <jack-output name="inst2"/>
+  </options>
+  <creation>
+    <setup name="setup1" channel="1" cc="31">
+      <kit name="kit1">
+        <instrument name="instru1" minnote="7" maxnote="7" rootnote="7" rootnotefine="0.000000" channel="10" cut="1" polyphony="0" output="inst1" volume="0.780000" pan="-0.120000" pitch_over_range="false" play_mode="trigger" play_loop="no" play_reverse="yes">
+          <variation minveloc="0" maxveloc="127" sample="/home/flo/INFO/TARDIGRADE/Software/TAPEUTAPE/tapeutape-091217/son1.wav" sampleRelative="./son1.wav"/>
+        </instrument>
+      </kit>
+    </setup>
+    <setup name="setup2" channel="1" cc="32">
+      <kit name="kit2">
+        <instrument name="instru1" minnote="0" maxnote="10" rootnote="0" rootnotefine="0.000000" channel="9" cut="5" polyphony="0" output="inst2" volume="1.000000" pan="-1.000000" pitch_over_range="false" play_mode="normal" play_loop="no" play_reverse="no">
+          <variation minveloc="0" maxveloc="127" sample="/home/flo/INFO/TARDIGRADE/Software/TAPEUTAPE/tapeutape-091217/son2.wav" sampleRelative="./son2.wav"/>
+        </instrument>
+      </kit>
+      <kit name="kit1">
+        <instrument name="instru1" minnote="40" maxnote="50" rootnote="45" rootnotefine="0.000000" channel="1" cut="1" polyphony="0" output="inst1" volume="0.500000" pan="1.000000" pitch_over_range="true" play_mode="normal" play_loop="no" play_reverse="no">
+          <variation minveloc="0" maxveloc="127" sample="/home/flo/INFO/TARDIGRADE/Software/TAPEUTAPE/tapeutape-091217/son1.wav" sampleRelative="./son1.wav"/>
+        </instrument>
+      </kit>
+    </setup>
+  </creation>
+</tapeutape>

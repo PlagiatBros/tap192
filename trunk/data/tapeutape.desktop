@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Tapeutape
+Comment=Midi Controllable Sample Player
+Icon=tapeutape.png
+Type=Application
+Exec=tapeutape
+Terminal=false
+StartupNotify=true
+Encoding=UTF-8
+Categories=Audio;AudioVideo;Application;
+GenericName=Sample Player
