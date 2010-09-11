@@ -22,7 +22,7 @@
  */
  
 #include <FL/Fl.H>
-#include <FL/Fl_Window.H>
+#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Text_Display.H>
@@ -58,7 +58,7 @@
 
 class tapeutape;
 
-class execWindow : public Fl_Window 
+class execWindow : public Fl_Double_Window 
 {
   public:
 			execWindow(int ,int ,const char*,tapeutape* );

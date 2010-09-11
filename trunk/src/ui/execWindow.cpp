@@ -27,25 +27,21 @@
 using namespace std;
 
 
-execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Window(w,h,titre),tap(t),fileSaved(true),copyType(0),lastSampleDir("")
+execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Window(w,h,titre),tap(t),fileSaved(true),copyType(0),lastSampleDir("")
 {
 	//fltk init
 	Fl::visual(FL_DOUBLE|FL_RGB);
 	
 	//window class
-	this->xclass("tapeutape"); 
 	this->iconlabel(std::string("/usr/local/share/pixmaps/tapeutape.png").c_str());
 
-	//better look
-	Fl::scheme("gtk+");
-
 	//default theme
-	Fl::set_color(FL_BACKGROUND_COLOR,240,240,240);
-	Fl::set_color(FL_BACKGROUND2_COLOR,250,250,250);
-	Fl::set_color(FL_FOREGROUND_COLOR,0,0,0);
+	Fl::set_color(FL_BACKGROUND_COLOR,136,136,136);
+	Fl::set_color(FL_BACKGROUND2_COLOR,0,0,0);
+	Fl::set_color(FL_FOREGROUND_COLOR,255,255,255);
 	Fl::set_color(FL_INACTIVE_COLOR,200,200,200);
-	Fl::set_color(FL_SELECTION_COLOR,100,100,100);
-
+	Fl::set_color(FL_SELECTION_COLOR,200,200,200);
+	
 	//callback
 	this->callback(statWindow,this);
 

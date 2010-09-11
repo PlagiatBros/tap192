@@ -1,4 +1,4 @@
-file /home/flo/INFO/TARDIGRADE/Software/TAPEUTAPE/tapeutape-100131/SConstruct,line 18:
+file /home/flo/INFO/TARDIGRADE/Software/TAPEUTAPE/tapeutape/trunk/SConstruct,line 17:
 	Configure(confdir = .sconf_temp)
 scons: Configure: Checking for C header file jack/jack.h... 
 scons: Configure: ".sconf_temp/conftest_0.c" is up to date.
@@ -11,7 +11,7 @@ scons: Configure: The original builder output was:
   |
 scons: Configure: ".sconf_temp/conftest_0.o" is up to date.
 scons: Configure: The original builder output was:
-  |gcc -o .sconf_temp/conftest_0.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_0.c
+  |gcc -o .sconf_temp/conftest_0.o -c -I/usr/include/libxml2 .sconf_temp/conftest_0.c
   |
 scons: Configure: (cached) yes
 
@@ -26,7 +26,7 @@ scons: Configure: The original builder output was:
   |
 scons: Configure: ".sconf_temp/conftest_1.o" is up to date.
 scons: Configure: The original builder output was:
-  |gcc -o .sconf_temp/conftest_1.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_1.c
+  |gcc -o .sconf_temp/conftest_1.o -c -I/usr/include/libxml2 .sconf_temp/conftest_1.c
   |
 scons: Configure: (cached) yes
 
@@ -41,7 +41,7 @@ scons: Configure: The original builder output was:
   |
 scons: Configure: ".sconf_temp/conftest_2.o" is up to date.
 scons: Configure: The original builder output was:
-  |gcc -o .sconf_temp/conftest_2.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_2.c
+  |gcc -o .sconf_temp/conftest_2.o -c -I/usr/include/libxml2 .sconf_temp/conftest_2.c
   |
 scons: Configure: (cached) yes
 
@@ -56,7 +56,7 @@ scons: Configure: The original builder output was:
   |
 scons: Configure: ".sconf_temp/conftest_3.o" is up to date.
 scons: Configure: The original builder output was:
-  |gcc -o .sconf_temp/conftest_3.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_3.c
+  |gcc -o .sconf_temp/conftest_3.o -c -I/usr/include/libxml2 .sconf_temp/conftest_3.c
   |
 scons: Configure: (cached) yes
 
@@ -71,7 +71,7 @@ scons: Configure: The original builder output was:
   |
 scons: Configure: ".sconf_temp/conftest_4.o" is up to date.
 scons: Configure: The original builder output was:
-  |gcc -o .sconf_temp/conftest_4.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_4.c
+  |gcc -o .sconf_temp/conftest_4.o -c -I/usr/include/libxml2 .sconf_temp/conftest_4.c
   |
 scons: Configure: (cached) yes
 
@@ -86,7 +86,7 @@ scons: Configure: The original builder output was:
   |
 scons: Configure: ".sconf_temp/conftest_5.o" is up to date.
 scons: Configure: The original builder output was:
-  |g++ -o .sconf_temp/conftest_5.o -c -I/usr/include/libxml2 -I/usr/include/lash-1.0 .sconf_temp/conftest_5.cpp
+  |g++ -o .sconf_temp/conftest_5.o -c -I/usr/include/libxml2 .sconf_temp/conftest_5.cpp
   |
 scons: Configure: (cached) yes
 

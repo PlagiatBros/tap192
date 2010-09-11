@@ -1,12 +1,11 @@
 # ENVIRONMENT
-env = Environment(CPPFLAGS=' -I/usr/include/libxml2 -I/usr/include/lash-1.0',LIBS=['asound','pthread','xml2','sndfile','samplerate','jack'])
+env = Environment(CPPFLAGS=' -I/usr/include/libxml2',LIBS=['asound','pthread','xml2','sndfile','samplerate','jack'])
 
 # SOURCE FILES
 base = Glob('src/base/*.cpp')
 audio = Glob('src/audio/*.cpp')
 midi = Glob('src/midi/*.cpp')
 ui = Glob('src/ui/*.cpp')
-lash = Glob('src/lash/*.cpp')
 sources = base+audio+midi
 
 # LANGUAGE
@@ -40,15 +39,6 @@ if not env.GetOption('clean') and not 'install' in COMMAND_LINE_TARGETS and not 
 	if not conf.CheckCHeader('libxml2/libxml/parser.h'):
 		missing+='libxml2'
 	# OPTIONS
-	#######	LASH
-	optlash = ARGUMENTS.get('lash', 1)
-	if (optlash == 1):
-		if not conf.CheckCXXHeader('lash/lash.h'):
-			missing+='lash\n'
-		else:
-			sources+=lash
-			env.ParseConfig('pkg-config --libs --cflags lash-1.0')
-			env.Append(CPPFLAGS = ' -DWITH_LASH ')
 	#######	GUI
 	optgui = ARGUMENTS.get('gui', 1)
 	if (optgui == 1):
