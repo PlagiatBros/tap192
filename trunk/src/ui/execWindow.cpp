@@ -52,6 +52,7 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
     			{ "&Open File",FL_CTRL + 'o',(Fl_Callback *)statOpen,this },
     			{ "&Save File",FL_CTRL + 's',(Fl_Callback *)statSave,this},
     			{ "S&ave File as",FL_CTRL + FL_SHIFT + 's',(Fl_Callback *)statSaveAs,this},
+    			{ "Import kits",FL_CTRL + 'i',(Fl_Callback *)statImport,this},
     			//{ "O&ptions", FL_CTRL + 'p',NULL,0},
     			{ "&Messages", FL_CTRL + 'm', statMessages,this},
     			{ "&Quit",FL_CTRL + 'q', (Fl_Callback *)statQuit,this},
@@ -339,7 +340,6 @@ void execWindow::cbWindow(Fl_Widget*)
     		return; // ignore Escape
 	
 	cbQuit(this);
-	exit(0);	
 }
 
 void execWindow::reset()
@@ -429,6 +429,24 @@ void execWindow::cbOpen(Fl_Widget* w)
 		this->reset();
 		tap->load(newFile);
 		tap->start();
+		delete [] newFile;
+	}
+	delete tFB;
+}
+
+void execWindow::cbImport(Fl_Widget* w)
+{
+	//open file dialog
+	tardiFlFileBrowser *tFB = new tardiFlFileBrowser();
+	tFB->open("Import Kits from a Directory","{}",tap->getCompleteFileName());
+	while(tFB->shown())
+	{
+		Fl::wait();
+	}
+	char* newFile=tFB->getResult();
+	if(newFile)
+	{
+		tap->import(newFile);
 		delete [] newFile;
 	}
 	delete tFB;
@@ -766,6 +784,8 @@ void execWindow::displayKit(int k)
 		creaMidiType=0;
 
 		//audio
+		creaVolume->show();
+		creaVolume->value(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getVolume());
 	}
 
 	//hide all the other widgets
@@ -777,7 +797,6 @@ void execWindow::displayKit(int k)
 	creaCheckPoly->hide();
 	creaCheckCut->hide();
 	creaCheckPitch->hide();
-	creaVolume->hide();
 	creaName->show();
 	creaPan->hide();
 	creaAudioOutput->hide();
@@ -1743,6 +1762,10 @@ void execWindow::cbCreaVolume(Fl_Widget*)
 	{
 		case 1:
 			{
+				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->setVolume(creaVolume->value());	
+				//recreate the tap list
+				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
+				
 			}
 			break;
 		case 2:

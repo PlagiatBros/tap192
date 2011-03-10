@@ -49,11 +49,16 @@ class kit
 		void showTaps(int);
 		float compVolume(float,unsigned short,unsigned short,unsigned short);
 		void exec(double);
+
+		inline void setVolume(float vol){m_volume=vol;}
+		inline float getVolume(){return m_volume;}
+
 	private:
 		std::vector<instrument*> instruments;
 		std::string name;
 		std::vector<tap*> taps[16][128][128];
-		double globVol;
+		double m_volume;
+		double m_globalVolume;
 
 };
 

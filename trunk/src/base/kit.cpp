@@ -26,20 +26,19 @@
 
 using namespace std;
 
-kit::kit():globVol(1)
+kit::kit():m_volume(1),m_globalVolume(1)
 {
 
 }
 
-kit::kit(const kit &k):name(k.name),globVol(k.globVol)
+kit::kit(const kit &k):name(k.name),m_volume(k.m_volume),m_globalVolume(k.m_globalVolume)
 {
 	//copy the instruments
-	for(unsigned int i=0;i<k.instruments.size();++i)
-	{
+	for(unsigned int i=0;i<k.instruments.size();++i) {
 		instruments.push_back(new instrument(*(k.instruments[i])));
 	}
 	//recreate the taps
-	exec(globVol);
+	exec(m_globalVolume);
 }
 
 kit::~kit()
@@ -81,14 +80,14 @@ void kit::removeInstrument(int inst)
 {
 	instrument* instru = instruments[inst];
 	instruments.erase(instruments.begin()+inst);
-	exec(globVol);
+	exec(m_globalVolume);
 	delete instru;
 }
 
 
 void kit::exec(double globalVolume)
 {
-	globVol=globalVolume;
+	m_globalVolume=globalVolume;
 	//clear the taps
 	for(int c=0;c<16;++c)
 		for(int n=0;n<128;++n)
@@ -123,7 +122,7 @@ void kit::exec(double globalVolume)
 					v<=instruments[j]->getVariation(k)->getMaxVeloc();v++)
 				{
 					//we compute the volume (with the velocity, the instrument's volume and the global volume)
-					double vol = globalVolume * compVolume(instruments[j]->getVolume(),v,instruments[j]->getVariation(k)->getMinVeloc(),instruments[j]->getVariation(k)->getMaxVeloc());
+					double vol = m_globalVolume * compVolume(instruments[j]->getVolume(),v,instruments[j]->getVariation(k)->getMinVeloc(),instruments[j]->getVariation(k)->getMaxVeloc());
 					//we create the corresponding tap in the array
 					taps[instruments[j]->getMidiChannel()-1][n][v].push_back(new tap(instruments[j]->getVariation(k),instruments[j],pitch,vol,panLeft,panRight));
 				}
@@ -156,5 +155,5 @@ vector<tap*> kit::getTap(unsigned short channel,unsigned short note,unsigned sho
 
 float kit::compVolume(float instruVol, unsigned short veloc, unsigned short minVeloc, unsigned short maxVeloc)
 {
-	return ((127.0 - ((float)maxVeloc - (float)veloc))/127.0)*instruVol;
+	return ((127.0 - ((float)maxVeloc - (float)veloc))/127.0)*instruVol*m_volume;
 }

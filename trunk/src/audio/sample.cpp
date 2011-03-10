@@ -109,19 +109,36 @@ int sample::load(char* file)
 
 	//create the buffers
 	buffers = new jack_default_audio_sample_t*[channelsCount];
-	for(int i=0;i<channelsCount;++i)
+	for(int i=0;i<channelsCount;++i) {
 		buffers[i] = new jack_default_audio_sample_t[framesCount];
 
+	}
+
+	/*
 	float cf[channelsCount];
 	//read the files into the buffers
-	for(int i=0;i<framesCount;++i)
-	{
+	for(int i=0;i<framesCount;++i) {
 		sf_readf_float(sndFile,cf,1);
 		for(int j=0;j<channelsCount;++j)
 		{
 			buffers[j][i]=(jack_default_audio_sample_t)cf[j];
 		}
 	}
+	*/
+
+	int maxNbFramesToRead=10000;
+	float cf[channelsCount * maxNbFramesToRead];
+	int nbFrames;
+	int pos = 0;
+	while ((nbFrames = sf_readf_float(sndFile,cf,maxNbFramesToRead)) > 0) {
+		for (int i = 0; i < nbFrames*channelsCount; i++, ++pos) {
+			for(int j=0;j<channelsCount;++j,++i) {
+				buffers[j][pos] = (jack_default_audio_sample_t)cf[i];
+			}
+		}
+	}
+
+
 
 	//close the file
 	if(sf_close(sndFile))

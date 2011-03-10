@@ -89,7 +89,6 @@ if (optlang=='fr'):
 		Bienvenue dans le programme d'installation de Tapeutape
 
 		Commencez par entrer la commande 'scons lang=fr' pour compiler Tapeutape 
-			ajoutez l'option 'lash=0' pour desactiver le support de lash
 			ajoutez l'option 'gui=0' pour compiler la version ligne de commande
 
 		Si tout se passe bien, entrez 'scons install' en tant qu'administrateur 
@@ -103,7 +102,6 @@ else:
 		Welcome to Tapeutape's Installation Program
 
 		Please type 'scons' to build Tapeutape 
-			add the option 'lash=0' to disable lash support
 			add the option 'gui=0' to build the command line version
 			add the option 'lang=fr' to display the build instructions in french
 

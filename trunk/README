@@ -3,10 +3,10 @@ TAPEUTAPE
 Tapeutape is a midi-controlled virtual sampler.It is highly configurable,lets you create instruments/kits/setups and is designed for live performance.It works on Gnu/Linux with the jack sound server. It can be build as both gui and command-line versions.
 It is released under the Gnu General Public Licence (see the COPYING file).
 
-by Florent Berthaut : postmaster_AT_tardigrade-inc.com 
+by Florent Berthaut : florent_AT_hitmuri_DOT_net 
 
 for more information (screenshots, audio examples, tutorials) see the website at :
-	http://tardigrade-inc.com/index/En/Tapeutape
+	http://tardigrade-inc.com
 
 FEATURES
 	**easy-to-use gui
@@ -31,12 +31,9 @@ INSTALLATION
 		-jack
 		-libsamplerate
 		-libsndfile
-		-lash (if lash is enabled)
 
 	To build Tapeutape, type the following commands followed by enter:
-		tar zxf tapeutape-0.1.0.tar.gz
-		cd tapeutape-0.1.0/
-		scons -h (or scons -h lang=fr for a french version)
+		scons (or scons lang=fr for a french version)
 	Then follow the instructions. 
 
 EXECUTION

@@ -237,6 +237,7 @@ int tapParser::parseSetup(xmlNodePtr cur_node)
 int tapParser::parseKit(xmlNodePtr cur_node,setup* s)
 {
 	char* val=NULL;
+	float volume=1.0;
 
 	//add a new kit
 	kit* k = new kit();
@@ -250,6 +251,13 @@ int tapParser::parseKit(xmlNodePtr cur_node,setup* s)
 		return -1;
 	}
 	k->setName(val);
+
+	//set its volume
+	val=NULL;
+	val=(char*)xmlGetProp(cur_node,(xmlChar*)"volume");
+	if(val!=NULL) {
+		k->setVolume(atof(val));
+	}
 
     	xmlNodePtr cNode = NULL;
 	for (cNode = cur_node->children; cNode; cNode = cNode->next) 
@@ -543,6 +551,8 @@ int tapParser::saveToFile(char* filename)
 			currentKit = currentSetup->getKit(j);
 			node3=xmlNewChild(node2,NULL,BAD_CAST "kit",NULL);	
 			xmlNewProp(node3, BAD_CAST "name", BAD_CAST currentKit->getName().c_str());
+			sprintf(buf, "%f", currentKit->getVolume());
+			xmlNewProp(node3, BAD_CAST "volume", BAD_CAST buf);
 			for(int j=0;j<currentKit->getNbInstruments();++j)	//instrument nodes
 			{
 				currentInstru = currentKit->getInstrument(j);

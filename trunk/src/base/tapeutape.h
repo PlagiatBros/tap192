@@ -71,6 +71,7 @@ class tapeutape
 		void save(char*);
 		void saveWithSamples(char*,const char*);
 		void stop();
+		void import(char*);
 
 		int getNbKits();
 		kit *getKit(int);

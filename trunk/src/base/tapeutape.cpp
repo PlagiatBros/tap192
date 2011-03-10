@@ -62,23 +62,6 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 	if(argc==2)
 		load(argv[1]);
 
-
-	#ifdef WITH_LASH
-		//lashClient
-		lashC = new lashClient(this,argc,argv); 
-		if(lashC->init()==-1)
-		{
-			showMessage(true,"Error initializing Lash, disabling lash");
-		}
-		else
-		{
-			//start lash client
-			showMessage(false,"Starting LASH Client");
-			lashC->start();
-			sleep(2);
-		}
-	#endif
-
 	//start 
 	start();
 
@@ -200,6 +183,44 @@ int tapeutape::load(char * nomfic)
 	return 0;
 }
 
+void tapeutape::import(char* dir)
+{
+	/*
+	std::string dirStr(dir);
+
+	//test if it is a directory
+	if(fl_filename_isdir(dirStr.c_str())) {
+		//create a default setup/kit/instru ...
+		setup* setup1 = new setup();
+		addSetup(setup1);
+		kit* kit1=NULL;
+		instrument* instru1=NULL;
+		//parse 
+		ostringstream oss,oss2;
+		DIR *dp2;
+		struct dirent *dirp2;
+		if((dp2  = opendir((dirStr).c_str())) != NULL) {
+			while ((dirp2 = readdir(dp2)) != NULL) {
+				if(dirp2->d_name[0]!='.') { //if not a hidden file
+					if(!fl_filename_isdir(dirp2->d_name)) { //if it's a file, try to add it as an instrument
+						sample* newsample = addSample(dirp2->d_name);
+						kit* kit1 = new kit();
+						setup1->addKit(kit1);
+						instrument* instru1 = new instrument();
+						kit1->addInstrument(instru1);
+								
+					}
+					else { //if it is a directory, create a new kit
+
+
+					}
+				}
+			}
+		}
+
+	}
+*/
+}
 
 int tapeutape::start()
 {		

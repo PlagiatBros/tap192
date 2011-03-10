@@ -79,6 +79,8 @@ class execWindow : public Fl_Double_Window
 			void cbQuit(Fl_Widget*);
   			static void statMessages(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbMessages(w);}	
 			void cbMessages(Fl_Widget*);
+  			static void statImport(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbImport(w);}	
+			void cbImport(Fl_Widget*);
 
 			
 			//tabs
