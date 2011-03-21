@@ -35,6 +35,7 @@
 #include <cstring>
 #include <jack/jack.h>
 #include <jack/ringbuffer.h>
+#include <limits>
 
 #include "tapParser.h"
 #include "kit.h"

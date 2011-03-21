@@ -114,7 +114,8 @@ int sample::load(char* file)
 
 	}
 
-	/*
+	
+/*
 	float cf[channelsCount];
 	//read the files into the buffers
 	for(int i=0;i<framesCount;++i) {
@@ -124,20 +125,20 @@ int sample::load(char* file)
 			buffers[j][i]=(jack_default_audio_sample_t)cf[j];
 		}
 	}
-	*/
+*/
 
 	int maxNbFramesToRead=10000;
 	float cf[channelsCount * maxNbFramesToRead];
 	int nbFrames;
 	int pos = 0;
 	while ((nbFrames = sf_readf_float(sndFile,cf,maxNbFramesToRead)) > 0) {
-		for (int i = 0; i < nbFrames*channelsCount; i++, ++pos) {
-			for(int j=0;j<channelsCount;++j,++i) {
+		for (int i = 0; i < nbFrames*channelsCount; ++pos) {
+			for(int j=0;j<channelsCount;++j) {
 				buffers[j][pos] = (jack_default_audio_sample_t)cf[i];
+				++i;
 			}
 		}
 	}
-
 
 
 	//close the file
