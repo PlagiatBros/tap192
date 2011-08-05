@@ -52,7 +52,7 @@ class sample
 		int getNbUsers();
 		void removeUser();
 
-		jack_default_audio_sample_t getSound(int,double);
+		void getFrame(const int&, const double&, jack_default_audio_sample_t&);
 		inline int getChannelsCount(){return channelsCount;};
 		inline long getFramesCount(){return framesCount;};
 		inline bool isLoaded(){return loaded;};	

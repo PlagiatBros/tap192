@@ -105,14 +105,11 @@ void midiProcess::midiLoop()
 				}
 
 				//if we have a note event, we put it in the ringbuffer
-    				if (ev->type == SND_SEQ_EVENT_NOTEON || ev->type==SND_SEQ_EVENT_NOTEOFF)	
-				{
+    				if (ev->type == SND_SEQ_EVENT_NOTEON || ev->type==SND_SEQ_EVENT_NOTEOFF) {
 					//we get the corresponding vector of tap from each setup
-					for(int s=0;s<tapeu->getNbSetups();++s)
-					{
-						std::vector<tap*> t= tapeu->getSetup(s)->getTap(ev->data.note.channel,ev->data.note.note,ev->data.note.velocity);
-						for(unsigned int i=0;i<t.size();++i) //for each tap in it
-						{
+					for(int s=0;s<tapeu->getNbSetups();++s) {
+						const std::vector<tap*>& t= tapeu->getSetup(s)->getTap(ev->data.note.channel,ev->data.note.note,ev->data.note.velocity);
+						for(unsigned int i=0;i<t.size();++i) { //for each tap in it
 							//we create the audioEvent with the needed informations
 							bool noteOn;
 							if(ev->type == SND_SEQ_EVENT_NOTEON && ev->data.note.velocity!=0) {
@@ -126,17 +123,19 @@ void midiProcess::midiLoop()
 								pitch*=-1.0;
 							}
 							unsigned long id = ev->data.note.channel*1000+ev->data.note.note;
-							audioEvent *ae = new audioEvent(t[i]->getVariation(),t[i]->getInstrument(),id,pitch,t[i]->getJackStereoChannel(),t[i]->getVolume(),t[i]->getPanLeft(),t[i]->getPanRight(),noteOn);	
+							audioEvent ae(t[i]->getVariation(),t[i]->getInstrument(),id,pitch,t[i]->getJackStereoChannel(),t[i]->getVolume(),t[i]->getPanLeft(),t[i]->getPanRight(),noteOn);	
 								
+							tapeu->addAudioEvent(ae);
+							/*
 							//and put it in the ring buffer	
 							jack_ringbuffer_write(EventsRingBuffer,(char*)ae,sizeof(audioEvent));
+							*/
 							
 						}
 					}
 				} 
 				else 
-				if(ev->type == SND_SEQ_EVENT_CONTROLLER)//send to the different setups	
-				{
+				if(ev->type == SND_SEQ_EVENT_CONTROLLER) { //send to the different setups
 					tapeu->processCC(ev->data.control.channel,ev->data.control.param,ev->data.control.value);
 				}
 

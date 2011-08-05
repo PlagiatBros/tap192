@@ -104,7 +104,7 @@ class instrument
 			
 			return ans;
 		};
-		inline int getJackStereoChannel(){return jackStereoChannel;};
+		inline const int& getJackStereoChannel(){return jackStereoChannel;};
 		inline double getVolume(){return volume;};
 		inline double getPan(){return pan;};
 	

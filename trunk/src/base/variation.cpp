@@ -91,15 +91,13 @@ sample* variation::getSample()
 	return sound;
 }
 
-jack_default_audio_sample_t variation::getSound(int channel,double offset)
+void variation::getFrame(const int& channel, const double& offset, jack_default_audio_sample_t& frame)
 {
-	if(sound)
-	{
-		return sound->getSound(channel,offset);
+	if(sound) {
+		return sound->getFrame(channel,offset, frame);
 	}
-	else
-	{
-		return 0;
+	else {
+		frame=0;
 	}
 }
 

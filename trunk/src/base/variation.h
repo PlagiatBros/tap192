@@ -43,7 +43,7 @@ class variation
 		unsigned short getMinVeloc();
 		int setSample(sample*);
 		sample* getSample();
-		jack_default_audio_sample_t getSound(int,double);
+		void getFrame(const int&, const double&, jack_default_audio_sample_t&);
 	
 	private:	
 		unsigned short maxVeloc,minVeloc;

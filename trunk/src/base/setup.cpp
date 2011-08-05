@@ -84,7 +84,7 @@ void setup::removeKit(int i)
 	kits.erase(kits.begin()+i);
 }
 
-vector<tap*> setup::getTap(unsigned short channel,unsigned short note,unsigned short vel)
+const vector<tap*>& setup::getTap(const unsigned short& channel, const unsigned short& note, const unsigned short& vel)
 {
 	return kits[currentKit]->getTap(channel,note,vel);
 }

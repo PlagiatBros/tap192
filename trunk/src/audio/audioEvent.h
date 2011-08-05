@@ -31,6 +31,7 @@
 class audioEvent			//audio event triggered by midi
 {
 	public:
+			audioEvent();
 			audioEvent(variation*,instrument*,unsigned long,double,int,double,double,double,bool);
 			inline variation* getVariation(){return var;}
 			inline instrument* getInstrument(){return instru;}

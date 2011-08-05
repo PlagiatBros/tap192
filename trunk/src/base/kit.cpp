@@ -148,7 +148,7 @@ void kit::showTaps(int c)
 		}
 }
 
-vector<tap*> kit::getTap(unsigned short channel,unsigned short note,unsigned short vel)
+const vector<tap*>& kit::getTap(const unsigned short& channel, const unsigned short& note, const unsigned short& vel)
 {
 	return taps[channel][note][vel];
 }

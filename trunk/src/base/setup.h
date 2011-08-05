@@ -39,7 +39,7 @@ class setup
 		~setup();
 		void setName(std::string);
 		std::string getName();
-		std::vector<tap*> getTap(unsigned short,unsigned short,unsigned short);
+		const std::vector<tap*>& getTap(const unsigned short&, const unsigned short&, const unsigned short&);
 		int getNbKits();
 		kit *getKit(int);
 		void addKit(kit*);

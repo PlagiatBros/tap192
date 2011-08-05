@@ -49,16 +49,24 @@ class jackProcess
 		friend int process(jack_nframes_t , void *);
 		friend int sRate(jack_nframes_t , void *);
 		friend void shutdown(void*);
+
+		void addAudioEvent(const audioEvent&);
 	
 	protected:
 		tapeutape* tap;
 		jack_ringbuffer_t* EventsRingBuffer;
 		jack_client_t *jackClient;
 		int sampleRate;	
-		std::vector<audioEvent*> audioEvents;
+		std::vector<audioEvent> audioEvents;
 		int polyphonie;
 		int nbJackStereoChannels;
 		std::vector<jack_port_t*> outputPorts[2]; 	
+
+		std::vector<audioEvent> m_processRingBuffer;
+		int m_processRingBufferReadPosition;
+		int m_processRingBufferFilledCount;
+		int m_processRingBufferWritePosition;
+		int m_processRingBufferEmptyCount;
 };
 
 

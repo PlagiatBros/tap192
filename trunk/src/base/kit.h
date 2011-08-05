@@ -45,7 +45,7 @@ class kit
 		instrument* getInstrument(int); 
 		void addInstrument(instrument*);
 		void removeInstrument(int);
-		std::vector<tap*> getTap(unsigned short,unsigned short,unsigned short);
+		const std::vector<tap*>& getTap(const unsigned short&, const unsigned short&, const unsigned short&);
 		void showTaps(int);
 		float compVolume(float,unsigned short,unsigned short,unsigned short);
 		void exec(double);

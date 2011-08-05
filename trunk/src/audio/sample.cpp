@@ -239,10 +239,8 @@ void sample::removeUser()
 	--nbUsers;
 }
 
-jack_default_audio_sample_t sample::getSound(int channel,double offset)
+void sample::getFrame(const int& channel, const double& offset, jack_default_audio_sample_t& frame)
 {
-
-
 	if(loaded)
 	{
 		//FIXME interpolation thanks pete bessman
@@ -258,19 +256,20 @@ jack_default_audio_sample_t sample::getSound(int channel,double offset)
 		//unsigned char d = (int)((offset - floor(offset)) * (0xFFFFFFFFU)) % 256;
 		unsigned char d = (int)((offset - floor(offset)) * (0xFFFFFFFFU)) >> 24;
 		//cout<<d<<endl;
-		if(channelsCount==1) //mono sound
-		{
-			return buffers[0][off1]*ct0[d] + buffers[0][off2]*ct1[d] + buffers[0][off3]*ct2[d] + buffers[0][off4]*ct3[d];	
+		if(channelsCount==1) { //mono sound
+			frame = buffers[0][off1]*ct0[d] + buffers[0][off2]*ct1[d] + buffers[0][off3]*ct2[d] + buffers[0][off4]*ct3[d];	
 		}
-		else			//stereo sound
-		{
-			return buffers[channel][off1]*ct0[d] + buffers[channel][off2]*ct1[d] + buffers[channel][off3]*ct2[d] + buffers[channel][off4]*ct3[d];	
+		else {			//stereo sound
+			frame = buffers[channel][off1]*ct0[d] + buffers[channel][off2]*ct1[d] + buffers[channel][off3]*ct2[d] + buffers[channel][off4]*ct3[d];
 		}
 	}
 	else
 	{
-		return 0;
+		frame=0;
 	}
+
+
+
 
 /*
     if ((y0 = (v->posi - 1) * 2) < 0)
