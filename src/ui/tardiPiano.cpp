@@ -263,7 +263,9 @@ int tardiPiano::handle(int event)
 							return 1;	
 						}
 						break;
-					default:break;
+					default:
+						return 1;
+						break;
 				}
 			}
 			break;

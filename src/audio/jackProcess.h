@@ -41,9 +41,9 @@ class jackProcess
 		~jackProcess();
 		int init();
 		int start();
-		int addPort(std::string);
-		int removePort(int);
-		int renamePort(int,std::string);
+		void addPort(std::string);
+		void removePort(int);
+		void renamePort(int,std::string);
 		jack_client_t* getClient();
 		int getSampleRate();
 		friend int process(jack_nframes_t , void *);

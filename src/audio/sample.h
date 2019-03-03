@@ -31,7 +31,7 @@
 #include <samplerate.h>
 #include <string.h>
 #include <math.h>
-
+#include <unistd.h>
 
 class sample
 {

@@ -220,13 +220,13 @@ void jackProcess::addAudioEvent(const audioEvent& newEvent)
 	}
 }
 
-int jackProcess::addPort(std::string st)
+void jackProcess::addPort(std::string st)
 {
 		outputPorts[0].push_back(jack_port_register (jackClient, (st+"-L").c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0));
 		outputPorts[1].push_back(jack_port_register (jackClient, (st+"-R").c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0));
 }
 
-int jackProcess::removePort(int num)
+void jackProcess::removePort(int num)
 {
 	jack_port_unregister (jackClient,outputPorts[0][num]);
 	jack_port_unregister (jackClient,outputPorts[1][num]);
@@ -234,10 +234,10 @@ int jackProcess::removePort(int num)
 	outputPorts[1].erase(outputPorts[1].begin()+num);	
 }
 
-int jackProcess::renamePort(int num,std::string st)
-{	
-	jack_port_set_name(outputPorts[0][num],(st+"-L").c_str());	
-	jack_port_set_name(outputPorts[1][num],(st+"-R").c_str());
+void jackProcess::renamePort(int num,std::string st)
+{
+	jack_port_rename(jackClient, outputPorts[0][num],(st+"-L").c_str());
+	jack_port_rename(jackClient, outputPorts[1][num],(st+"-R").c_str());
 }
 
 int jackProcess::init()
