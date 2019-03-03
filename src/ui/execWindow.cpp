@@ -2121,4 +2121,3 @@ void execWindow::changeKit(int setup,int kit)
 	setupLists[setup]->redraw();
 	Fl::check();
 }
-

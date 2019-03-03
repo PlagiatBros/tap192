@@ -56,7 +56,6 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 	{
 		showMessage(true,"Error Starting Midi ");
 	}
-	midi->startThread();
 
 	//if a file name was specified
 	if(argc==2)
@@ -64,6 +63,7 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 
 	//start 
 	start();
+	midi->startThread();
 
 	//if everything's ok  
 	showMessage(false,"Let's play !! "); 
