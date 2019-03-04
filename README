@@ -1,7 +1,7 @@
 HISTORY
 
 2019-03 - 0.1.2 * maintenance release
-    **prevent crash when receiving CC0 events (kit change while loading)
+    **prevent crash when receiving CC0 events (kit change) while loading
     **c++ warnings fixes
     **svn to git conversion
 
