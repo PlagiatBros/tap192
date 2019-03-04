@@ -1,3 +1,14 @@
+HISTORY
+
+2019-03 - 0.1.2 * maintenance release
+    **prevent crash when receiving CC0 events (kit change while loading)
+	**c++ warnings fixes
+	**svn to git conversion
+
+2009-01 - 0.1.1 * last official release
+    **see commit logs
+
+
 TAPEUTAPE
 
 Tapeutape is a midi-controlled virtual sampler.It is highly configurable,lets you create instruments/kits/setups and is designed for live performance.It works on Gnu/Linux with the jack sound server. It can be build as both gui and command-line versions.
@@ -6,7 +17,7 @@ It is released under the Gnu General Public Licence (see the COPYING file).
 by Florent Berthaut : florent_AT_hitmuri_DOT_net 
 
 for more information (screenshots, audio examples, tutorials) see the website at :
-	http://tardigrade-inc.com
+	http://hitmuri.net/index.php/Software/Tapeutape
 
 FEATURES
 	**easy-to-use gui
