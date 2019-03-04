@@ -58,7 +58,7 @@
 #define RING_BUFFER_SIZE 1024
 #define MIDI_PRIORITY 60
 
-#define TAPEUTAPE_VERSION "0.1.0"
+#define TAPEUTAPE_VERSION "0.1.2"
 
 class tapeutape  
 {	
