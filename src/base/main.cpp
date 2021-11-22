@@ -28,7 +28,7 @@
 #include <iostream>
 #include "tapeutape.h"
 
-#include "nsm/nsm.h"
+#include "../nsm/nsm.h"
 
 using namespace std;
 
@@ -61,7 +61,7 @@ nsm_open_cb(const char *name, const char *display_name, const char *client_id, c
 {
     nsm_wait = false;
     nsm_folder = name;
-    global_client_name = client_id;
+//    global_client_name = client_id;
     // NSM API 1.1.0: check if server supports optional-gui
 //    nsm_opional_gui_support = strstr(nsm_get_session_manager_features(nsm), "optional-gui");
     mkdir(nsm_folder.c_str(), 0777);
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
         nsm = nsm_new();
         nsm_set_open_callback(nsm, nsm_open_cb, 0);
         if (nsm_init(nsm, nsm_url) == 0) {
-            nsm_send_announce(nsm, PACKAGE, ":dirty:", argv[0]);
+            nsm_send_announce(nsm, "Tapeutape", ":dirty:", argv[0]);
         }
         int timeout = 0;
         while (nsm_wait) {
@@ -86,15 +86,14 @@ int main(int argc, char** argv)
             timeout += 1;
             if (timeout > 200) exit(1);
         }
+
+        tapeutape tap(argc,argv);
 				global_filename = nsm_folder + "sampler.tap";
-				std::ifstream infile(global_filename);
-				if (!infile.good()) {
-						tapParser tapfile;
-            (global_filename);
-            f.write(p, -1, -1);
-        }
-				tapeutape tap(argc,);
-				// TODO: démarrer tapeutape avant de vérifier le fichier ?
+        std::ifstream infile(global_filename);
+        if(!infile.good())
+				    tap.save((char *)global_filename.c_str());
+        else
+            tap.load((char *)global_filename.c_str());
     }
 		else
 				tapeutape tap(argc,argv);

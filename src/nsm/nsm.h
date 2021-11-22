@@ -216,6 +216,13 @@ nsm_is_active ( nsm_client_t *nsm )
 
 NSM_EXPORT
 const char *
+nsm_get_client_id( nsm_client_t *nsm )
+{
+  return _NSM()->nsm_client_id;
+}
+
+NSM_EXPORT
+const char *
 nsm_get_session_manager_name ( nsm_client_t *nsm )
 {
     return _NSM()->_session_manager_name;

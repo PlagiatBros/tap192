@@ -39,7 +39,7 @@ class jackProcess
 	public:
 		jackProcess(tapeutape*, jack_ringbuffer_t*,int);
 		~jackProcess();
-		int init();
+		int init(const char*);
 		int start();
 		void addPort(std::string);
 		void removePort(int);

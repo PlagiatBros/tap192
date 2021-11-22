@@ -22,6 +22,8 @@
  */
 
 #include "tapeutape.h"
+#include "../nsm/nsm.h"
+extern nsm_client_t *nsm;
 
 using namespace std;
 
@@ -43,7 +45,15 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 	//jackProcess , initialised here to get the samplerate to load the files
 	jack = new jackProcess(this,eventsRingBuffer,polyphony);
 	showMessage(false,"Starting Jack Client");
-	if(jack->init())
+	const char* jackClientName;
+	if (nsm_get_client_id(nsm)){
+			showMessage(false,"Starting in NSM Mode");
+			jackClientName = nsm_get_client_id(nsm);
+	}	else {
+			showMessage(false,"Starting in non-NSM Mode");
+			jackClientName = "Tapeutape";
+	}
+	if(jack->init(jackClientName))
 	{
 		showMessage(true,"Error Initialiasing Jack Client");
 	}

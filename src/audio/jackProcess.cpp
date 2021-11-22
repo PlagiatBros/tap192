@@ -240,7 +240,7 @@ void jackProcess::renamePort(int num,std::string st)
 	jack_port_rename(jackClient, outputPorts[1][num],(st+"-R").c_str());
 }
 
-int jackProcess::init()
+int jackProcess::init(const char *jackClientName)
 {
 	//ring buffer
 	m_processRingBuffer.resize(100,audioEvent());
@@ -251,7 +251,7 @@ int jackProcess::init()
 
 	//jack client creation
 	jackClient=NULL;
-	jackClient = jack_client_open("Tapeutape",JackUseExactName,NULL);		
+	jackClient = jack_client_open(jackClientName,JackUseExactName,NULL);
 	if(!jackClient)
 	{
 		tap->showMessage(true,"Error creating the jackClient");

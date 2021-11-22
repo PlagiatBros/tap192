@@ -1,5 +1,5 @@
 # ENVIRONMENT
-env = Environment(CPPFLAGS=' -I/usr/include/libxml2',LIBS=['asound','pthread','xml2','sndfile','samplerate','jack'])
+env = Environment(CPPFLAGS=' -I/usr/include/libxml2',LIBS=['asound','pthread','xml2','sndfile','samplerate','jack', 'liblo'])
 
 # SOURCE FILES
 base = Glob('src/base/*.cpp')
