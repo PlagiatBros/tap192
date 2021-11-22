@@ -19,10 +19,10 @@ if not env.GetOption('clean') and not 'install' in COMMAND_LINE_TARGETS and not 
 	######## GCC
 	f = FindFile('g++', ['/usr/bin', '/usr/local/bin'])
 	if f:
-		print 'Checking for g++...yes'
+		print('Checking for g++...yes')
 	else:
 		missing+='g++\n'
-		print 'Checking for g++...no'
+		print('Checking for g++...no')
 	######## JACK
 	if not conf.CheckCHeader('jack/jack.h'):
 		missing+='jack\n'
@@ -53,17 +53,17 @@ if not env.GetOption('clean') and not 'install' in COMMAND_LINE_TARGETS and not 
 	#IF SOMETHING WAS MISSING
 	if(missing!=''):
 		if(optlang=='fr'):
-			print '\nLes dependances suivantes sont manquantes:\n'
-			print missing
-			print '\n'
-			print """Merci de les installer (paquetages -dev ou -devel) puis de re-entrer la commande 'scons lang=fr'
-				"""
+			print('\nLes dependances suivantes sont manquantes:\n')
+			print(missing)
+			print('\n')
+			print("""Merci de les installer (paquetages -dev ou -devel) puis de re-entrer la commande 'scons lang=fr'
+				""")
 		else:
-			print '\nThe following dependencies are missing:\n'
-			print missing
-			print '\n'
-			print """Please install them (packages -dev or -devel) and re-type 'scons'
-				"""
+			print('\nThe following dependencies are missing:\n')
+			print(missing)
+			print('\n')
+			print("""Please install them (packages -dev or -devel) and re-type 'scons'
+				""")
 		Exit(1)
 	
 # BUILD
