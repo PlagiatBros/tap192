@@ -272,7 +272,6 @@ int tapeutape::start()
 
 void tapeutape::save(char* f)
 {
-	cout << "Début sauvegarde" << endl;
 	showMessage(false,"Now saving...");
 	fileName=f;
 	tapParser tap(this);
@@ -289,7 +288,6 @@ void tapeutape::save(char* f)
 		}
 	}
 	showMessage(false,"Finished!");
-	cout << "Fin sauvegarde" << endl;
 }
 
 void tapeutape::saveWithSamples(char* f,const char* cpath)

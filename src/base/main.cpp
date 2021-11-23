@@ -41,11 +41,12 @@ nsm_client_t *nsm = 0;
 bool nsm_replied = false;
 string nsm_folder = "";
 
+tapeutape * tap_instance;
+
 int
 nsm_save_cb(char **, void *userdata)
 {
-    tapeutape *t = (tapeutape*) userdata;
-    t->save((char*)global_filename.c_str());
+    tap_instance->save((char*)global_filename.c_str());
     return ERR_OK;
 }
 
@@ -88,24 +89,30 @@ int main(int argc, char** argv)
         sleep(2);
         if (!nsm_replied) exit(1);
 
-        tapeutape tap(argc,argv);
+        tap_instance = new tapeutape(argc,argv);
 		global_filename = nsm_folder + "/sampler.tap";
         std::ifstream infile(global_filename);
         if(!infile.good())
-		    tap.save((char *)global_filename.c_str());
+		    tap_instance->save((char *)global_filename.c_str());
         else
-            tap.load((char *)global_filename.c_str());
+            tap_instance->load((char *)global_filename.c_str());
 
         // register callbacks
-        nsm_set_save_callback(nsm, nsm_save_cb, (void*) &tap);
+        nsm_set_save_callback(nsm, nsm_save_cb, 0);
         }
 		else
-			tapeutape tap(argc,argv);
+			tap_instance = new tapeutape(argc,argv);
 
+    int r;
 	#ifdef WITH_GUI
 		Fl::lock();
-		return Fl::run();
+		r = Fl::run();
 	#else
-		return EXIT_SUCCESS;
+		r = EXIT_SUCCESS;
 	#endif
+
+    nsm_free(nsm);
+    delete tap_instance;
+
+    return r;
 }
