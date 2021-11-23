@@ -70,7 +70,7 @@ nsm_open_cb(const char *name, const char *display_name, const char *client_id, c
     // nsm_opional_gui_support = strstr(nsm_get_session_manager_features(nsm), "optional-gui");
     mkdir(nsm_folder.c_str(), 0777);
     // make sure nsm server doesn't override cached visibility state
-    nsm_send_is_shown(nsm);
+    // nsm_send_is_shown(nsm);
     return ERR_OK;
 }
 
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
             nsm_send_announce(nsm, "Tapeutape", ":dirty:", argv[0]);
         }
         nsm_thread_start(nsm);
-        sleep(2);
+        usleep(500000);
         if (!nsm_replied) exit(1);
 
         tap_instance = new tapeutape(argc,argv);
@@ -99,9 +99,9 @@ int main(int argc, char** argv)
 
         // register callbacks
         nsm_set_save_callback(nsm, nsm_save_cb, 0);
-        }
-		else
-			tap_instance = new tapeutape(argc,argv);
+    }
+	else
+		tap_instance = new tapeutape(argc,argv);
 
     int r;
 	#ifdef WITH_GUI
