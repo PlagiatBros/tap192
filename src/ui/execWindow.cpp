@@ -29,9 +29,11 @@ using namespace std;
 
 execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Window(w,h,titre),tap(t),fileSaved(true),copyType(0),lastSampleDir("")
 {
+	setupLists = NULL;
+
 	//fltk init
 	Fl::visual(FL_DOUBLE|FL_RGB);
-	
+
 	//window class
 	this->iconlabel(std::string("/usr/local/share/pixmaps/tapeutape.png").c_str());
 
@@ -426,7 +428,6 @@ void execWindow::cbOpen(Fl_Widget* w)
 	char* newFile=tFB->getResult();
 	if(newFile)
 	{
-		this->reset();
 		tap->load(newFile);
 		tap->start();
 		delete [] newFile;

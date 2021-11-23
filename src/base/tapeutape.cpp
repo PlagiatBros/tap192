@@ -44,16 +44,7 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 
 	//jackProcess , initialised here to get the samplerate to load the files
 	jack = new jackProcess(this,eventsRingBuffer,polyphony);
-	const char* jackClientName;
-	if (nsm){
-			showMessage(false,"Starting Jack Client in NSM Mode");
-			jackClientName = nsm_get_client_id(nsm);
-	}	else {
-			showMessage(false,"Starting Jack Client in non-NSM Mode");
-			jackClientName = (const char*) malloc(sizeof("Tapeutape")+1);
-			jackClientName = "Tapeutape";
-	}
-	if(jack->init(jackClientName))
+	if(jack->init())
 	{
 		showMessage(true,"Error Initialiasing Jack Client");
 	}
@@ -162,6 +153,9 @@ std::string tapeutape::getCompleteFileName()
 
 int tapeutape::load(char * nomfic)
 {
+
+	execWin->reset();
+
 	//delete the setups/kits/instruments/variations
 	for(unsigned int i=0;i<setups.size();++i)
 	{

@@ -94,8 +94,10 @@ int main(int argc, char** argv)
         std::ifstream infile(global_filename);
         if(!infile.good())
 		    tap_instance->save((char *)global_filename.c_str());
-        else
+        else {
             tap_instance->load((char *)global_filename.c_str());
+            tap_instance->start();
+        }
 
         // register callbacks
         nsm_set_save_callback(nsm, nsm_save_cb, 0);

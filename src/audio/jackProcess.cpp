@@ -26,6 +26,8 @@
 #include <iostream>
 #include <cmath>
 
+#include "../nsm/nsm.h"
+extern nsm_client_t *nsm;
 
 using namespace std;
 
@@ -240,7 +242,7 @@ void jackProcess::renamePort(int num,std::string st)
 	jack_port_rename(jackClient, outputPorts[1][num],(st+"-R").c_str());
 }
 
-int jackProcess::init(const char *jackClientName)
+int jackProcess::init()
 {
 	//ring buffer
 	m_processRingBuffer.resize(100,audioEvent());
@@ -251,7 +253,11 @@ int jackProcess::init(const char *jackClientName)
 
 	//jack client creation
 	jackClient=NULL;
-	jackClient = jack_client_open(jackClientName,JackUseExactName,NULL);
+	if(nsm)
+		jackClient = jack_client_open(nsm_get_client_id(nsm),JackUseExactName,NULL);
+	else
+		jackClient = jack_client_open("Tapeutape",JackUseExactName,NULL);
+
 	if(!jackClient)
 	{
 		tap->showMessage(true,"Error creating the jackClient");
