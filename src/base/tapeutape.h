@@ -119,6 +119,10 @@ class tapeutape
 		void processCC(unsigned short, unsigned short,unsigned short);
 		inline void addAudioEvent(const audioEvent& newEvent){jack->addAudioEvent(newEvent);}
 
+		// nsm
+		bool isDirty();
+		bool isVisible();
+		void setVisible(bool v);
 
 	private:
 		bool loop;

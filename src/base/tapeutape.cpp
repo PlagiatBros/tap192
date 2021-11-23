@@ -22,6 +22,7 @@
  */
 
 #include "tapeutape.h"
+
 #include "../nsm/nsm.h"
 extern nsm_client_t *nsm;
 
@@ -36,7 +37,6 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 		execWin = new execWindow(350,400,"Tapeutape",this);
 		execWin->size_range(350,400,0,0,0,0);
 		execWin->resizable(execWin);
-		execWin->show();
 	#endif
 
 	//ring buffer
@@ -636,4 +636,20 @@ void tapeutape::setGlobalVolume(double gv)
 double tapeutape::getGlobalVolume()
 {
 	return globalVolume;
+}
+
+bool tapeutape::isDirty()
+{
+	return execWin->isDirty();
+}
+
+bool tapeutape::isVisible()
+{
+	return execWin->isVisible();
+}
+
+void tapeutape::setVisible(bool v)
+{
+	execWin->setVisible(v);
+	if (v) execWin->setTitle("Tapeutape : "+getFileName());
 }

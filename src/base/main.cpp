@@ -35,8 +35,9 @@ using namespace std;
 string global_filename = "";
 
 // nsm
-bool global_nsm_gui = false;
-bool nsm_opional_gui_support = true;
+bool global_nsm_visible = false;
+bool global_nsm_dirty = false;
+bool global_nsm_opional_gui = false;
 nsm_client_t *nsm = 0;
 bool nsm_replied = false;
 string nsm_folder = "";
@@ -47,18 +48,19 @@ int
 nsm_save_cb(char **, void *userdata)
 {
     tap_instance->save((char*)global_filename.c_str());
+    nsm_send_is_clean(nsm);
     return ERR_OK;
 }
 
 void
 nsm_hide_cb(void *userdata)
 {
-    global_nsm_gui = false;
+    global_nsm_visible = false;
 }
 void
 nsm_show_cb(void *userdata)
 {
-    global_nsm_gui = true;
+    global_nsm_visible = true;
 }
 int
 nsm_open_cb(const char *name, const char *display_name, const char *client_id, char **out_msg, void *userdata)
@@ -67,7 +69,7 @@ nsm_open_cb(const char *name, const char *display_name, const char *client_id, c
     nsm_folder = name;
     // global_client_name = client_id;
     // NSM API 1.1.0: check if server supports optional-gui
-    // nsm_opional_gui_support = strstr(nsm_get_session_manager_features(nsm), "optional-gui");
+    global_nsm_opional_gui = strstr(nsm_get_session_manager_features(nsm), "optional-gui");
     mkdir(nsm_folder.c_str(), 0777);
     // make sure nsm server doesn't override cached visibility state
     // nsm_send_is_shown(nsm);
@@ -83,11 +85,16 @@ int main(int argc, char** argv)
         nsm_set_open_callback(nsm, nsm_open_cb, 0);
 
         if (nsm_init_thread(nsm, nsm_url) == 0) {
-            nsm_send_announce(nsm, "Tapeutape", ":dirty:", argv[0]);
+            nsm_send_announce(nsm, "Tapeutape", ":optional-gui:dirty:", argv[0]);
         }
         nsm_thread_start(nsm);
         usleep(500000);
         if (!nsm_replied) exit(1);
+
+        if (global_nsm_opional_gui) {
+            nsm_set_show_callback(nsm, nsm_show_cb, 0);
+            nsm_set_hide_callback(nsm, nsm_hide_cb, 0);
+        }
 
         tap_instance = new tapeutape(argc,argv);
 		global_filename = nsm_folder + "/sampler.tap";
@@ -108,12 +115,31 @@ int main(int argc, char** argv)
     int r;
 	#ifdef WITH_GUI
 		Fl::lock();
-		r = Fl::run();
+        if (nsm) {
+            if (!global_nsm_opional_gui) tap_instance->setVisible(true);
+            while (true) {
+                Fl::wait(0.1);
+                if (tap_instance->isDirty() != global_nsm_dirty) {
+                    global_nsm_dirty = tap_instance->isDirty();
+                    if (global_nsm_dirty) nsm_send_is_dirty(nsm);
+                    else nsm_send_is_clean(nsm);
+                }
+                if (global_nsm_opional_gui && tap_instance->isVisible() != global_nsm_visible) {
+                    tap_instance->setVisible(global_nsm_visible);
+                    if (global_nsm_visible)nsm_send_is_shown(nsm);
+                    else nsm_send_is_hidden(nsm);
+                }
+            }
+            r = EXIT_SUCCESS;
+        } else {
+            tap_instance->setVisible(true);
+            r = Fl::run();
+        }
 	#else
 		r = EXIT_SUCCESS;
 	#endif
 
-    nsm_free(nsm);
+    if (nsm) nsm_free(nsm);
     delete tap_instance;
 
     return r;

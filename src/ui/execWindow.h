@@ -196,6 +196,11 @@ class execWindow : public Fl_Double_Window
 			void displayVar(int);
 			void updateMidi();
 
+            // nsm
+            bool isVisible(){return visible;};
+            bool isDirty(){return !fileSaved;};
+            void setVisible(bool v);
+
   private:
 			tapeutape *tap;
 			bool fileSaved;
@@ -279,6 +284,8 @@ class execWindow : public Fl_Double_Window
 
 
 			std::string statusStr;
+
+            bool visible;
 };
 
 #endif

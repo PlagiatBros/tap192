@@ -24,6 +24,11 @@
 #include "execWindow.h"
 #include "../base/tapeutape.h"
 
+#include "../nsm/nsm.h"
+extern nsm_client_t *nsm;
+extern bool global_nsm_opional_gui;
+extern bool global_nsm_visible;
+
 using namespace std;
 
 
@@ -43,12 +48,12 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 	Fl::set_color(FL_FOREGROUND_COLOR,255,255,255);
 	Fl::set_color(FL_INACTIVE_COLOR,200,200,200);
 	Fl::set_color(FL_SELECTION_COLOR,200,200,200);
-	
+
 	//callback
 	this->callback(statWindow,this);
 
 	//menu
-	Fl_Menu_Item menuitems[] = 
+	Fl_Menu_Item menuitems[] =
 	{
   		{ "&Menu",0, 0, 0, FL_SUBMENU },
     			{ "&Open File",FL_CTRL + 'o',(Fl_Callback *)statOpen,this },
@@ -57,7 +62,7 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
     			{ "Import kits",FL_CTRL + 'i',(Fl_Callback *)statImport,this},
     			//{ "O&ptions", FL_CTRL + 'p',NULL,0},
     			{ "&Messages", FL_CTRL + 'm', statMessages,this},
-    			{ "&Quit",FL_CTRL + 'q', (Fl_Callback *)statQuit,this},
+    			{ global_nsm_opional_gui ? "&Hide" : "&Quit",FL_CTRL + 'q', (Fl_Callback *)statQuit,this},
 			{0},
 		{0}
 	};
@@ -65,7 +70,7 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 	menu->copy(menuitems);
 
 	//status
-	status = new Fl_Group(0,h-15,w,15,"");			
+	status = new Fl_Group(0,h-15,w,15,"");
 	status->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
 
 	//messages
@@ -145,13 +150,13 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 	creaSelectedInst=-1;
 	creaSelectedVar=-1;
 
-	creaGlobalTab = new Fl_Group(0,h-130,w,115,"Global");			
-	creaAudioTab = new Fl_Group(0,h-130,w,115,"Audio");			
-	creaMidiTab = new Fl_Group(0,h-130,w,115,"Midi");			
+	creaGlobalTab = new Fl_Group(0,h-130,w,115,"Global");
+	creaAudioTab = new Fl_Group(0,h-130,w,115,"Audio");
+	creaMidiTab = new Fl_Group(0,h-130,w,115,"Midi");
 	creaTabs->insert(*creaGlobalTab,0);
 	creaTabs->insert(*creaAudioTab,1);
 	creaTabs->insert(*creaMidiTab,2);
-	
+
 	creaNew = new Fl_Button(w-130,h-125,20,20,"@+");
 	creaNew->callback(statCreaNew,this);
 	creaNew->tooltip("Add an element to the list");
@@ -322,7 +327,7 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 
 	//execution tab
 
-
+	visible = false;
 }
 
 execWindow::~execWindow()
@@ -331,28 +336,28 @@ execWindow::~execWindow()
 
 void execWindow::setTitle(std::string t)
 {
-	label(t.c_str());	
+	label(t.c_str());
 	this->redraw();
 	Fl::check();
 }
 
 void execWindow::cbWindow(Fl_Widget*)
 {
-	if (Fl::event()==FL_SHORTCUT && Fl::event_key()==FL_Escape) 
+	if (Fl::event()==FL_SHORTCUT && Fl::event_key()==FL_Escape)
     		return; // ignore Escape
-	
+
 	cbQuit(this);
 }
 
 void execWindow::reset()
-{	
+{
 	//erase everything
 	setOutList->clear();
 	creaAudioOutput->clear();
 
 	//erase everything
 	creaSample->setBuffers(NULL);
-	
+
 	//erase the execution  lists
 	if(setupLists)
 	{
@@ -361,7 +366,7 @@ void execWindow::reset()
 			execTab->remove(setupLists[i]);
 			delete setupLists[i];
 		}
-		delete [] setupLists;	
+		delete [] setupLists;
 		setupLists=NULL;
 	}
 
@@ -379,9 +384,9 @@ void execWindow::reset()
 
 void execWindow::init()
 {
-	
+
 	setStatus("");
-	
+
 	creaMidiType=0;
 	creaMidiCnt=0;
 	fileSaved=true;
@@ -404,13 +409,13 @@ void execWindow::init()
 	for(int j=0;j<tap->getNbSetups();++j)
 	{
 		std::string setName = tap->getSetup(j)->getName();
-		creaSetupList->add(setName.c_str());		
+		creaSetupList->add(setName.c_str());
 	}
 
 	updateExecTab();
-	
+
 	tabs->value(execTab);
-	
+
 	this->redraw();
 	Fl::check();
 }
@@ -458,7 +463,7 @@ void execWindow::cbSave(Fl_Widget* w)
 	if(tap->getCompleteFileName()=="")
 	{
 		cbSaveAs(this);
-	}	
+	}
 	else
 	{
 		size_t size = tap->getCompleteFileName().size() + 1;
@@ -496,6 +501,11 @@ void execWindow::cbSaveAs(Fl_Widget* w)
 
 void execWindow::cbQuit(Fl_Widget* w)
 {
+	if (global_nsm_opional_gui) {
+		global_nsm_visible = false;
+		return;
+	}
+
 	if(!fileSaved)
 	{
 		switch(fl_choice("File not saved ! Quit without saving ?", "Quit without saving","Save then Quit" ,"Don't quit"))
@@ -510,9 +520,9 @@ void execWindow::cbQuit(Fl_Widget* w)
 			}
 			break;
 			default: return;
-				
+
 		}
-	}	
+	}
 
 	//tout nettoyer puis quitter
 	this->reset();
@@ -567,12 +577,12 @@ void execWindow::cbSetOutNew(Fl_Widget*)
 	fileSaved=false;
 	bool outputCreated=false;
 	unsigned int outputNb=0;
-	std::string outputName; 
+	std::string outputName;
 	while(!outputCreated)
 	{
 		std::ostringstream oss;
-		oss << outputNb;	
-		outputName ="Output"+oss.str(); 
+		oss << outputNb;
+		outputName ="Output"+oss.str();
 		outputCreated=true;
 		for(unsigned int i=0;i<tap->getNbJackStereoChannels();++i)
 		{
@@ -594,7 +604,7 @@ void execWindow::cbSetOutRemove(Fl_Widget*)
 	//remove the output, if there is one left after that
 	if(tap->getNbJackStereoChannels()>1 && setOutList->value()>0)
 	{
-		tap->removeJackStereoChannel(setOutList->value()-1);	
+		tap->removeJackStereoChannel(setOutList->value()-1);
 		creaAudioOutput->remove(setOutList->value()-1);
 		setOutList->remove(setOutList->value());
 	}
@@ -640,7 +650,7 @@ void execWindow::cbSetVolume(Fl_Widget*)
 	tap->setGlobalVolume(setVolume->value());
 }
 
-//---------------------------------CREATION------------------------------------- 
+//---------------------------------CREATION-------------------------------------
 //clic on the setup list
 void execWindow::cbCreaSetupList(Fl_Widget*)
 {
@@ -668,26 +678,26 @@ void execWindow::displaySetup(int s)
 	creaVarList->clear();
 	creaMidiCC->value(0);
 	creaMidiChan->value(0);
-	creaName->value("");	
-	
+	creaName->value("");
+
 	if(s>=0)
 	{
 		//show the setup's kits
 		for(int j=0;j<tap->getSetup(s)->getNbKits();++j)
 		{
 			std::string kitName = tap->getSetup(s)->getKit(j)->getName();
-			creaKitList->add(kitName.c_str());		
+			creaKitList->add(kitName.c_str());
 		}
-		
+
 		//display the setup's name
-		creaName->value(tap->getSetup(s)->getName().c_str());	
+		creaName->value(tap->getSetup(s)->getName().c_str());
 
 		//midi
 		creaMidiSel->clear();
 		creaMidiSel->add("Select Kit");
 		creaMidiSel->value(0);
 		if(tap->getSetup(s)->getCC()==-1)
-		{	
+		{
 			creaMidiAct->value(0);
 			creaMidiCC->value(-1);
 			creaMidiCC->deactivate();
@@ -760,8 +770,8 @@ void execWindow::displayKit(int k)
 {
 	creaInstList->clear();
 	creaVarList->clear();
-	creaCut->clear();		
-	creaName->value("");	
+	creaCut->clear();
+	creaName->value("");
 
 	if(k>=0)
 	{
@@ -769,14 +779,14 @@ void execWindow::displayKit(int k)
 		for(int j=0;j<tap->getSetup(creaSelectedSetup)->getKit(k)->getNbInstruments();++j)
 		{
 			std::string instName = tap->getSetup(creaSelectedSetup)->getKit(k)->getInstrument(j)->getName();
-			creaInstList->add(instName.c_str());		
+			creaInstList->add(instName.c_str());
 
 			//set the other instruments of the kit for the cut
-			creaCut->add(instName.c_str());		
+			creaCut->add(instName.c_str());
 		}
-		
+
 		//get the name
-		creaName->value(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getName().c_str());	
+		creaName->value(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getName().c_str());
 
 		//midi
 		creaMidiSel->clear();
@@ -841,7 +851,7 @@ void execWindow::displayInst(int ins)
 {
 
 	creaVarList->clear();
-	creaName->value("");	
+	creaName->value("");
 
 	if(ins>=0)
 	{
@@ -854,12 +864,12 @@ void execWindow::displayInst(int ins)
 			{
 				varName = s->getName();
 			}
-			creaVarList->add(varName.c_str());		
+			creaVarList->add(varName.c_str());
 		}
 
 
 		//get the name
-		creaName->value(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getName().c_str());	
+		creaName->value(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getName().c_str());
 
 		//get the play mode
 		creaPlayMode->value(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getPlayMode());
@@ -905,15 +915,15 @@ void execWindow::displayInst(int ins)
 		//get the audio output
 		creaAudioOutput->value(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getJackStereoChannel());
 
-	
+
 
 		//get the note range
-		unsigned short minNote= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getMinNote();		
-		unsigned short maxNote= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getMaxNote();		
-		unsigned short rootNote= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getRootNote();		
-		float rootNoteFine= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getRootNoteFine();		
-		unsigned short chan= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getMidiChannel();		
-		
+		unsigned short minNote= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getMinNote();
+		unsigned short maxNote= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getMaxNote();
+		unsigned short rootNote= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getRootNote();
+		float rootNoteFine= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getRootNoteFine();
+		unsigned short chan= tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(ins)->getMidiChannel();
+
 		creaMidiPiano->setLSelect(minNote);
 		creaMidiPiano->setMSelect(rootNote);
 		creaMidiPiano->setRSelect(maxNote);
@@ -922,7 +932,7 @@ void execWindow::displayInst(int ins)
 		creaMidiRootFine->value(rootNoteFine);
 		creaMidiMax->value(maxNote);
 		creaMidiChan->value(chan);
-		
+
 	}
 
 	//midi
@@ -1068,30 +1078,30 @@ void execWindow::cbCreaNew(Fl_Widget*)
 			{
 				setup* ns = new setup();
 				ns->setName("new setup");
-				tap->addSetup(ns);	
+				tap->addSetup(ns);
 				creaSetupList->add("new setup");
 				creaSetupList->value(creaSetupList->size());
 				creaSelectedSetup=creaSetupList->size()-1;
 				creaKitList->clear();
 				kit* nk = new kit();
 				nk->setName("new kit");
-				tap->getSetup(creaSelectedSetup)->addKit(nk);	
+				tap->getSetup(creaSelectedSetup)->addKit(nk);
 				creaKitList->add("new kit");
 				creaSelectedKit=creaKitList->size()-1;
 				creaInstList->clear();
 				instrument* ni = new instrument();
 				ni->setName("new instrument");
-				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->addInstrument(ni);	
-				
+				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->addInstrument(ni);
+
 				creaInstList->add("new instrument");
 				creaSelectedInst=creaInstList->size()-1;
 				creaVarList->clear();
 				variation* nv = new variation();
-				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->addVariation(nv);	
+				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->addVariation(nv);
 				creaVarList->add("no sample yet");
-				
+
 				displaySetup(creaSelectedSetup);
-				
+
 			}
 			break;
 		case 1://kit
@@ -1100,22 +1110,22 @@ void execWindow::cbCreaNew(Fl_Widget*)
 				{
 					kit* nk = new kit();
 					nk->setName("new kit");
-					tap->getSetup(creaSelectedSetup)->addKit(nk);	
+					tap->getSetup(creaSelectedSetup)->addKit(nk);
 					creaKitList->add("new kit");
 					creaKitList->value(creaKitList->size());
 					creaSelectedKit=creaKitList->size()-1;
 					creaInstList->clear();
 					instrument* ni = new instrument();
 					ni->setName("new instrument");
-					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->addInstrument(ni);	
+					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->addInstrument(ni);
 					creaInstList->add("new instrument");
 					creaSelectedInst=creaInstList->size()-1;
 					creaVarList->clear();
 					variation* nv = new variation();
-					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->addVariation(nv);	
+					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->addVariation(nv);
 					creaVarList->add("no sample yet");
 
-					
+
 					displayKit(creaSelectedKit);
 				}
 			}
@@ -1126,17 +1136,17 @@ void execWindow::cbCreaNew(Fl_Widget*)
 				{
 					instrument* ni = new instrument();
 					ni->setName("new instrument");
-					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->addInstrument(ni);	
+					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->addInstrument(ni);
 					creaInstList->add("new instrument");
 					creaInstList->value(creaInstList->size());
 					creaSelectedInst=creaInstList->size()-1;
 					creaVarList->clear();
 					variation* nv = new variation();
-					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->addVariation(nv);	
+					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->addVariation(nv);
 					creaVarList->add("no sample yet");
 
 					displayInst(creaSelectedInst);
-					
+
 					//recreate the tap list
 					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
 				}
@@ -1147,7 +1157,7 @@ void execWindow::cbCreaNew(Fl_Widget*)
 				if(creaSelectedInst>=0)
 				{
 					variation* nv = new variation();
-					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->addVariation(nv);	
+					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->addVariation(nv);
 					creaVarList->add("no sample yet");
 					creaVarList->value(creaVarList->size());
 					creaSelectedVar=creaVarList->size()-1;
@@ -1177,7 +1187,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 				{
 					if(creaSelectedSetup>-1)
 					{
-						copySetup = new setup(*(tap->getSetup(creaSelectedSetup)));	
+						copySetup = new setup(*(tap->getSetup(creaSelectedSetup)));
 						copyType=1;
 						creaCopyPaste->label("P");
 						showMessage(false,"Setup "+copySetup->getName()+" copied");
@@ -1192,13 +1202,13 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 				{
 					if(copyType==1)
 					{
-						tap->addSetup(copySetup);	
+						tap->addSetup(copySetup);
 						creaSetupList->add(copySetup->getName().c_str());
 						creaSetupList->value(creaSetupList->size());
 						creaSelectedSetup=creaSetupList->size()-1;
 						displaySetup(creaSelectedSetup);
 						showMessage(false,"Setup "+copySetup->getName()+" pasted");
-					}	
+					}
 					else
 					{
 						delete copySetup;
@@ -1215,7 +1225,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 				{
 					if(creaSelectedKit>-1)
 					{
-						copyKit = new kit(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)));	
+						copyKit = new kit(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)));
 						copyType=2;
 						creaCopyPaste->label("P");
 						showMessage(false,"Kit "+copyKit->getName()+" copied");
@@ -1230,13 +1240,13 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 				{
 					if(copyType==2 && creaSelectedSetup>-1)
 					{
-						tap->getSetup(creaSelectedSetup)->addKit(copyKit);	
+						tap->getSetup(creaSelectedSetup)->addKit(copyKit);
 						creaKitList->add(copyKit->getName().c_str());
 						creaKitList->value(creaKitList->size());
 						creaSelectedKit=creaKitList->size()-1;
 						displayKit(creaSelectedKit);
 						showMessage(false,"Kit "+copyKit->getName()+" pasted");
-					}	
+					}
 					else
 					{
 						delete copyKit;
@@ -1253,7 +1263,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 				{
 					if(creaSelectedInst>-1)
 					{
-						copyInst = new instrument(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)));	
+						copyInst = new instrument(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)));
 						copyType=3;
 						creaCopyPaste->label("P");
 						showMessage(false,"Instrument "+copyInst->getName()+" copied");
@@ -1276,7 +1286,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 						creaSelectedInst=creaInstList->size()-1;
 						displayInst(creaSelectedInst);
 						showMessage(false,"Instrument "+copyInst->getName()+" pasted");
-					}	
+					}
 					else
 					{
 						delete copyInst;
@@ -1293,7 +1303,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 				{
 					if(creaSelectedVar>-1)
 					{
-						copyVar = new variation(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->getVariation(creaSelectedVar)));	
+						copyVar = new variation(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->getVariation(creaSelectedVar)));
 						copyType=4;
 						creaCopyPaste->label("P");
 						showMessage(false,"Variation "+copyVar->getSample()->getName()+" copied");
@@ -1318,7 +1328,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 						creaSelectedVar=creaVarList->size()-1;
 						displayVar(creaSelectedVar);
 						showMessage(false,"Variation "+copyVar->getSample()->getName()+" pasted");
-					}	
+					}
 					else
 					{
 						delete copyVar;
@@ -1356,7 +1366,7 @@ void execWindow::cbCreaRemove(Fl_Widget*)
 			if(creaSelectedSetup!=-1)
 			{
 				//remove the setup
-				tap->removeSetup(creaSelectedSetup);	
+				tap->removeSetup(creaSelectedSetup);
 				creaSetupList->remove(creaSelectedSetup+1);
 				//if there are setups remaining
 				if(creaSetupList->size()>0)
@@ -1382,7 +1392,7 @@ void execWindow::cbCreaRemove(Fl_Widget*)
 			if(creaSelectedKit!=-1)
 			{
 				//remove the kit
-				tap->getSetup(creaSelectedSetup)->removeKit(creaSelectedKit);	
+				tap->getSetup(creaSelectedSetup)->removeKit(creaSelectedKit);
 				creaKitList->remove(creaSelectedKit+1);
 				//if there are kits remaining
 				if(creaKitList->size()>0)
@@ -1409,7 +1419,7 @@ void execWindow::cbCreaRemove(Fl_Widget*)
 				if(creaInstList->size()>1)
 				{
 					//remove the inst
-					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->removeInstrument(creaSelectedInst);	
+					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->removeInstrument(creaSelectedInst);
 					creaInstList->remove(creaSelectedInst+1);
 
 					//if it was the last inst, select another inst
@@ -1431,7 +1441,7 @@ void execWindow::cbCreaRemove(Fl_Widget*)
 				if(creaVarList->size()>1)
 				{
 					//remove the var
-					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->removeVariation(creaSelectedVar);	
+					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->removeVariation(creaSelectedVar);
 					creaVarList->remove(creaSelectedVar+1);
 
 					//if it was the last var, select another var
@@ -1462,15 +1472,15 @@ void execWindow::cbCreaUp(Fl_Widget*)
 				//if selectedSetup>0, swap the setup with the previous one
 				if(creaSelectedSetup>0)
 				{
-					setup* prevSetup = tap->getSetup(creaSelectedSetup-1); 
-					setup* nextSetup = tap->getSetup(creaSelectedSetup); 
+					setup* prevSetup = tap->getSetup(creaSelectedSetup-1);
+					setup* nextSetup = tap->getSetup(creaSelectedSetup);
 					tap->setSetup(creaSelectedSetup-1,nextSetup);
 					tap->setSetup(creaSelectedSetup,prevSetup);
-					creaSetupList->swap(creaSelectedSetup,creaSelectedSetup+1);		
+					creaSetupList->swap(creaSelectedSetup,creaSelectedSetup+1);
 					creaSelectedSetup--;
 					creaSetupList->value(creaSelectedSetup+1);
 				}
-				
+
 			}
 			break;
 		case 1://kit
@@ -1478,11 +1488,11 @@ void execWindow::cbCreaUp(Fl_Widget*)
 				//if selectedKit>0, swap the kit with the previous one
 				if(creaSelectedKit>0)
 				{
-					kit* prevKit = tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit-1); 
-					kit* nextKit = tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit); 
+					kit* prevKit = tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit-1);
+					kit* nextKit = tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit);
 					tap->getSetup(creaSelectedSetup)->setKit(creaSelectedKit-1,nextKit);
 					tap->getSetup(creaSelectedSetup)->setKit(creaSelectedKit,prevKit);
-					creaKitList->swap(creaSelectedKit+1,creaSelectedKit);		
+					creaKitList->swap(creaSelectedKit+1,creaSelectedKit);
 					creaSelectedKit--;
 					creaKitList->value(creaSelectedKit+1);
 				}
@@ -1497,7 +1507,7 @@ void execWindow::cbCreaUp(Fl_Widget*)
 					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->moveVariation(false,creaSelectedVar);
 					//recreate the tap list
 					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
-					creaVarList->swap(creaSelectedVar+1,creaSelectedVar);		
+					creaVarList->swap(creaSelectedVar+1,creaSelectedVar);
 					creaSelectedVar--;
 					creaVarList->value(creaSelectedVar+1);
 
@@ -1518,12 +1528,12 @@ void execWindow::cbCreaDown(Fl_Widget*)
 				//swap the setup with the next one
 				if(creaSelectedSetup>-1 && creaSelectedSetup<creaSetupList->size()-1)
 				{
-					setup* prevSetup = tap->getSetup(creaSelectedSetup); 
-					setup* nextSetup = tap->getSetup(creaSelectedSetup+1); 
+					setup* prevSetup = tap->getSetup(creaSelectedSetup);
+					setup* nextSetup = tap->getSetup(creaSelectedSetup+1);
 					tap->setSetup(creaSelectedSetup,nextSetup);
 					tap->setSetup(creaSelectedSetup+1,prevSetup);
-					creaSetupList->text(creaSelectedSetup+2,prevSetup->getName().c_str());		
-					creaSetupList->text(creaSelectedSetup+1,nextSetup->getName().c_str());		
+					creaSetupList->text(creaSelectedSetup+2,prevSetup->getName().c_str());
+					creaSetupList->text(creaSelectedSetup+1,nextSetup->getName().c_str());
 					creaSelectedSetup++;
 					creaSetupList->value(creaSelectedSetup+1);
 				}
@@ -1531,15 +1541,15 @@ void execWindow::cbCreaDown(Fl_Widget*)
 			break;
 		case 1: //kit
 			{
-				//swap the kit with the next one		
+				//swap the kit with the next one
 				if(creaSelectedKit>-1 && creaSelectedKit<creaKitList->size()-1)
 				{
-					kit* prevKit = tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit); 
-					kit* nextKit = tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit+1); 
+					kit* prevKit = tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit);
+					kit* nextKit = tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit+1);
 					tap->getSetup(creaSelectedSetup)->setKit(creaSelectedKit,nextKit);
 					tap->getSetup(creaSelectedSetup)->setKit(creaSelectedKit+1,prevKit);
-					creaKitList->text(creaSelectedKit+2,prevKit->getName().c_str());		
-					creaKitList->text(creaSelectedKit+1,nextKit->getName().c_str());		
+					creaKitList->text(creaSelectedKit+2,prevKit->getName().c_str());
+					creaKitList->text(creaSelectedKit+1,nextKit->getName().c_str());
 					creaSelectedKit++;
 					creaKitList->value(creaSelectedKit+1);
 				}
@@ -1553,7 +1563,7 @@ void execWindow::cbCreaDown(Fl_Widget*)
 					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->moveVariation(true,creaSelectedVar);
 					//recreate the tap list
 					tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
-					creaVarList->swap(creaSelectedVar+1,creaSelectedVar+2);		
+					creaVarList->swap(creaSelectedVar+1,creaSelectedVar+2);
 					creaSelectedVar++;
 					creaVarList->value(creaSelectedVar+1);
 				}
@@ -1572,21 +1582,21 @@ void execWindow::cbCreaName(Fl_Widget*)
 			if(creaSelectedSetup!=-1)
 			{
 				tap->getSetup(creaSelectedSetup)->setName(creaName->value());
-				creaSetupList->text(creaSelectedSetup+1,creaName->value());		
+				creaSetupList->text(creaSelectedSetup+1,creaName->value());
 			}
 			break;
 		case 1:
 			if(creaSelectedKit!=-1)
 			{
 				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->setName(creaName->value());
-				creaKitList->text(creaSelectedKit+1,creaName->value());		
+				creaKitList->text(creaSelectedKit+1,creaName->value());
 			}
 			break;
 		case 2:
 			if(creaSelectedInst!=-1)
 			{
 				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setName(creaName->value());
-				creaInstList->text(creaSelectedInst+1,creaName->value());		
+				creaInstList->text(creaSelectedInst+1,creaName->value());
 			}
 			break;
 		default:
@@ -1638,7 +1648,7 @@ void execWindow::cbCreaCheckCut(Fl_Widget*)
 		{
 			creaCut->activate();
 			tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setCut(creaCut->value());
-			
+
 		}
 		else
 		{
@@ -1680,7 +1690,7 @@ void execWindow::cbCreaCheckPitch(Fl_Widget*)
 void execWindow::cbCreaSampleOpen(Fl_Widget*)
 {
 	fileSaved=false;
-	
+
 	if(creaSelectedVar!=-1)
 	{
 		std::string previousDir ="";
@@ -1724,29 +1734,29 @@ void execWindow::cbCreaSampleOpen(Fl_Widget*)
 
 			//cut the file name
 			std::string audioFileStr(audioFile);
-			size_t found = audioFileStr.find_last_of("/\\");	
+			size_t found = audioFileStr.find_last_of("/\\");
 			audioFileStr = audioFileStr.substr(found+1);
 			//display loading
 			setStatus("Loading sample: "+audioFileStr);
 			creaSampleName->value("");
-			
+
 			//if the var already has a sample, release it
 			variation *v = tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->getVariation(creaSelectedVar);
 			sample *s = v->getSample();
 			//try to load the file
 			if(v->setSample(tap->addSample(audioFile,audioFileR)))
-			{	
+			{
 				v->setSample(s);
 				displayVar(creaSelectedVar);
 			}
 			else
 			{
 				setStatus("Sample loaded: "+audioFileStr);
-				creaVarList->text(creaSelectedVar+1,audioFileStr.c_str());		
+				creaVarList->text(creaSelectedVar+1,audioFileStr.c_str());
 				displayVar(creaSelectedVar);
 				if(s)
 				{
-					tap->removeSample(s);		
+					tap->removeSample(s);
 				}
 			}
 			delete [] audioFile;
@@ -1763,15 +1773,15 @@ void execWindow::cbCreaVolume(Fl_Widget*)
 	{
 		case 1:
 			{
-				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->setVolume(creaVolume->value());	
+				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->setVolume(creaVolume->value());
 				//recreate the tap list
 				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
-				
+
 			}
 			break;
 		case 2:
 			{
-				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setVolume(creaVolume->value());	
+				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setVolume(creaVolume->value());
 				//recreate the tap list
 				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
 			}
@@ -1786,7 +1796,7 @@ void execWindow::cbCreaPan(Fl_Widget*)
 	fileSaved=false;
 	if(creaSelectedInst!=-1)
 	{
-		tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setPan(creaPan->value());	
+		tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setPan(creaPan->value());
 		//recreate the tap list
 		tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
 	}
@@ -1797,7 +1807,7 @@ void execWindow::cbCreaAudioOutput(Fl_Widget*)
 	fileSaved=false;
 	if(creaSelectedInst!=-1)
 	{
-		tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setJackStereoChannel(creaAudioOutput->value());	
+		tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setJackStereoChannel(creaAudioOutput->value());
 	}
 }
 
@@ -1874,12 +1884,12 @@ void execWindow::cbCreaMidiLearn(Fl_Widget*)
 		setStatus("Midi Learn: Stopped");
 		tap->stopMidiLearn();
 	}
-		
+
 }
 
 void execWindow::learnMidi(int ch,int ccn,int vel)
 {
-	//tester 
+	//tester
 	switch(creaMidiType)
 	{
 		case 0: //channel,control
@@ -1996,8 +2006,8 @@ void execWindow::updateMidi()
 					{
 						case 0://change kit
 							{
-								tap->getSetup(creaSelectedSetup)->setCC((short)(creaMidiChan->value()),(short)(creaMidiCC->value()));		
-							}	
+								tap->getSetup(creaSelectedSetup)->setCC((short)(creaMidiChan->value()),(short)(creaMidiCC->value()));
+							}
 							break;
 						default:break;
 					}
@@ -2010,9 +2020,9 @@ void execWindow::updateMidi()
 				{
 					switch((int)(creaMidiSel->value()))
 					{
-						case 0://change 
+						case 0://change
 							{
-							}	
+							}
 							break;
 					}
 				}
@@ -2026,10 +2036,10 @@ void execWindow::updateMidi()
 					{
 						case 0://play sample
 							{
-								tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setMidi(0,(short)(creaMidiChan->value()),(short)(creaMidiMin->value()),(short)(creaMidiRoot->value()),(short)(creaMidiMax->value()),creaMidiRootFine->value());		
+								tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setMidi(0,(short)(creaMidiChan->value()),(short)(creaMidiMin->value()),(short)(creaMidiRoot->value()),(short)(creaMidiMax->value()),creaMidiRootFine->value());
 								//recreate the tap list
-								tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());					
-							}	
+								tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
+							}
 							break;
 						default: //else
 							break;
@@ -2045,12 +2055,12 @@ void execWindow::updateMidi()
 					{
 						case 0://velocity range
 							{
-								tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->getVariation(creaSelectedVar)->setMidi(0,(short)(creaMidiChan->value()),(short)(creaMidiMin->value()),(short)(creaMidiMax->value()));		
+								tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->getVariation(creaSelectedVar)->setMidi(0,(short)(creaMidiChan->value()),(short)(creaMidiMin->value()),(short)(creaMidiMax->value()));
 								//update the variations
 								tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->updateVariations(creaSelectedVar);
 								//recreate the tap list
 								tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
-							}	
+							}
 							break;
 						default: //else
 							break;
@@ -2073,7 +2083,7 @@ void execWindow::updateExecTab()
 			execTab->remove(setupLists[i]);
 			delete setupLists[i];
 		}
-		delete [] setupLists;	
+		delete [] setupLists;
 		setupLists=NULL;
 	}
 
@@ -2083,7 +2093,7 @@ void execWindow::updateExecTab()
 		setupLists = new Fl_Hold_Browser*[tap->getNbSetups()];
 		int width = w() / tap->getNbSetups();
 		for(int i=0;i<tap->getNbSetups();++i)
-		{		 
+		{
 			std::string name=tap->getSetup(i)->getName();
 			setupLists[i] = new Fl_Hold_Browser(i*width,80,width,h()-104,name.c_str());
 			setupLists[i]->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
@@ -2091,7 +2101,7 @@ void execWindow::updateExecTab()
 			for(int j=0;j<tap->getSetup(i)->getNbKits();++j)
 			{
 				std::string kitName = tap->getSetup(i)->getKit(j)->getName();
-				setupLists[i]->add(kitName.c_str());		
+				setupLists[i]->add(kitName.c_str());
 			}
 			setupLists[i]->select(1);
 			execTab->insert(*setupLists[i],i+1);
@@ -2104,7 +2114,7 @@ void execWindow::cbExecSetupList(Fl_Widget* w)
 {
 	//get the number of the setup which list was clicked
 	int s = execTab->find(w);
-	
+
 	if(s>=0 && s<tap->getNbSetups())
 	{
 		Fl_Hold_Browser* hb = (Fl_Hold_Browser*)w;
@@ -2121,4 +2131,18 @@ void execWindow::changeKit(int setup,int kit)
 	setupLists[setup]->select(kit);
 	setupLists[setup]->redraw();
 	Fl::check();
+}
+
+
+void execWindow::setVisible(bool v)
+{
+	if (v != visible) {
+		visible = v;
+
+		if (visible) {
+			show();
+		} else {
+			while ( Fl::first_window() ) Fl::first_window()->hide();
+		}
+	}
 }
