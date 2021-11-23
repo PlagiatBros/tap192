@@ -60,14 +60,14 @@
 
 #define TAPEUTAPE_VERSION "0.1.2"
 
-class tapeutape  
-{	
+class tapeutape
+{
 	public:
-		tapeutape(int,char**); 
+		tapeutape(int,char**);
 		~tapeutape();
 		void showMessage(bool,std::string);
-		
-		int load(char*); 
+
+		int load(char*);
 		int start();
 		void save(char*);
 		void saveWithSamples(char*,const char*);
@@ -89,26 +89,26 @@ class tapeutape
 		sample* addSample(char*,char*);
 		void removeSample(sample*);
 		void setSetupCC(short,short);
-		short getSetupChannel(); 		
-		short getSetupCC(); 		
+		short getSetupChannel();
+		short getSetupCC();
 		void setGlobalVolume(double);
-		double getGlobalVolume(); 		
+		double getGlobalVolume();
 		void setPolyphony(int);
 		int getPolyphony();
 		std::string getFileName();
 		std::string getCompleteFileName();
 		void createTaps();
-		
+
 
 		//Jack Part
 		int getNbJackStereoChannels();
-		void addJackStereoChannel(std::string);		
-		void addCreateJackStereoChannel(std::string);		
+		void addJackStereoChannel(std::string);
+		void addCreateJackStereoChannel(std::string);
 		void removeJackStereoChannel(int );
 		std::string getJackStereoChannelName(int);
 		void setJackStereoChannelName(int,std::string);
 		int getJackStereoChannel(std::string);
-		jackProcess* getJackProcess();			
+		jackProcess* getJackProcess();
 		void setSampleRate(int);
 
 		//Midi Part
@@ -116,16 +116,16 @@ class tapeutape
 		void startMidiLearn();
 		void stopMidiLearn();
 		void processMidiLearn(int,int,int);
-		void processCC(unsigned short, unsigned short,unsigned short);			
+		void processCC(unsigned short, unsigned short,unsigned short);
 		inline void addAudioEvent(const audioEvent& newEvent){jack->addAudioEvent(newEvent);}
 
 
-	private: 	
+	private:
 		bool loop;
 
 		//Tap File
 		std::string fileName;
-		
+
 		#ifdef WITH_GUI
 			//Gui
 			execWindow *execWin;
@@ -135,15 +135,15 @@ class tapeutape
 		std::vector<sample*> samples;
 		std::vector<setup*> setups;
 
-		//Audio		
+		//Audio
 		std::vector<std::string> jackStereoChannelsNames;
 		jackProcess *jack;
 		double globalVolume;
 
 		//Midi
 		midiProcess* midi;
-		short setupChannel;			
-		short setupCC;			
+		short setupChannel;
+		short setupCC;
 		int polyphony;
 
 		//Events

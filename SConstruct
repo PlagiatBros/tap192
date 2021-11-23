@@ -11,7 +11,7 @@ sources = base+audio+midi
 # LANGUAGE
 optlang = ARGUMENTS.get('lang','en')
 
-#  CONFIGURE 
+#  CONFIGURE
 if not env.GetOption('clean') and not 'install' in COMMAND_LINE_TARGETS and not env.GetOption('help'):
 	# CHECK DEPENDENCIES
 	conf = Configure(env)
@@ -65,7 +65,7 @@ if not env.GetOption('clean') and not 'install' in COMMAND_LINE_TARGETS and not 
 			print("""Please install them (packages -dev or -devel) and re-type 'scons'
 				""")
 		Exit(1)
-	
+
 # BUILD
 if not 'install' in COMMAND_LINE_TARGETS:
 	tapeutape = env.Program('tapeutape',sources)
@@ -88,10 +88,10 @@ if (optlang=='fr'):
 	Help("""
 		Bienvenue dans le programme d'installation de Tapeutape
 
-		Commencez par entrer la commande 'scons lang=fr' pour compiler Tapeutape 
+		Commencez par entrer la commande 'scons lang=fr' pour compiler Tapeutape
 			ajoutez l'option 'gui=0' pour compiler la version ligne de commande
 
-		Si tout se passe bien, entrez 'scons install' en tant qu'administrateur 
+		Si tout se passe bien, entrez 'scons install' en tant qu'administrateur
 		pour installer Tapeutape dans /usr/local/
 
 		Si vous voulez nettoyer la compilation, entrez 'scons -c'
@@ -101,15 +101,13 @@ else:
 	Help("""
 		Welcome to Tapeutape's Installation Program
 
-		Please type 'scons' to build Tapeutape 
+		Please type 'scons' to build Tapeutape
 			add the option 'gui=0' to build the command line version
 			add the option 'lang=fr' to display the build instructions in french
 
-		If everything went good, type 'scons install' as root 
+		If everything went good, type 'scons install' as root
 		to install Tapeutape in /usr/local/
 
 		If you want to clean the build, type 'scons -c'
 		If you want to uninstall Tapeutape, type 'scons -c install'
 	     """)
-	
-

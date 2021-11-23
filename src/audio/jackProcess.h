@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef _JACKPROCESS_H
 #define _JACKPROCESS_H
 
@@ -51,16 +51,16 @@ class jackProcess
 		friend void shutdown(void*);
 
 		void addAudioEvent(const audioEvent&);
-	
+
 	protected:
 		tapeutape* tap;
 		jack_ringbuffer_t* EventsRingBuffer;
 		jack_client_t *jackClient;
-		int sampleRate;	
+		int sampleRate;
 		std::vector<audioEvent> audioEvents;
 		int polyphonie;
 		int nbJackStereoChannels;
-		std::vector<jack_port_t*> outputPorts[2]; 	
+		std::vector<jack_port_t*> outputPorts[2];
 
 		std::vector<audioEvent> m_processRingBuffer;
 		int m_processRingBufferReadPosition;
@@ -70,4 +70,4 @@ class jackProcess
 };
 
 
-#endif 
+#endif

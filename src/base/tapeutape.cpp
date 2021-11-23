@@ -31,7 +31,7 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 {
 	fileName="";
 
-	#ifdef WITH_GUI 
+	#ifdef WITH_GUI
 		//start the ui
 		execWin = new execWindow(350,400,"Tapeutape",this);
 		execWin->size_range(350,400,0,0,0,0);
@@ -44,13 +44,13 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 
 	//jackProcess , initialised here to get the samplerate to load the files
 	jack = new jackProcess(this,eventsRingBuffer,polyphony);
-	showMessage(false,"Starting Jack Client");
 	const char* jackClientName;
-	if (nsm_get_client_id(nsm)){
-			showMessage(false,"Starting in NSM Mode");
+	if (nsm){
+			showMessage(false,"Starting Jack Client in NSM Mode");
 			jackClientName = nsm_get_client_id(nsm);
 	}	else {
-			showMessage(false,"Starting in non-NSM Mode");
+			showMessage(false,"Starting Jack Client in non-NSM Mode");
+			jackClientName = (const char*) malloc(sizeof("Tapeutape")+1);
 			jackClientName = "Tapeutape";
 	}
 	if(jack->init(jackClientName))
@@ -60,7 +60,7 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 
 
 	//midiProcess init and start
-	midi = new midiProcess(this,jack->getClient(),MIDI_PRIORITY,eventsRingBuffer);	
+	midi = new midiProcess(this,jack->getClient(),MIDI_PRIORITY,eventsRingBuffer);
 	showMessage(false,"Starting MIDI");
 	if(midi->midiInit())
 	{
@@ -71,12 +71,12 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 	if(argc==2)
 		load(argv[1]);
 
-	//start 
+	//start
 	start();
 	midi->startThread();
 
-	//if everything's ok  
-	showMessage(false,"Let's play !! "); 
+	//if everything's ok
+	showMessage(false,"Let's play !! ");
 
 	#ifndef WITH_GUI
 	while(loop)
@@ -89,10 +89,10 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 		while(!(cin>>choice) || choice<1 || choice>3)
 		{
 			if ( cin.fail() )
-			{ 
-			    cin.clear(); 
+			{
+			    cin.clear();
 			    cin.ignore( numeric_limits<streamsize>::max(), '\n' );
-			}		
+			}
 			showMessage(false,"Incorrect Choice");
 			showMessage(false,"Menu :");
 			showMessage(false,"1 : Open File");
@@ -136,12 +136,14 @@ tapeutape::~tapeutape()
 	jack_ringbuffer_free(eventsRingBuffer);
 }
 
+
+
 void tapeutape::showMessage(bool t,std::string mess)
 {
 	#ifdef WITH_GUI
-		Fl::lock(); 
+		Fl::lock();
 		execWin->showMessage(t,mess);
-		Fl::unlock(); 
+		Fl::unlock();
 	#else
 		cout<<"<Tapeutape> "<<mess<<endl;
 	#endif
@@ -149,7 +151,7 @@ void tapeutape::showMessage(bool t,std::string mess)
 
 std::string tapeutape::getFileName()
 {
-	size_t found = fileName.find_last_of("/\\");	
+	size_t found = fileName.find_last_of("/\\");
 	return fileName.substr(found+1);
 }
 
@@ -166,7 +168,7 @@ int tapeutape::load(char * nomfic)
 		delete setups[i];
 	}
 	setups.clear();
-	
+
 	//delete the samples
 	for(unsigned int i=0;i<samples.size();++i)
 	{
@@ -175,7 +177,7 @@ int tapeutape::load(char * nomfic)
 	samples.clear();
 
 	//delete the outputs
-	jackStereoChannelsNames.clear();	
+	jackStereoChannelsNames.clear();
 
 	fileName=nomfic;
 
@@ -205,7 +207,7 @@ void tapeutape::import(char* dir)
 		addSetup(setup1);
 		kit* kit1=NULL;
 		instrument* instru1=NULL;
-		//parse 
+		//parse
 		ostringstream oss,oss2;
 		DIR *dp2;
 		struct dirent *dirp2;
@@ -218,7 +220,7 @@ void tapeutape::import(char* dir)
 						setup1->addKit(kit1);
 						instrument* instru1 = new instrument();
 						kit1->addInstrument(instru1);
-								
+
 					}
 					else { //if it is a directory, create a new kit
 
@@ -233,12 +235,12 @@ void tapeutape::import(char* dir)
 }
 
 int tapeutape::start()
-{		
+{
 
 	//test if we created at least one jack-output
 	if(jackStereoChannelsNames.size()==0)
 	{
-		jackStereoChannelsNames.push_back("output");	
+		jackStereoChannelsNames.push_back("output");
 	}
 
 	//jackProcess , real start
@@ -247,7 +249,7 @@ int tapeutape::start()
 		showMessage(true,"Error starting jack client");
 	}
 
-	//create the array of taps for each setup  
+	//create the array of taps for each setup
 	createTaps();
 
 	//(re)init lash
@@ -259,10 +261,10 @@ int tapeutape::start()
 
 	//(re)init the gui
 	#ifdef WITH_GUI
-		Fl::lock(); 
+		Fl::lock();
 		execWin->init();
 		execWin->setTitle("Tapeutape : "+getFileName());
-		Fl::unlock(); 
+		Fl::unlock();
 	#endif
 
 	return 0;
@@ -270,20 +272,24 @@ int tapeutape::start()
 
 void tapeutape::save(char* f)
 {
+	cout << "Début sauvegarde" << endl;
+	showMessage(false,"Now saving...");
 	fileName=f;
 	tapParser tap(this);
 	if(!tap.saveToFile(f))
 	{
 		#ifdef WITH_GUI
-			Fl::lock(); 
+			Fl::lock();
 			execWin->setTitle("Tapeutape : "+getFileName());
-			Fl::unlock(); 
+			Fl::unlock();
 		#endif
 		for(unsigned int s=0;s<samples.size();++s)
 		{
 			samples[s]->processFileName(samples[s]->getAbsoluteName(),fileName);
 		}
 	}
+	showMessage(false,"Finished!");
+	cout << "Fin sauvegarde" << endl;
 }
 
 void tapeutape::saveWithSamples(char* f,const char* cpath)
@@ -297,9 +303,9 @@ void tapeutape::saveWithSamples(char* f,const char* cpath)
 		//get the new filename, according to the tap path
 		std::string sampleName;
 		std::ostringstream oss;
-		oss << s;	
-		sampleName ="sample"+oss.str(); 
-		size_t found = samples[s]->getAbsoluteName().find_last_of(".\\");	
+		oss << s;
+		sampleName ="sample"+oss.str();
+		size_t found = samples[s]->getAbsoluteName().find_last_of(".\\");
 		std::string sampleExt = samples[s]->getAbsoluteName().substr(found+1);
 		std::string sampleCompleteName = path+"/"+sampleName+"."+sampleExt;
 		//if the sample wasn't already saved with the tap
@@ -323,9 +329,9 @@ void tapeutape::saveWithSamples(char* f,const char* cpath)
 	{
 		//set the new name
 		#ifdef WITH_GUI
-			Fl::lock(); 
+			Fl::lock();
 			execWin->setTitle("Tapeutape : "+getFileName());
-			Fl::unlock(); 
+			Fl::unlock();
 		#endif
 	}
 }
@@ -343,7 +349,7 @@ void tapeutape::stop()
 	//stops the jack client
 	if(jack)
 	{
-		delete jack;	
+		delete jack;
 		jack=NULL;
 	}
 
@@ -369,7 +375,7 @@ void tapeutape::stop()
 
 void tapeutape::createTaps()
 {
-	//create the array of taps for each setup  
+	//create the array of taps for each setup
 	for(unsigned int i=0;i<setups.size();++i)
 	{
 		for(unsigned int j=0;j<setups[i]->getNbKits();++j)
@@ -436,10 +442,10 @@ sample* tapeutape::addSample(char* n,char *rn)
 {
 	std::string sampleName(n);
 	sample *addedSample=NULL;
-	//if there is a sample	
+	//if there is a sample
 	if(sampleName!="")
 	{
-		//test if the sample has already been added 
+		//test if the sample has already been added
 		for(unsigned int i=0;i<samples.size();++i)
 		{
 			if(samples[i]->getAbsoluteName()==sampleName)
@@ -501,7 +507,7 @@ void tapeutape::setSampleRate(int sr)
 				for(unsigned int l=0;l<setups[i]->getKit(j)->getInstrument(k)->getNbVariations();++l)
 					setups[i]->getKit(j)->getInstrument(k)->getVariation(l)->getSample()->setSampleRate(sr);
 */
-					
+
 	for(unsigned int s=0;s<samples.size();++s)
 	{
 		samples[s]->setSampleRate(sr);
@@ -556,14 +562,14 @@ void tapeutape::removeJackStereoChannel(int ind)
 
 int tapeutape::getNbJackStereoChannels()
 {
-	return jackStereoChannelsNames.size();	
+	return jackStereoChannelsNames.size();
 }
 
 std::string tapeutape::getJackStereoChannelName(int ind)
 {
-	return jackStereoChannelsNames[ind];	
+	return jackStereoChannelsNames[ind];
 }
-		
+
 void tapeutape::setJackStereoChannelName(int ind,std::string n)
 {
 	jackStereoChannelsNames[ind]=n;
@@ -593,9 +599,9 @@ void tapeutape::stopMidiLearn()
 void tapeutape::processMidiLearn(int ch,int ccn,int vel)
 {
 	#ifdef WITH_GUI
-		Fl::lock(); 
+		Fl::lock();
 		execWin->learnMidi(ch,ccn,vel);
-		Fl::unlock(); 
+		Fl::unlock();
 	#endif
 }
 
@@ -623,9 +629,9 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
 		{
 			int kit = setups[i]->changeKit(val);
 			#ifdef WITH_GUI
-				Fl::lock(); 
+				Fl::lock();
 				execWin->changeKit(i,kit+1);
-				Fl::unlock(); 
+				Fl::unlock();
 			#endif
 		}
 }
@@ -638,5 +644,4 @@ void tapeutape::setGlobalVolume(double gv)
 double tapeutape::getGlobalVolume()
 {
 	return globalVolume;
-} 		
-
+}

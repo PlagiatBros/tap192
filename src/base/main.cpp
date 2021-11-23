@@ -42,10 +42,13 @@ bool nsm_wait = true;
 string nsm_folder = "";
 
 int
-nsm_save_cb(char **,  void *userdata)
+nsm_save_cb(char **, void *userdata)
 {
+    tapeutape *t = (tapeutape*) userdata;
+    t->save((char*)global_filename.c_str());
     return ERR_OK;
 }
+
 void
 nsm_hide_cb(void *userdata)
 {
@@ -88,12 +91,15 @@ int main(int argc, char** argv)
         }
 
         tapeutape tap(argc,argv);
-				global_filename = nsm_folder + "sampler.tap";
+				global_filename = nsm_folder + "/sampler.tap";
         std::ifstream infile(global_filename);
         if(!infile.good())
 				    tap.save((char *)global_filename.c_str());
         else
             tap.load((char *)global_filename.c_str());
+
+        // register callbacks
+        nsm_set_save_callback(nsm, nsm_save_cb, (void*) &tap);
     }
 		else
 				tapeutape tap(argc,argv);

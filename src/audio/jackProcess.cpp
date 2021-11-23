@@ -37,16 +37,16 @@ int process(jack_nframes_t nframes, void *arg)
 	//WE GET THE OUTPUT PORTS
 	jack_default_audio_sample_t *out[2][nbOutputs];
 	for(int i=0;i<nbOutputs;++i) {
-		out[0][i] = (jack_default_audio_sample_t *)jack_port_get_buffer (proc->outputPorts[0][i], nframes);	
-		out[1][i] = (jack_default_audio_sample_t *)jack_port_get_buffer (proc->outputPorts[1][i], nframes);	
+		out[0][i] = (jack_default_audio_sample_t *)jack_port_get_buffer (proc->outputPorts[0][i], nframes);
+		out[1][i] = (jack_default_audio_sample_t *)jack_port_get_buffer (proc->outputPorts[1][i], nframes);
 	}
-	
-	//WE GET ALL THE NEW AUDIO EVENTS 
+
+	//WE GET ALL THE NEW AUDIO EVENTS
 	while(proc->m_processRingBufferFilledCount>0) {
 		proc->m_processRingBufferFilledCount--;
 		//get the new event
 		audioEvent& newEvent = proc->m_processRingBuffer[proc->m_processRingBufferReadPosition];
-		
+
 		if(newEvent.getEvent()==true) {
 			bool stoppingLoop=false;
 
@@ -54,7 +54,7 @@ int process(jack_nframes_t nframes, void *arg)
 			if(newEvent.getInstrument()->getPlayMode()==1 && newEvent.getInstrument()->getPlayLoop()==1) {
 				for(unsigned int a=0;a<proc->audioEvents.size();++a) {
 					if(proc->audioEvents[a].getID() == newEvent.getID()) {
-						proc->audioEvents[a].fadeOut(nframes);	
+						proc->audioEvents[a].fadeOut(nframes);
 						stoppingLoop=true;
 					}
 				}
@@ -62,19 +62,19 @@ int process(jack_nframes_t nframes, void *arg)
 			if(!stoppingLoop) {
 				//if size left
 				if((int)(proc->audioEvents.size()) < proc->polyphonie) {
-					//we inform the sample that it's going to be played, and if possible (not cutting)	
+					//we inform the sample that it's going to be played, and if possible (not cutting)
 					if(newEvent.getInstrument()->addPlaying()==0) {
-						//we add it to the list of audioEvents of its jack Channel 
+						//we add it to the list of audioEvents of its jack Channel
 						proc->audioEvents.push_back(newEvent);
 					}
 				}
 			}
 		}
-		else { //if it's a noteOff 
-			//we go through all the events and stop the one with the same id , of course if the play mode is not "trigger" 
+		else { //if it's a noteOff
+			//we go through all the events and stop the one with the same id , of course if the play mode is not "trigger"
 			for(unsigned int a=0;a<proc->audioEvents.size();++a) {
 				if(proc->audioEvents[a].getID() == newEvent.getID() && newEvent.getInstrument()->getPlayMode()==0) {
-					proc->audioEvents[a].fadeOut(nframes);	
+					proc->audioEvents[a].fadeOut(nframes);
 				}
 			}
 		}
@@ -89,7 +89,7 @@ int process(jack_nframes_t nframes, void *arg)
 		//we get the next event
 		audioEvent* ae = (audioEvent*) malloc(sizeof(audioEvent));
 		jack_ringbuffer_read(proc->EventsRingBuffer,(char*)ae,sizeof(audioEvent));
-		
+
 		//if it's a noteon
 		if((bool)((audioEvent*)ae->getEvent())==true) {
 			bool stoppingLoop=false;
@@ -98,7 +98,7 @@ int process(jack_nframes_t nframes, void *arg)
 			if(((audioEvent*)ae)->getInstrument()->getPlayMode()==1 && ((audioEvent*)ae)->getInstrument()->getPlayLoop()==1) {
 				for(unsigned int a=0;a<proc->audioEvents.size();++a) {
 					if(proc->audioEvents[a]->getID() == ((audioEvent*)ae)->getID()) {
-						proc->audioEvents[a]->fadeOut(nframes);	
+						proc->audioEvents[a]->fadeOut(nframes);
 						stoppingLoop=true;
 					}
 				}
@@ -106,10 +106,10 @@ int process(jack_nframes_t nframes, void *arg)
 			if(!stoppingLoop) {
 				//if size left
 				if((int)(proc->audioEvents.size()) < proc->polyphonie) {
-					//we inform the sample that it's going to be played, and if possible (not cutting)	
+					//we inform the sample that it's going to be played, and if possible (not cutting)
 					if((audioEvent*)ae->getInstrument()->addPlaying()==0)
 					{
-						//we add it to the list of audioEvents of its jack Channel 
+						//we add it to the list of audioEvents of its jack Channel
 						proc->audioEvents.push_back(audioEvent(((audioEvent*)ae)->getVariation(),((audioEvent*)ae)->getInstrument(),((audioEvent*)ae)->getID(),((audioEvent*)ae)->getPitch(),((audioEvent*)ae)->getJackStereoChannel(),((audioEvent*)ae)->getVolume(),((audioEvent*)ae)->getPanLeft(),((audioEvent*)ae)->getPanRight(),((audioEvent*)ae)->getEvent()));
 
 					}
@@ -117,10 +117,10 @@ int process(jack_nframes_t nframes, void *arg)
 			}
 		}
 		else//if it's a noteOff {
-			//we go through all the events and stop the one with the same id , of course if the play mode is not "trigger" 
+			//we go through all the events and stop the one with the same id , of course if the play mode is not "trigger"
 			for(unsigned int a=0;a<proc->audioEvents.size();++a) {
 				if(proc->audioEvents[a].getID() == ((audioEvent*)ae)->getID() && ((audioEvent*)ae)->getInstrument()->getPlayMode()==0) {
-					proc->audioEvents[a].fadeOut(nframes);	
+					proc->audioEvents[a].fadeOut(nframes);
 				}
 			}
 		}
@@ -129,25 +129,25 @@ int process(jack_nframes_t nframes, void *arg)
 	}
 */
 
-	
+
 	//WE TEST THE CUTS
-	
+
 	//for every audioEvent
 	for(unsigned int ae=0;ae<proc->audioEvents.size();++ae) {
 		//test the cut by and start to fade out if needed
 		if(proc->audioEvents[ae].getInstrument()->isCut()) {
-			proc->audioEvents[ae].fadeOut(nframes);	
+			proc->audioEvents[ae].fadeOut(nframes);
 		}
 	}
 
 	//WE PUT THE CHANNELS BUFFERS TO 0
 
 	//for each stereo channel
-	for(int chan=0;chan<proc->nbJackStereoChannels;++chan) {	
+	for(int chan=0;chan<proc->nbJackStereoChannels;++chan) {
 		memset(out[0][chan],0.0,nframes*sizeof(jack_default_audio_sample_t));
 		memset(out[1][chan],0.0,nframes*sizeof(jack_default_audio_sample_t));
 	}
-	
+
 	//THEN WE PLAY THE SAMPLES IN THE LIST
 
 	//for every audioEvent
@@ -157,15 +157,15 @@ int process(jack_nframes_t nframes, void *arg)
 
 		//then for the remaining length
 		for(jack_nframes_t ind=0;ind<length;++ind) {
-					
+
 			//FIXME interpolation des offsets
 			//we play the sample (in the corresponding channels)
-			jack_default_audio_sample_t frame; 
-			proc->audioEvents[ae].getVariation()->getFrame(0,proc->audioEvents[ae].getOffset(), frame);	
-			out[0][proc->audioEvents[ae].getJackStereoChannel()][ind]+= frame* proc->audioEvents[ae].getVolume() * proc->audioEvents[ae].getPanLeft() ;	
-			proc->audioEvents[ae].getVariation()->getFrame(1,proc->audioEvents[ae].getOffset(), frame);	
+			jack_default_audio_sample_t frame;
+			proc->audioEvents[ae].getVariation()->getFrame(0,proc->audioEvents[ae].getOffset(), frame);
+			out[0][proc->audioEvents[ae].getJackStereoChannel()][ind]+= frame* proc->audioEvents[ae].getVolume() * proc->audioEvents[ae].getPanLeft() ;
+			proc->audioEvents[ae].getVariation()->getFrame(1,proc->audioEvents[ae].getOffset(), frame);
 			out[1][proc->audioEvents[ae].getJackStereoChannel()][ind]+=frame * proc->audioEvents[ae].getVolume() * proc->audioEvents[ae].getPanRight() ;
-			
+
 			//and we ++ the offset
 			proc->audioEvents[ae].addOffset();
 		}
@@ -199,7 +199,7 @@ jackProcess::jackProcess(tapeutape* t,jack_ringbuffer_t* rb, int poly):tap(t),Ev
 
 jackProcess::~jackProcess()
 {
-	jack_deactivate(jackClient); 
+	jack_deactivate(jackClient);
 	for(int i=0;i<nbJackStereoChannels;++i)
 	{
 			jack_port_unregister (jackClient,outputPorts[0][i]);
@@ -230,8 +230,8 @@ void jackProcess::removePort(int num)
 {
 	jack_port_unregister (jackClient,outputPorts[0][num]);
 	jack_port_unregister (jackClient,outputPorts[1][num]);
-	outputPorts[0].erase(outputPorts[0].begin()+num);	
-	outputPorts[1].erase(outputPorts[1].begin()+num);	
+	outputPorts[0].erase(outputPorts[0].begin()+num);
+	outputPorts[1].erase(outputPorts[1].begin()+num);
 }
 
 void jackProcess::renamePort(int num,std::string st)
@@ -257,9 +257,9 @@ int jackProcess::init(const char *jackClientName)
 		tap->showMessage(true,"Error creating the jackClient");
 		return -1;
 	}
-	sampleRate = jack_get_sample_rate(jackClient);	
+	sampleRate = jack_get_sample_rate(jackClient);
 	tap->setSampleRate(sampleRate);
-	
+
 	return 0;
 }
 
@@ -279,7 +279,7 @@ int jackProcess::start()
 		outputPorts[1].clear();
 	}
 
-	jack_deactivate(jackClient); 
+	jack_deactivate(jackClient);
 
 	//we create the output ports
 	nbJackStereoChannels = tap->getNbJackStereoChannels();
@@ -290,17 +290,17 @@ int jackProcess::start()
 			outputPorts[1].push_back(jack_port_register (jackClient, (st+"-R").c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0));
 	}
 
-	//sample rate callback 
+	//sample rate callback
 	//jack_set_sample_rate_callback (jackClient, sRate, this);
 
 	//process callback
 	jack_set_process_callback (jackClient, process, this);
 
 	//on shutdown
-	jack_on_shutdown(jackClient,shutdown,this);	
+	jack_on_shutdown(jackClient,shutdown,this);
 
 	//activate the client
-	if(jack_activate(jackClient)) 
+	if(jack_activate(jackClient))
 	{
 		tap->showMessage(true,"Cannot activate jack client, jackd not running ?");
 		return -1;
@@ -321,4 +321,3 @@ int jackProcess::getSampleRate()
 {
 	return sampleRate;
 }
-
