@@ -620,12 +620,22 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
 		if(setups[i]->getChannel()-1 == chan && setups[i]->getCC() == cc)
 		{
 			int kit = setups[i]->changeKit(val);
+
+			// CC 126 & 127 (whatever the channel) reserved for Reverse mode toggle
+			if(cc > 125)
+			{
+				//choper l'instrument, trouver son channel, et sa note, comparer, setReverseMode
+				for(unsigned int i=0;i<kit.instruments.size();i++)
+					if(kit.instrument[i].getMidiChannel() == chan)
+						kit.instrument[i].setPlayReverse(127-cc);
+			}
+
 			#ifdef WITH_GUI
 				Fl::lock();
 				execWin->changeKit(i,kit+1);
 				Fl::unlock();
 			#endif
-		}
+	}
 }
 
 void tapeutape::setGlobalVolume(double gv)
