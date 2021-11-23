@@ -53,13 +53,13 @@ addKitDialog::~addKitDialog()
 
 void addKitDialog::cbOkBut(Fl_Widget*)
 {
-	this->hide();	
+	this->hide();
 }
 
 void addKitDialog::cbCancelBut(Fl_Widget*)
 {
 	value=-1;
-	this->hide();	
+	this->hide();
 }
 
 void addKitDialog::cbChoice(Fl_Widget*)
@@ -76,4 +76,3 @@ void addKitDialog::addKit(const char* ch)
 {
 	addKitChoice->add(ch);
 }
-

@@ -50,7 +50,7 @@ tardiFlFileBrowser::tardiFlFileBrowser():Fl_Window(330,290,"Open File"),showHidd
 	filesList = new Fl_Hold_Browser(10,40,280,180);
 	filesList->callback(statList,this);
 	this->insert(*filesList,3);
-	
+
 	//add / hide dirs
 	hiddenButton = new Fl_Toggle_Button(300,40,20,20,"h");
 	hiddenButton->callback(statHidden,this);
@@ -60,7 +60,7 @@ tardiFlFileBrowser::tardiFlFileBrowser():Fl_Window(330,290,"Open File"),showHidd
 	addButton->tooltip("Create a directory");
 	addButton->callback(statAdd,this);
 	this->insert(*addButton,5);
-	
+
 	//name input
 	fileName = new Fl_Input(90,230,200,20,"Filename ");
 	fileName->callback(statFileName,this);
@@ -87,7 +87,7 @@ tardiFlFileBrowser::~tardiFlFileBrowser()
 	delete okButton;
 	delete cancelButton;
 	delete fileName;
-	
+
 }
 
 void tardiFlFileBrowser::cbPrevButton(Fl_Widget*)
@@ -127,7 +127,7 @@ void tardiFlFileBrowser::cbList(Fl_Widget*)
 {
 	//deactivates the ok button
 	okButton->deactivate();
-	fileName->value("");				
+	fileName->value("");
 	if(filesList->value()>0)
 	{
 		//get the absolute name
@@ -156,13 +156,13 @@ void tardiFlFileBrowser::cbList(Fl_Widget*)
 				{
 					//set the result and close the browser
 					result=strdup(absFn.c_str());
-					this->hide();	
+					this->hide();
 					Fl::event_clicks(0);
 				}
 				else
 				{
 					//set the name in the input
-					fileName->value(filesList->text(filesList->value()));				
+					fileName->value(filesList->text(filesList->value()));
 					//activates the ok button
 					okButton->activate();
 				}
@@ -183,7 +183,7 @@ void tardiFlFileBrowser::cbFileName(Fl_Widget*)
 
 void tardiFlFileBrowser::cbOk(Fl_Widget*)
 {
-	std::string sResult = currentDir+std::string(fileName->value()); 
+	std::string sResult = currentDir+std::string(fileName->value());
         result=strdup(sResult.c_str());
 	this->hide();
 }
@@ -207,7 +207,7 @@ void tardiFlFileBrowser::cbAdd(Fl_Widget*)
 
 void tardiFlFileBrowser::cbHidden(Fl_Widget*)
 {
-	showHidden = hiddenButton->value();	
+	showHidden = hiddenButton->value();
 	displayCurrentDir();
 }
 
@@ -226,7 +226,7 @@ void tardiFlFileBrowser::open(std::string browserT,std::string fileX,std::string
 	}
 	else//go to the user directory
 	{
-		currentDir="/home/";		
+		currentDir="/home/";
 	}
 
 	//sets currentPattern
@@ -251,7 +251,7 @@ int tardiFlFileBrowser::displayCurrentDir()
 
 	dirent **files;
 	int nbFiles = scandir(currentDir.c_str(),&files,NULL,alphasort);
-	//if problem, retry with the user directory 
+	//if problem, retry with the user directory
 	if(nbFiles<0)
 	{
 		return -1;
@@ -287,7 +287,7 @@ int tardiFlFileBrowser::displayCurrentDir()
 		}
 	}
 
-	return 0;	
+	return 0;
 }
 
 
@@ -329,7 +329,7 @@ void tardiFlFileBrowser::storeCurrentPath()
 
 void tardiFlFileBrowser::displayCurrentPath(int pos)
 {
-	
+
 	int currentPathPosition=pathButtons.size()-1;
 	//find the latest shown button
 	for(int i=pathButtons.size()-1;i>=0;--i)
@@ -403,7 +403,7 @@ void tardiFlFileBrowser::displayCurrentPath(int pos)
 
 	this->redraw();
 	Fl::check();
-	
+
 }
 
 char* tardiFlFileBrowser::getResult()

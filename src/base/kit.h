@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef _KIT_H
 #define _KIT_H
 
@@ -42,7 +42,7 @@ class kit
 		std::string getName();
 		bool isFilled();
 		int getNbInstruments();
-		instrument* getInstrument(int); 
+		instrument* getInstrument(int);
 		void addInstrument(instrument*);
 		void removeInstrument(int);
 		const std::vector<tap*>& getTap(const unsigned short&, const unsigned short&, const unsigned short&);

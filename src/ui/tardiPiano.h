@@ -21,7 +21,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef _TARDI_PIANO_H
 #define _TARDI_PIANO_H
 
@@ -38,7 +38,7 @@ class tardiPiano : public Fl_Widget
 {
 	public 	:
 			tardiPiano(int , int , int , int , const char*);
-			~tardiPiano();	
+			~tardiPiano();
 			void draw();
 			int handle(int);
 			int trouve_note(int,int);
@@ -47,12 +47,12 @@ class tardiPiano : public Fl_Widget
 			int getMSelect();
 			void maj();
 			void setLSelect(int);
-			void setRSelect(int);	
-			void setMSelect(int);	
-	
-	private : 		
-		 	float touches[128][2];//0:posX,1:type	
-			int lSelect,rSelect,mSelect;	
+			void setRSelect(int);
+			void setMSelect(int);
+
+	private :
+		 	float touches[128][2];//0:posX,1:type
+			int lSelect,rSelect,mSelect;
 			int mouse;
 };
 

@@ -55,7 +55,7 @@ int sample::tryLoad(char* file,char* relativeFile,std::string tapFile)
 	{
 		if(relativeFile!=NULL)
 		{
-			size_t found = tapFile.find_last_of("/\\");	
+			size_t found = tapFile.find_last_of("/\\");
 			std::string relativeToTapFile;
 			if(found!=tapFile.npos)
 			{
@@ -69,7 +69,7 @@ int sample::tryLoad(char* file,char* relativeFile,std::string tapFile)
 			char * buffer = new char[ size ];
 			strncpy( buffer, relativeToTapFile.c_str(), size );
 			if(!load(buffer))
-			{	
+			{
 				processFileName(std::string(relativeFile),tapFile);
 				res=0;
 				loaded=true;
@@ -97,13 +97,13 @@ int sample::load(char* file)
 
 	if(!sndFile)
 		return -1;
-	
+
 	//test the samplerate
 	sampleRate = sfInfo.samplerate;
-	
+
 	//channels
 	channelsCount =  sfInfo.channels;
-	
+
 	//frames number
 	framesCount = (long)(sfInfo.frames);
 
@@ -114,7 +114,7 @@ int sample::load(char* file)
 
 	}
 
-	
+
 /*
 	float cf[channelsCount];
 	//read the files into the buffers
@@ -153,7 +153,7 @@ void sample::setSampleRate(int sr)
 	if(sr != sampleRate && loaded)
 	{
 		loaded=false;
-		long newFramesCount = (long)((double)framesCount / (double) sampleRate * (double)sr); 
+		long newFramesCount = (long)((double)framesCount / (double) sampleRate * (double)sr);
 
 		jack_default_audio_sample_t** convs = new jack_default_audio_sample_t*[channelsCount];
 		SRC_DATA *datas = new SRC_DATA[channelsCount];
@@ -168,12 +168,12 @@ void sample::setSampleRate(int sr)
 			datas[i].output_frames = newFramesCount;
 			datas[i].src_ratio = (double)sr / (double)sampleRate;
 
-			src_simple(datas+i, 0, 1) ;	
+			src_simple(datas+i, 0, 1) ;
 		}
 
 		for(int i=0;i<channelsCount;++i)
 		{
-			delete [] buffers[i];	
+			delete [] buffers[i];
 			buffers[i] = new jack_default_audio_sample_t[datas[i].output_frames_gen];
 
 			for(int j=0;j<datas[i].output_frames_gen;++j)
@@ -191,7 +191,7 @@ void sample::setSampleRate(int sr)
 		}
 		delete [] convs;
 		delete [] datas;
-		
+
 		loaded=true;
 	}
 }
@@ -201,7 +201,7 @@ void sample::unload()
 	//unload the file
 	if(buffers)
 	{
-		for(int i=0;i<channelsCount;++i)	
+		for(int i=0;i<channelsCount;++i)
 			delete [] buffers[i];
 		delete [] buffers;
 	}
@@ -231,7 +231,7 @@ void sample::addUser()
 
 int sample::getNbUsers()
 {
-	return nbUsers;	
+	return nbUsers;
 }
 
 void sample::removeUser()
@@ -257,7 +257,7 @@ void sample::getFrame(const int& channel, const double& offset, jack_default_aud
 		unsigned char d = (int)((offset - floor(offset)) * (0xFFFFFFFFU)) >> 24;
 		//cout<<d<<endl;
 		if(channelsCount==1) { //mono sound
-			frame = buffers[0][off1]*ct0[d] + buffers[0][off2]*ct1[d] + buffers[0][off3]*ct2[d] + buffers[0][off4]*ct3[d];	
+			frame = buffers[0][off1]*ct0[d] + buffers[0][off2]*ct1[d] + buffers[0][off3]*ct2[d] + buffers[0][off4]*ct3[d];
 		}
 		else {			//stereo sound
 			frame = buffers[channel][off1]*ct0[d] + buffers[channel][off2]*ct1[d] + buffers[channel][off3]*ct2[d] + buffers[channel][off4]*ct3[d];
@@ -303,9 +303,9 @@ float cerp(float y0, float y1, float y2, float y3, guint8 d)
 	if(loaded)
 	{
 		if(channelsCount==1) //mono sound
-			return buffers[0][(long)offset];	
+			return buffers[0][(long)offset];
 		else			//stereo sound
-			return buffers[channel][(long)offset];	
+			return buffers[channel][(long)offset];
 	}
 	else
 			return 0;
@@ -329,7 +329,7 @@ void sample::processFileName(std::string f,std::string t)
 	{
 		if(t==".") //if path like .
 			t = "";
-		
+
 		//remove the ../ if any
 		std::string tmpCD = currentDirectory;
 		bool bback=false;
@@ -342,12 +342,12 @@ void sample::processFileName(std::string f,std::string t)
 			else
 			{
 				t = t.substr(back+3);
-				tmpCD = tmpCD.substr(0,back2); 
+				tmpCD = tmpCD.substr(0,back2);
 			}
 		}
 		if(t!="")
 		{
-			t = tmpCD+"/"+t; 
+			t = tmpCD+"/"+t;
 		}
 		else
 		{
@@ -355,7 +355,7 @@ void sample::processFileName(std::string f,std::string t)
 		}
 	}
 	//get last '/'
-	size_t found = t.find_last_of("/\\");	
+	size_t found = t.find_last_of("/\\");
 
 	//NAME OF THE FILE
 	name= t.substr(found+1);
@@ -382,14 +382,14 @@ void sample::processFileName(std::string f,std::string t)
 			else
 			{
 				f = f.substr(back+3);
-				tmpCD = tmpCD.substr(0,back2); 
+				tmpCD = tmpCD.substr(0,back2);
 			}
 		}
-		f = tmpCD+"/"+f; 
+		f = tmpCD+"/"+f;
 	}
 
 	//get last '/'
-	found = f.find_last_of("/\\");	
+	found = f.find_last_of("/\\");
 
 	//NAME OF THE FILE
 	name= f.substr(found+1);
@@ -405,7 +405,7 @@ void sample::processFileName(std::string f,std::string t)
 	{
 		size_t slashF = tmpF.find_first_of("/\\")+1;
 		size_t slashT = tmpT.find_first_of("/\\")+1;
-		
+
 		std::string subF = tmpF.substr(0,slashF);
 		std::string subT = tmpT.substr(0,slashT);
 
@@ -420,16 +420,16 @@ void sample::processFileName(std::string f,std::string t)
 		}
 	}
 
-	//get the number of directories in the tap path	
+	//get the number of directories in the tap path
 	root=false;
 	while(tmpT.length()>0)
 	{
 		size_t slashT = tmpT.find_first_of("/\\")+1;
 		tmpT = tmpT.substr(slashT);
-		pathFromTap+="../";	
+		pathFromTap+="../";
 	}
-	
-	//get path from tap	
+
+	//get path from tap
 	pathFromTap = pathFromTap+tmpF;
 
 	//so we have the absolute name
@@ -442,4 +442,3 @@ void sample::processFileName(std::string f,std::string t)
 	//and we have the relative name
 	relativeName = pathFromTap+name;
 }
-

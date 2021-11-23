@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #include "variation.h"
 #include <alsa/asoundlib.h>
 #include "tapeutape.h"
@@ -60,12 +60,12 @@ void variation::setMaxVeloc(unsigned short vmax)
 {
 	 maxVeloc=vmax;
 }
-			
+
 void variation::setMinVeloc(unsigned short vmin)
 {
 	 minVeloc=vmin;
 }
-			
+
 unsigned short variation::getMaxVeloc()
 {
 	 return maxVeloc;
@@ -100,4 +100,3 @@ void variation::getFrame(const int& channel, const double& offset, jack_default_
 		frame=0;
 	}
 }
-

@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef AUDIOEVENT_H
 #define AUDIOEVENT_H
 
@@ -55,16 +55,16 @@ class audioEvent			//audio event triggered by midi
 						offset=var->getSample()->getFramesCount()-1;
 					}
 				}
-			} 
+			}
 			//we start fading out
 			inline void fadeOut(int nframes)
 			{
 				fade=volume/1000.0;
 			}
 
-			inline int getPlayingLength(int nframes) 
+			inline int getPlayingLength(int nframes)
 			{
-				int length= (int)nframes; 
+				int length= (int)nframes;
 				//if looping, always return the max nb of frames
 				//if not looping
 				if(!m_playLoop)
@@ -87,12 +87,12 @@ class audioEvent			//audio event triggered by midi
 					volume-=fade;
 				return volume;
 			}
-			
+
 	private:
 			variation* var;
 			instrument* instru;
 			double pitch;
-			unsigned long id; 
+			unsigned long id;
 			bool event;
 			double volume;
 			double panLeft;

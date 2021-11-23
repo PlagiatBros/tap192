@@ -48,14 +48,14 @@ int tapParser::createTree(char* f)
 	fileName=f;
    	doc= xmlReadFile(f,NULL,0);
     	root_element = xmlDocGetRootElement(doc);
-	if (doc == NULL || root_element==NULL ) 
+	if (doc == NULL || root_element==NULL )
 	{
 		std::string fn(f);
         	tap->showMessage(true,"Failed to parse "+fn);
 		return -1;
     	}
 
-	if (xmlStrcmp(root_element->name, (const xmlChar *) "tapeutape")) 
+	if (xmlStrcmp(root_element->name, (const xmlChar *) "tapeutape"))
 	{
 		tap->showMessage(true,"Document of the wrong type, root node != tapeutape");
 		xmlFreeDoc(doc);
@@ -95,11 +95,11 @@ int tapParser::parseCurrent(xmlNodePtr a_node)
 {
     	xmlNodePtr cur_node = NULL;
 
-	for (cur_node = a_node; cur_node; cur_node = cur_node->next) 
+	for (cur_node = a_node; cur_node; cur_node = cur_node->next)
  	{
-		char* val = NULL;    	
+		char* val = NULL;
 		std::string nodeName((const char*)(cur_node->name));
-        	if (cur_node->type == XML_ELEMENT_NODE) 
+        	if (cur_node->type == XML_ELEMENT_NODE)
 		{
 			if(nodeName=="options")
 			{
@@ -124,35 +124,35 @@ int tapParser::parseOptions(xmlNodePtr cur_node)
 	val=(char*)xmlGetProp(cur_node,(xmlChar*)"globalvolume");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : globalvolume missing in the options node"); 
+		tap->showMessage(true,"Problem in the .tap file : globalvolume missing in the options node");
 		return -1;
 	}
-	tap->setGlobalVolume(atof(val));					
-	val=NULL;	
+	tap->setGlobalVolume(atof(val));
+	val=NULL;
 
 	//sets the max polyphony
 	val = (char*)xmlGetProp(cur_node,(xmlChar*)"max_polyphony");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : max_polyphony missing in the options node"); 
+		tap->showMessage(true,"Problem in the .tap file : max_polyphony missing in the options node");
 		return -1;
 	}
 	tap->setPolyphony(atoi(val));
 
     	xmlNodePtr cNode = NULL;
 
-	for (cNode = cur_node->children; cNode; cNode = cNode->next) 
+	for (cNode = cur_node->children; cNode; cNode = cNode->next)
  	{
-		val = NULL;    	
+		val = NULL;
 		std::string nodeName((const char*)(cNode->name));
-        	if (cNode->type == XML_ELEMENT_NODE) 
+        	if (cNode->type == XML_ELEMENT_NODE)
 		{
 			if(nodeName=="jack-output")
 			{
 				val=(char*)xmlGetProp(cNode,(xmlChar*)"name");
 				if(val==NULL)
 				{
-					tap->showMessage(true,"Problem in the .tap file : name missing in a jack-output node"); 
+					tap->showMessage(true,"Problem in the .tap file : name missing in a jack-output node");
 					return -1;
 				}
 				tap->addJackStereoChannel(val);
@@ -167,11 +167,11 @@ int tapParser::parseCreation(xmlNodePtr cur_node)
 {
 	char* val=NULL;
     	xmlNodePtr cNode = NULL;
-	for (cNode = cur_node->children; cNode; cNode = cNode->next) 
+	for (cNode = cur_node->children; cNode; cNode = cNode->next)
  	{
-		val = NULL;    	
+		val = NULL;
 		std::string nodeName((const char*)(cNode->name));
-        	if (cNode->type == XML_ELEMENT_NODE) 
+        	if (cNode->type == XML_ELEMENT_NODE)
 		{
 			if(nodeName=="setup")
 				if(parseSetup(cNode))
@@ -193,7 +193,7 @@ int tapParser::parseSetup(xmlNodePtr cur_node)
 	val =(char*)xmlGetProp(cur_node,(xmlChar*)"channel");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : channel missing in a setup node"); 
+		tap->showMessage(true,"Problem in the .tap file : channel missing in a setup node");
 		return -1;
 	}
 	chan = (unsigned short)atoi(val);
@@ -202,35 +202,35 @@ int tapParser::parseSetup(xmlNodePtr cur_node)
 	val = (char*)xmlGetProp(cur_node,(xmlChar*)"cc");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : cc missing in a setup node"); 
+		tap->showMessage(true,"Problem in the .tap file : cc missing in a setup node");
 		return -1;
 	}
 	cc = (unsigned short)atoi(val);
 	s->setCC(chan,cc);
 	val=NULL;
-		
+
 	val= (char*)xmlGetProp(cur_node,(xmlChar*)"name");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : name missing in a setup node"); 
+		tap->showMessage(true,"Problem in the .tap file : name missing in a setup node");
 		return -1;
 	}
 	std::string name(val);
 	s->setName(name);
 
     	xmlNodePtr cNode = NULL;
-	for (cNode = cur_node->children; cNode; cNode = cNode->next) 
+	for (cNode = cur_node->children; cNode; cNode = cNode->next)
  	{
-		val = NULL;    	
+		val = NULL;
 		std::string nodeName((const char*)(cNode->name));
-        	if (cNode->type == XML_ELEMENT_NODE) 
+        	if (cNode->type == XML_ELEMENT_NODE)
 		{
 			if(nodeName=="kit")
 				if(parseKit(cNode,s))
 					return -1;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -247,7 +247,7 @@ int tapParser::parseKit(xmlNodePtr cur_node,setup* s)
 	val=(char*)xmlGetProp(cur_node,(xmlChar*)"name");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : name missing in a kit node"); 
+		tap->showMessage(true,"Problem in the .tap file : name missing in a kit node");
 		return -1;
 	}
 	k->setName(val);
@@ -260,11 +260,11 @@ int tapParser::parseKit(xmlNodePtr cur_node,setup* s)
 	}
 
     	xmlNodePtr cNode = NULL;
-	for (cNode = cur_node->children; cNode; cNode = cNode->next) 
+	for (cNode = cur_node->children; cNode; cNode = cNode->next)
  	{
-		val = NULL;    	
+		val = NULL;
 		std::string nodeName((const char*)(cNode->name));
-        	if (cNode->type == XML_ELEMENT_NODE) 
+        	if (cNode->type == XML_ELEMENT_NODE)
 		{
 			if(nodeName=="instrument")
 				if(parseInstrument(cNode,k))
@@ -282,12 +282,12 @@ int tapParser::parseInstrument(xmlNodePtr cur_node,kit* k)
 	//add a new instrument to the current kit
 	instrument* ins = new instrument();
 	k->addInstrument(ins);
-	
+
 	//set its name
-	val=(char*)xmlGetProp(cur_node,(xmlChar*)"name");	
+	val=(char*)xmlGetProp(cur_node,(xmlChar*)"name");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : name missing in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : name missing in an instrument node");
 		return -1;
 	}
 	ins->setName(val);
@@ -298,82 +298,82 @@ int tapParser::parseInstrument(xmlNodePtr cur_node,kit* k)
 	val=(char*)xmlGetProp(cur_node,(xmlChar*)"minnote");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : minnote missing in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : minnote missing in an instrument node");
 		return -1;
 	}
-	ins->setMinNote(atoi(val)); 	
+	ins->setMinNote(atoi(val));
 	val=NULL;
 
 	//sets its maximum note
 	val=(char*)xmlGetProp(cur_node,(xmlChar*)"maxnote");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : maxnote missing in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : maxnote missing in an instrument node");
 		return -1;
 	}
-	ins->setMaxNote(atoi(val)); 
-	val=NULL;					
+	ins->setMaxNote(atoi(val));
+	val=NULL;
 
 	//sets its root note
 	val=(char*)xmlGetProp(cur_node,(xmlChar*)"rootnote");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : rootnote missing in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : rootnote missing in an instrument node");
 		return -1;
 	}
-	ins->setRootNote(atoi(val)); 
+	ins->setRootNote(atoi(val));
 	val=NULL;
 
 	//sets its root note fine
 	val=(char*)xmlGetProp(cur_node,(xmlChar*)"rootnotefine");
 	float fine=0;
 	if(val==NULL) {
-		tap->showMessage(true,"Problem in the .tap file : rootnotefine missing in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : rootnotefine missing in an instrument node");
 	}
 	else {
 		fine = atof(val);
 	}
-	ins->setRootNoteFine(fine); 
+	ins->setRootNoteFine(fine);
 	val=NULL;
-	
+
 	//sets its channel
 	val=(char*)xmlGetProp(cur_node,(xmlChar*)"channel");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : channel missing in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : channel missing in an instrument node");
 		return -1;
 	}
-	ins->setMidiChannel(atoi(val)); 
-	val=NULL;	
-	
+	ins->setMidiChannel(atoi(val));
+	val=NULL;
+
 	//sets its polyphony
 	val =  (char*)xmlGetProp(cur_node,(xmlChar*)"polyphony");
 	if(val!=NULL)
-		ins->setPolyphony(atoi(val)); 
+		ins->setPolyphony(atoi(val));
 	else
-		ins->setPolyphony(0); 
-	
+		ins->setPolyphony(0);
+
 	val=NULL;
 
 	//sets its cut
 	val = (char*)xmlGetProp(cur_node,(xmlChar*)"cut");
 	if(val!=NULL)
-		ins->setCut(atoi(val)); 
+		ins->setCut(atoi(val));
 	else
-		ins->setCut(-1); 
+		ins->setCut(-1);
 	val=NULL;
 
 	//sets its jack channel
 	val = (char*)xmlGetProp(cur_node,(xmlChar*)"output");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : output missing in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : output missing in an instrument node");
 		return -1;
 	}
 	prop= tap->getJackStereoChannel(val);
 	if(prop==-1)
 	{
-		tap->showMessage(true,"Problem in the .tap file : unknown output in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : unknown output in an instrument node");
 		prop=0;
 	}
 	ins->setJackStereoChannel(prop);
@@ -383,7 +383,7 @@ int tapParser::parseInstrument(xmlNodePtr cur_node,kit* k)
 	val = (char*)xmlGetProp(cur_node,(xmlChar*)"volume");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : volume missing in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : volume missing in an instrument node");
 		return -1;
 	}
 	ins->setVolume(atof(val));
@@ -393,11 +393,11 @@ int tapParser::parseInstrument(xmlNodePtr cur_node,kit* k)
 	val = (char*)xmlGetProp(cur_node,(xmlChar*)"pan");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : pan missing in an instrument node"); 
+		tap->showMessage(true,"Problem in the .tap file : pan missing in an instrument node");
 		return -1;
 	}
 	ins->setPan(atof(val));
-	
+
 	//sets if we pitch over range
 	char* por =  (char*)xmlGetProp(cur_node,(xmlChar*)"pitch_over_range");
 	if(por!=NULL)
@@ -443,20 +443,20 @@ int tapParser::parseInstrument(xmlNodePtr cur_node,kit* k)
 
 	//get the variations
     	xmlNodePtr cNode = NULL;
-	for (cNode = cur_node->children; cNode; cNode = cNode->next) 
+	for (cNode = cur_node->children; cNode; cNode = cNode->next)
  	{
-		val = NULL;    	
+		val = NULL;
 		std::string nodeName((const char*)(cNode->name));
-        	if (cNode->type == XML_ELEMENT_NODE) 
+        	if (cNode->type == XML_ELEMENT_NODE)
 		{
 			if(nodeName=="variation")
 				if(parseVariation(cNode,ins))
 					return -1;
 		}
 	}
-	
+
 	return 0;
-	
+
 }
 
 
@@ -471,20 +471,20 @@ int tapParser::parseVariation(xmlNodePtr cur_node,instrument* ins)
 	val = (char*)xmlGetProp(cur_node,(xmlChar*)"minveloc");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : minveloc missing in a variation node"); 
+		tap->showMessage(true,"Problem in the .tap file : minveloc missing in a variation node");
 		return -1;
 	}
-	var->setMinVeloc(atoi(val)); 	
+	var->setMinVeloc(atoi(val));
 	val=NULL;
 
 	//sets its maximum velocity
 	val = (char*)xmlGetProp(cur_node,(xmlChar*)"maxveloc");
 	if(val==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : maxveloc missing in a variation node"); 
+		tap->showMessage(true,"Problem in the .tap file : maxveloc missing in a variation node");
 		return -1;
 	}
-	var->setMaxVeloc(atoi(val)); 	
+	var->setMaxVeloc(atoi(val));
 
 	char* n=NULL;
 	char* rn = NULL;
@@ -493,12 +493,12 @@ int tapParser::parseVariation(xmlNodePtr cur_node,instrument* ins)
 	rn = (char*)xmlGetProp(cur_node,(xmlChar*)"sampleRelative");
 	if(n==NULL)
 	{
-		tap->showMessage(true,"Problem in the .tap file : sample missing in a variation node"); 
+		tap->showMessage(true,"Problem in the .tap file : sample missing in a variation node");
 		return -1;
 	}
-	
+
 	var->setSample(tap->addSample(n,rn));
-	
+
 	usleep(100);
 
 	return 0;
@@ -508,15 +508,15 @@ int tapParser::saveToFile(char* filename)
 {
 
 	char buf[32];
-	
-	xmlDocPtr doc = NULL;  
+
+	xmlDocPtr doc = NULL;
     	xmlNodePtr rootNode = NULL, node1 = NULL, node2 = NULL,node3 = NULL,node4 = NULL,node5 = NULL;
 
 	doc = xmlNewDoc(BAD_CAST "1.0");
     	rootNode = xmlNewNode(NULL, BAD_CAST "tapeutape");
 	xmlNewProp(rootNode, BAD_CAST "version", BAD_CAST TAPEUTAPE_VERSION );
     	xmlDocSetRootElement(doc, rootNode);
-	
+
 	//option node
 	node1 = xmlNewChild(rootNode, NULL, BAD_CAST "options",NULL);
 	sprintf(buf, "%f", tap->getGlobalVolume());
@@ -524,17 +524,17 @@ int tapParser::saveToFile(char* filename)
 	sprintf(buf, "%d", tap->getPolyphony());
 	xmlNewProp(node1, BAD_CAST "max_polyphony", BAD_CAST buf);
 
-	
+
 	for(int i=0;i<tap->getNbJackStereoChannels();++i) 	//jackChannels nodes
 	{
-		node2=xmlNewChild(node1,NULL,BAD_CAST "jack-output",NULL);	
+		node2=xmlNewChild(node1,NULL,BAD_CAST "jack-output",NULL);
 		size_t size = tap->getJackStereoChannelName(i).size() + 1;
 		char * buffer = new char[ size ];
 		strncpy( buffer, tap->getJackStereoChannelName(i).c_str(), size );
 		xmlNewProp(node2, BAD_CAST "name", BAD_CAST buffer);
 		delete [] buffer;
 	}
-	
+
 	//creation node
 	node1 = xmlNewChild(rootNode, NULL, BAD_CAST "creation",NULL);
 	for(int i=0;i<tap->getNbSetups();++i)//setup nodes
@@ -549,14 +549,14 @@ int tapParser::saveToFile(char* filename)
 		for(int j=0;j<currentSetup->getNbKits();++j)//kit nodes
 		{
 			currentKit = currentSetup->getKit(j);
-			node3=xmlNewChild(node2,NULL,BAD_CAST "kit",NULL);	
+			node3=xmlNewChild(node2,NULL,BAD_CAST "kit",NULL);
 			xmlNewProp(node3, BAD_CAST "name", BAD_CAST currentKit->getName().c_str());
 			sprintf(buf, "%f", currentKit->getVolume());
 			xmlNewProp(node3, BAD_CAST "volume", BAD_CAST buf);
 			for(int j=0;j<currentKit->getNbInstruments();++j)	//instrument nodes
 			{
 				currentInstru = currentKit->getInstrument(j);
-				node4=xmlNewChild(node3,NULL,BAD_CAST "instrument",NULL);	
+				node4=xmlNewChild(node3,NULL,BAD_CAST "instrument",NULL);
 				xmlNewProp(node4, BAD_CAST "name", BAD_CAST currentInstru->getName().c_str());
 				sprintf(buf, "%d", currentInstru->getMinNote());
 				xmlNewProp(node4, BAD_CAST "minnote", BAD_CAST buf);
@@ -583,9 +583,9 @@ int tapParser::saveToFile(char* filename)
 				xmlNewProp(node4, BAD_CAST "pan", BAD_CAST buf);
 				if(currentInstru->getPitchOverRange())
 					xmlNewProp(node4, BAD_CAST "pitch_over_range", BAD_CAST "true");
-				else		
+				else
 					xmlNewProp(node4, BAD_CAST "pitch_over_range", BAD_CAST "false");
-					
+
 				if(currentInstru->getPlayMode()==0)
 					xmlNewProp(node4, BAD_CAST "play_mode", BAD_CAST "normal");
 				else if(currentInstru->getPlayMode()==1)
@@ -603,7 +603,7 @@ int tapParser::saveToFile(char* filename)
 				for(int k=0;k<currentInstru->getNbVariations();++k)  //variation nodes
 				{
 					currentVar = currentInstru->getVariation(k);
-					node5=xmlNewChild(node4,NULL,BAD_CAST "variation",NULL);	
+					node5=xmlNewChild(node4,NULL,BAD_CAST "variation",NULL);
 					sprintf(buf, "%d", currentVar->getMinVeloc());
 					xmlNewProp(node5, BAD_CAST "minveloc", BAD_CAST buf);
 					sprintf(buf, "%d", currentVar->getMaxVeloc());
@@ -625,9 +625,9 @@ int tapParser::saveToFile(char* filename)
 					{
 						xmlNewProp(node5, BAD_CAST "sample", BAD_CAST "");
 						xmlNewProp(node5, BAD_CAST "sampleRelative", BAD_CAST "");
-						
+
 					}
-				}	
+				}
 			}
 		}
 	}
@@ -638,7 +638,7 @@ int tapParser::saveToFile(char* filename)
 	xmlFreeDoc(doc);
 
 	xmlCleanupParser();
-	
+
 	return 0;
 }
 
@@ -647,11 +647,11 @@ int tapParser::saveToFile(char* filename)
 int tapParser::parse005(xmlNodePtr a_node)
 {
 	xmlNodePtr cur_node;
-	for (cur_node = a_node; cur_node; cur_node = cur_node->next) 
+	for (cur_node = a_node; cur_node; cur_node = cur_node->next)
  	{
-		char* val = NULL;    	
+		char* val = NULL;
 		std::string nodeName((const char*)(cur_node->name));
-        	if (cur_node->type == XML_ELEMENT_NODE) 
+        	if (cur_node->type == XML_ELEMENT_NODE)
 		{
 			if(nodeName=="options")
 			{
@@ -660,13 +660,13 @@ int tapParser::parse005(xmlNodePtr a_node)
 			}
 			else if(nodeName=="config")
 			{
-				//for each setup 
+				//for each setup
 				xmlNodePtr sNode;
-				for (sNode = cur_node->children; sNode; sNode = sNode->next) 
+				for (sNode = cur_node->children; sNode; sNode = sNode->next)
 				{
-					val = NULL;    	
+					val = NULL;
 					std::string sNodeName((const char*)(sNode->name));
-					if (sNode->type == XML_ELEMENT_NODE && sNodeName=="setup") 
+					if (sNode->type == XML_ELEMENT_NODE && sNodeName=="setup")
 					{
 						//create a new setup
 						setup* s = new setup();
@@ -675,7 +675,7 @@ int tapParser::parse005(xmlNodePtr a_node)
 						val =(char*)xmlGetProp(sNode,(xmlChar*)"channel");
 						if(val==NULL)
 						{
-							tap->showMessage(true,"Problem in the .tap file : channel missing in a setup node"); 
+							tap->showMessage(true,"Problem in the .tap file : channel missing in a setup node");
 							return -1;
 						}
 						chan = (unsigned short)atoi(val);
@@ -684,17 +684,17 @@ int tapParser::parse005(xmlNodePtr a_node)
 						val = (char*)xmlGetProp(sNode,(xmlChar*)"cc");
 						if(val==NULL)
 						{
-							tap->showMessage(true,"Problem in the .tap file : cc missing in a setup node"); 
+							tap->showMessage(true,"Problem in the .tap file : cc missing in a setup node");
 							return -1;
 						}
 						cc = (unsigned short)atoi(val);
 						s->setCC(chan,cc);
 						val=NULL;
-							
+
 						val= (char*)xmlGetProp(sNode,(xmlChar*)"name");
 						if(val==NULL)
 						{
-							tap->showMessage(true,"Problem in the .tap file : name missing in a setup node"); 
+							tap->showMessage(true,"Problem in the .tap file : name missing in a setup node");
 							return -1;
 						}
 						std::string name(val);
@@ -702,31 +702,31 @@ int tapParser::parse005(xmlNodePtr a_node)
 
 						//for each kit in the setup
 						xmlNodePtr kNode;
-						for (kNode = sNode->children; kNode; kNode = kNode->next) 
+						for (kNode = sNode->children; kNode; kNode = kNode->next)
 						{
-							val = NULL;    	
+							val = NULL;
 							std::string kNodeName((const char*)(kNode->name));
-							if (kNode->type == XML_ELEMENT_NODE && kNodeName=="kit") 
+							if (kNode->type == XML_ELEMENT_NODE && kNodeName=="kit")
 							{
-							
+
 								val = (char*)xmlGetProp(kNode,(xmlChar*)"name");
 								if(val==NULL)
 								{
-									tap->showMessage(true,"Problem in the .tap file : name missing in a kit node"); 
+									tap->showMessage(true,"Problem in the .tap file : name missing in a kit node");
 									return -1;
 								}
-								std::string confKitName(val); 
-								
+								std::string confKitName(val);
+
 								//find the corresponding kit in the creation section
 								xmlNodePtr creaNode;
-								for (creaNode = a_node; creaNode; creaNode = creaNode->next) 
+								for (creaNode = a_node; creaNode; creaNode = creaNode->next)
 								{
 									std::string creaNodeName((const char*)(creaNode->name));
 									if (creaNode->type == XML_ELEMENT_NODE && creaNodeName=="creation")
 									{
 						//get back a little
 						xmlNodePtr creaKitNode;
-						for (creaKitNode = creaNode->children; creaKitNode; creaKitNode = creaKitNode->next) 
+						for (creaKitNode = creaNode->children; creaKitNode; creaKitNode = creaKitNode->next)
 						{
 							std::string creaKitNodeName((const char*)(creaKitNode->name));
 							if (creaKitNode->type == XML_ELEMENT_NODE && creaKitNodeName=="kit")
@@ -735,20 +735,20 @@ int tapParser::parse005(xmlNodePtr a_node)
 								val = (char*)xmlGetProp(creaKitNode,(xmlChar*)"name");
 								if(val!=NULL)
 								{
-									
-									std::string creaKitName(val); 
+
+									std::string creaKitName(val);
 									//if we have found the good kit
 									//then parse it and add it to the setup
 									if(creaKitName==confKitName)
 										parseKit(creaKitNode,s);
-									
+
 								}
 							}
 						}
-						//move again	
+						//move again
 									}
 								}
-									
+
 
 							}
 

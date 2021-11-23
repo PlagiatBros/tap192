@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef MIDIPROCESS_H
 #define MIDIPROCESS_H
 
@@ -41,13 +41,13 @@ class midiProcess
 			static void* threadExec(void* );//midiThread method
 			int midiInit(); //midi init
 			void midiLoop(); //midi process loop
-			void stopThread(); //stops the midiThread	
-			int startThread(); //starts the midiThread			
-			void startMidiLearn();	
-			void stopMidiLearn();	
+			void stopThread(); //stops the midiThread
+			int startThread(); //starts the midiThread
+			void startMidiLearn();
+			void stopMidiLearn();
 			int getAlsaID();
 	private:
-			tapeutape* tapeu;	
+			tapeutape* tapeu;
 			pthread_t midiThread; //midiThread ID
 			snd_seq_t *seqHandle;//sequencer handle
 			int midiInputPort;//midi input port

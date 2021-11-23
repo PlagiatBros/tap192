@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef variation_h
 #define variation_h
 
@@ -29,10 +29,10 @@
 #include "../audio/sample.h"
 
 
-class variation 
+class variation
 {
-	
-	public:		
+
+	public:
 		variation();
 		variation(const variation &);
 		~variation();
@@ -44,9 +44,9 @@ class variation
 		int setSample(sample*);
 		sample* getSample();
 		void getFrame(const int&, const double&, jack_default_audio_sample_t&);
-	
-	private:	
+
+	private:
 		unsigned short maxVeloc,minVeloc;
-		sample *sound;	
+		sample *sound;
 };
 #endif

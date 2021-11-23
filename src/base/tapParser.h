@@ -54,7 +54,7 @@ class tapParser
 		int saveToFile(char*);
 
 	private:
-		
+
 		char* fileName;
 		xmlDocPtr doc;
 		xmlNode *root_element;

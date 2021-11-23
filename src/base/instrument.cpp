@@ -71,7 +71,7 @@ void instrument::moveVariation(bool down, int var)
 	variation* swapVar;
 	unsigned short swapVal;
 
-	if(down) //moving towards the end (->127)	
+	if(down) //moving towards the end (->127)
 	{
 		if(var<variations.size()-1)//if not the last var
 		{
@@ -83,11 +83,11 @@ void instrument::moveVariation(bool down, int var)
 			variations[var]->setMinVeloc(swapVal);
 
 			swapVar = variations[var+1];
-			variations[var+1] = variations[var];	
-			variations[var] = swapVar;	
-		}	
+			variations[var+1] = variations[var];
+			variations[var] = swapVar;
+		}
 	}
-	else //moving towards the beginning (->0)	
+	else //moving towards the beginning (->0)
 	{
 		if(var>0)//if not the first var
 		{
@@ -99,11 +99,11 @@ void instrument::moveVariation(bool down, int var)
 			variations[var]->setMinVeloc(swapVal);
 
 			swapVar = variations[var-1];
-			variations[var-1] = variations[var];	
-			variations[var] = swapVar;	
-		}	
+			variations[var-1] = variations[var];
+			variations[var] = swapVar;
+		}
 	}
-}	
+}
 
 void instrument::updateVariations(int var)
 {
@@ -127,9 +127,9 @@ void instrument::updateVariations(int var)
 		{
 			int min = (v==0)?0:v*step+1;
 			int max = ((v+1)*step>127)?127:(v+1)*step;
-			variations[v]->setMinVeloc(min);	
-			variations[v]->setMaxVeloc(max);	
-		}	
+			variations[v]->setMinVeloc(min);
+			variations[v]->setMaxVeloc(max);
+		}
 	}
 }
 
@@ -150,7 +150,7 @@ void instrument::setName(std::string n)
 {
 	name=n;
 }
-		
+
 
 void instrument::setMidi(short com,short chan,short min,short root,short max,float fine)
 {
@@ -158,15 +158,15 @@ void instrument::setMidi(short com,short chan,short min,short root,short max,flo
 	{
 		case 0:
 			{
-				minNote=min;		
-				rootNote=root;		
+				minNote=min;
+				rootNote=root;
 				rootNoteFine=fine;
-				maxNote=max;		
-				midiChannel=(chan>0)?chan-1:0;		
+				maxNote=max;
+				midiChannel=(chan>0)?chan-1:0;
 			}
 			break;
 		default:break;
-	}	
+	}
 }
 
 void instrument::setMinNote(unsigned short mn)
@@ -181,7 +181,7 @@ void instrument::setMaxNote(unsigned short mn)
 
 void instrument::setMidiChannel(unsigned short c)
 {
-	midiChannel=(c>0)?c-1:0;		
+	midiChannel=(c>0)?c-1:0;
 }
 
 void instrument::setRootNote(unsigned short rn)
@@ -243,4 +243,3 @@ bool instrument::getPitchOverRange()
 {
 	return pitchOverRange;
 }
-

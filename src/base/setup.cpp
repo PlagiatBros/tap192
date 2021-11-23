@@ -115,6 +115,3 @@ short setup::getCC()
 {
 	return cc;
 }
-
-
-

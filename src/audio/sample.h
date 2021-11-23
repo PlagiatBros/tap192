@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef _SAMPLE_H
 #define _SAMPLE_H
 
@@ -36,18 +36,18 @@
 class sample
 {
 	public:
-		sample();	
-		~sample();	
-		
+		sample();
+		~sample();
+
 		std::string getName();
 		std::string getAbsoluteName();
 		std::string getRelativeName();
-		
+
 		int tryLoad(char*,char*,std::string);
 		int load(char*);
 		void unload();
 		void processFileName(std::string,std::string);
-	
+
 		void addUser();
 		int getNbUsers();
 		void removeUser();
@@ -55,7 +55,7 @@ class sample
 		void getFrame(const int&, const double&, jack_default_audio_sample_t&);
 		inline int getChannelsCount(){return channelsCount;};
 		inline long getFramesCount(){return framesCount;};
-		inline bool isLoaded(){return loaded;};	
+		inline bool isLoaded(){return loaded;};
 		jack_default_audio_sample_t** getBuffers();
 		void setSampleRate(int);
 
@@ -66,7 +66,7 @@ class sample
 		jack_default_audio_sample_t** buffers;
 		int channelsCount;
 		int sampleRate;
-		long framesCount; 
+		long framesCount;
 		bool loaded;
 		int nbUsers;
 };

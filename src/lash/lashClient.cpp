@@ -38,7 +38,7 @@ void* process(void *arg)
 		lash_event_t*  event  = NULL;
 		lash_config_t* config = NULL;
 		const char*    str    = NULL;
-    
+
 		while ((event = lash_get_event(lashC->client)))
 		{
 			if (lash_event_get_type(event) == LASH_Quit)
@@ -61,7 +61,7 @@ void* process(void *arg)
 				lashC->tap->showMessage(false,"Saved As "+path);
 				lashC->tap->saveWithSamples(cpath,str);
 				delete [] cpath;
-				
+
 				//send the confirmation
 				lash_event_t* conf = lash_event_new_with_type (LASH_Save_File);
 				lash_send_event (lashC->client, conf);
@@ -82,7 +82,7 @@ void* process(void *arg)
 				lashC->tap->load(cpath);
 				lashC->tap->start();
 				delete [] cpath;
-				
+
 				//send the confirmation
 				lash_event_t* conf = lash_event_new_with_type (LASH_Restore_File);
 				lash_send_event (lashC->client, conf);
@@ -141,6 +141,3 @@ int lashClient::stop()
 {
 	return 0;
 }
-
-
-

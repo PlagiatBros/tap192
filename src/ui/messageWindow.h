@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Menu_Item.H>
@@ -36,11 +36,11 @@
 #include <iostream>
 #include <string>
 
- 
+
 #ifndef _MESSAGEWINDOW_H
 #define _MESSAGEWINDOW_H
 
-class messageWindow : public Fl_Window 
+class messageWindow : public Fl_Window
 {
 	public:
 			messageWindow(int ,int ,const char*);

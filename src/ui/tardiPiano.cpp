@@ -27,8 +27,8 @@
 using namespace std;
 
 tardiPiano::tardiPiano(int x, int y, int w, int h, const char* n) : Fl_Widget(x,y,w,h,n),lSelect(60),rSelect(60),mSelect(60)
-{	
-	
+{
+
 	float whiteW = 1.0/75.0;
 	float blackW = whiteW/2.0;
 
@@ -39,8 +39,8 @@ tardiPiano::tardiPiano(int x, int y, int w, int h, const char* n) : Fl_Widget(x,
 		{
 			touches[12*i+j][0] =  (float)(7*i)*whiteW + pos*whiteW;
 			touches[12*i+j][1] = 0;
-		}	
-		
+		}
+
 		for(int j=5;j<12;j+=2,++pos) //second part of the white keys
 		{
 			touches[12*i+j][0] = (float)(7*i)*whiteW + pos*whiteW;
@@ -52,7 +52,7 @@ tardiPiano::tardiPiano(int x, int y, int w, int h, const char* n) : Fl_Widget(x,
 		{
 			touches[12*i+j][0] = (float)(7*i)*whiteW +pos*whiteW - blackW/2.0;
 			touches[12*i+j][1] = 1;
-			
+
 		}
 		++pos;
 		for(int j=6;j<11;j+=2,++pos) // second part of the black keys
@@ -70,15 +70,15 @@ tardiPiano::tardiPiano(int x, int y, int w, int h, const char* n) : Fl_Widget(x,
 	{
 		touches[12*i+j][0] = (7*i)*whiteW + pos*whiteW;
 		touches[12*i+j][1] = 0;
-	}		
+	}
 	pos=1;
 	for(int j=1;j<4;j+=2,++pos) //black keys
 	{
 		touches[12*i+j][0] = (7*i)*whiteW +pos*whiteW - blackW/2;
 		touches[12*i+j][1] = 1;
-		
+
 	}
-	
+
 	//last white keys
 	pos=3;
 	touches[12*i+5][0] = (7*i)*whiteW + pos*whiteW;
@@ -92,20 +92,20 @@ tardiPiano::tardiPiano(int x, int y, int w, int h, const char* n) : Fl_Widget(x,
 	touches[12*i+6][0] = (7*i)*whiteW +pos*whiteW - blackW/2;
 	touches[12*i+6][1] = 1;
 
-}	
-				
-				
+}
+
+
 tardiPiano::~tardiPiano()
 {
-	
+
 }
-				
+
 void tardiPiano::draw()
 {
 	//draw the white keys
 	float noteH=this->h();
 	float noteW=this->w()/75.0;
-	for(int i=0;i<128;++i)	
+	for(int i=0;i<128;++i)
 	{
 		switch((int)(touches[i][1]))
 		{
@@ -131,7 +131,7 @@ void tardiPiano::draw()
 		if(touches[i][1]==0.0 || touches[i][1]==2.0 || touches[i][1]==4.0)
 		{
 			if(touches[i][1]==0.0)
-			
+
 				fl_draw_box(FL_THIN_UP_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,FL_BACKGROUND_COLOR);
 			else
 				fl_draw_box(FL_THIN_UP_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,FL_INACTIVE_COLOR);
@@ -143,7 +143,7 @@ void tardiPiano::draw()
 	//draw the black keys
 	noteH=(float)(this->h())/2.0;
 	noteW=this->w()/(75.0*2.0);
-	for(int i=0;i<128;++i)	
+	for(int i=0;i<128;++i)
 	{
 		switch((int)(touches[i][1]))
 		{
@@ -175,23 +175,23 @@ void tardiPiano::draw()
 		}
 		*/
 	}
-	
+
 }
 
 
 int tardiPiano::handle(int event)
 {
-	
+
 	int posX = Fl::event_x();
 	int posY = Fl::event_y();
-				
+
 	int note=60;
 	note = trouve_note(posX,posY);
 
 	switch(event)
 	{
 		//si clique : on recupere la pos de la souris
-		case FL_PUSH : 
+		case FL_PUSH :
 		{
 			switch(Fl::event_button())
 			{
@@ -203,8 +203,8 @@ int tardiPiano::handle(int event)
 						else
 							lSelect=rSelect;
 						maj();
-						do_callback();	
-						return 1;	
+						do_callback();
+						return 1;
 					}break;
 				case FL_RIGHT_MOUSE : //if right clic, end range
 					{
@@ -215,7 +215,7 @@ int tardiPiano::handle(int event)
 							rSelect=lSelect;
 						maj();
 						do_callback();
-						return 1;	
+						return 1;
 					}break;
 				case FL_MIDDLE_MOUSE : //if middle clic
 					{
@@ -223,7 +223,7 @@ int tardiPiano::handle(int event)
 						mSelect=note;
 						maj();
 						do_callback();
-						return 1;	
+						return 1;
 					}break;
 				default:
       					return Fl_Widget::handle(event);
@@ -240,8 +240,8 @@ int tardiPiano::handle(int event)
 							else
 								lSelect=rSelect;
 							maj();
-							do_callback();	
-							return 1;	
+							do_callback();
+							return 1;
 						}
 						break;
 					case FL_RIGHT_MOUSE:
@@ -252,7 +252,7 @@ int tardiPiano::handle(int event)
 								rSelect=lSelect;
 							maj();
 							do_callback();
-							return 1;	
+							return 1;
 						}
 						break;
 					case FL_MIDDLE_MOUSE:
@@ -260,7 +260,7 @@ int tardiPiano::handle(int event)
 							mSelect=note;
 							maj();
 							do_callback();
-							return 1;	
+							return 1;
 						}
 						break;
 					default:
@@ -272,7 +272,7 @@ int tardiPiano::handle(int event)
 		case FL_RELEASE:
 			{
 				mouse=-1;
-				return 1;	
+				return 1;
 			}
 			break;
 		default:
@@ -287,7 +287,7 @@ int tardiPiano::trouve_note(int posX,int posY)
 
 	posX-=this->x();
 	posY-=this->y();
-				
+
 	if(posY>this->h()/2)//si on est apres la moitie en hauteur
 	{	//alors on ne cherche que dans les blanches
 		for(int i=0;i<128;++i)
@@ -296,9 +296,9 @@ int tardiPiano::trouve_note(int posX,int posY)
 				{
 					res=i;
 					break;
-				}		
+				}
 	}
-	else			//sinon on cherche deja dans les noires	
+	else			//sinon on cherche deja dans les noires
 	{
 		for(int i=0;i<128;++i)
 			if(fmod(touches[i][1],2)!=0)
@@ -378,7 +378,3 @@ void tardiPiano::maj()
 
 	this->redraw();
 }
-
-
-
-

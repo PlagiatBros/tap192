@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Menu_Item.H>
@@ -36,23 +36,23 @@
 #include <iostream>
 #include <string>
 
- 
+
 #ifndef _ADDKITDIALOG_H
 #define _ADDKITDIALOG_H
 
-class addKitDialog : public Fl_Window 
+class addKitDialog : public Fl_Window
 {
 	public:
 			addKitDialog(int ,int ,const char*);
 			~addKitDialog();
 
-  			static void statOkBut(Fl_Widget* w,void* f){addKitDialog *tmpf = static_cast<addKitDialog *>(f);tmpf->cbOkBut(w);}	
+  			static void statOkBut(Fl_Widget* w,void* f){addKitDialog *tmpf = static_cast<addKitDialog *>(f);tmpf->cbOkBut(w);}
 			void cbOkBut(Fl_Widget*);
-  			static void statCancelBut(Fl_Widget* w,void* f){addKitDialog *tmpf = static_cast<addKitDialog*>(f);tmpf->cbCancelBut(w);}	
+  			static void statCancelBut(Fl_Widget* w,void* f){addKitDialog *tmpf = static_cast<addKitDialog*>(f);tmpf->cbCancelBut(w);}
 			void cbCancelBut(Fl_Widget*);
-  			static void statChoice(Fl_Widget* w,void* f){addKitDialog *tmpf = static_cast<addKitDialog *>(f);tmpf->cbChoice(w);}	
+  			static void statChoice(Fl_Widget* w,void* f){addKitDialog *tmpf = static_cast<addKitDialog *>(f);tmpf->cbChoice(w);}
 			void cbChoice(Fl_Widget*);
-			
+
 			int getValue();
 			void addKit(const char*);
 

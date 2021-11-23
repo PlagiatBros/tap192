@@ -41,6 +41,3 @@ m_playReverse(instru->getPlayReverse())
 		offset=var->getSample()->getFramesCount()-1;
 	}
 }
-
-
-

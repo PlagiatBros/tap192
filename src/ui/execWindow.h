@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Item.H>
@@ -52,132 +52,132 @@
 #include "../base/kit.h"
 #include "../base/instrument.h"
 #include "../base/variation.h"
- 
+
 #ifndef _EXECWINDOW_H
 #define _EXECWINDOW_H
 
 class tapeutape;
 
-class execWindow : public Fl_Double_Window 
+class execWindow : public Fl_Double_Window
 {
   public:
 			execWindow(int ,int ,const char*,tapeutape* );
 			~execWindow();
 
-			
-  			static void statWindow(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbWindow(w);}	
+
+  			static void statWindow(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbWindow(w);}
 			void cbWindow(Fl_Widget*);
 
 			//menu callback
-  			static void statOpen(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbOpen(w);}	
+  			static void statOpen(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbOpen(w);}
 			void cbOpen(Fl_Widget*);
-  			static void statSave(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSave(w);}	
+  			static void statSave(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSave(w);}
 			void cbSave(Fl_Widget*);
-  			static void statSaveAs(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSaveAs(w);}	
+  			static void statSaveAs(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSaveAs(w);}
 			void cbSaveAs(Fl_Widget*);
-  			static void statQuit(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbQuit(w);}	
+  			static void statQuit(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbQuit(w);}
 			void cbQuit(Fl_Widget*);
-  			static void statMessages(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbMessages(w);}	
+  			static void statMessages(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbMessages(w);}
 			void cbMessages(Fl_Widget*);
-  			static void statImport(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbImport(w);}	
+  			static void statImport(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbImport(w);}
 			void cbImport(Fl_Widget*);
 
-			
+
 			//tabs
-  			static void statTabs(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbTabs(w);}	
+  			static void statTabs(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbTabs(w);}
 			void cbTabs(Fl_Widget*);
 
 			//settings tab
-  			static void statSetOutList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetOutList(w);}	
+  			static void statSetOutList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetOutList(w);}
 			void cbSetOutList(Fl_Widget*);
-  			static void statSetOutNew(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetOutNew(w);}	
+  			static void statSetOutNew(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetOutNew(w);}
 			void cbSetOutNew(Fl_Widget*);
-  			static void statSetOutRemove(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetOutRemove(w);}	
+  			static void statSetOutRemove(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetOutRemove(w);}
 			void cbSetOutRemove(Fl_Widget*);
-  			static void statSetOutName(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetOutName(w);}	
+  			static void statSetOutName(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetOutName(w);}
 			void cbSetOutName(Fl_Widget*);
-  			static void statSetCheckPoly(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetCheckPoly(w);}	
+  			static void statSetCheckPoly(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetCheckPoly(w);}
 			void cbSetCheckPoly(Fl_Widget*);
-  			static void statSetPoly(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetPoly(w);}	
+  			static void statSetPoly(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetPoly(w);}
 			void cbSetPoly(Fl_Widget*);
-  			static void statSetVolume(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetVolume(w);}	
+  			static void statSetVolume(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbSetVolume(w);}
 			void cbSetVolume(Fl_Widget*);
 
 
 			//creation tab
 			//lists
-  			static void statCreaSetupList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaSetupList(w);}	
+  			static void statCreaSetupList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaSetupList(w);}
 			void cbCreaSetupList(Fl_Widget*);
-  			static void statCreaKitList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaKitList(w);}	
+  			static void statCreaKitList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaKitList(w);}
 			void cbCreaKitList(Fl_Widget*);
-  			static void statCreaInstList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaInstList(w);}	
+  			static void statCreaInstList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaInstList(w);}
 			void cbCreaInstList(Fl_Widget*);
-  			static void statCreaVarList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaVarList(w);}	
+  			static void statCreaVarList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaVarList(w);}
 			void cbCreaVarList(Fl_Widget*);
-			
+
 			//global
-  		
-			static void statCreaNew(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaNew(w);}	
+
+			static void statCreaNew(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaNew(w);}
 			void cbCreaNew(Fl_Widget*);
-			static void statCreaCopyPaste(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCopyPaste(w);}	
+			static void statCreaCopyPaste(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCopyPaste(w);}
 			void cbCreaCopyPaste(Fl_Widget*);
-  			static void statCreaRemove(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaRemove(w);}	
+  			static void statCreaRemove(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaRemove(w);}
 			void cbCreaRemove(Fl_Widget*);
-  			static void statCreaUp(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaUp(w);}	
+  			static void statCreaUp(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaUp(w);}
 			void cbCreaUp(Fl_Widget*);
-  			static void statCreaDown(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaDown(w);}	
+  			static void statCreaDown(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaDown(w);}
 			void cbCreaDown(Fl_Widget*);
 
-  			static void statCreaName(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaName(w);}	
+  			static void statCreaName(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaName(w);}
 			void cbCreaName(Fl_Widget*);
-  			static void statCreaPlayMode(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaPlayMode(w);}	
+  			static void statCreaPlayMode(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaPlayMode(w);}
 			void cbCreaPlayMode(Fl_Widget*);
-  			static void statCreaCut(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCut(w);}	
+  			static void statCreaCut(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCut(w);}
 			void cbCreaCut(Fl_Widget*);
-  			static void statCreaCheckCut(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCheckCut(w);}	
+  			static void statCreaCheckCut(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCheckCut(w);}
 			void cbCreaCheckCut(Fl_Widget*);
-  			static void statCreaPoly(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaPoly(w);}	
+  			static void statCreaPoly(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaPoly(w);}
 			void cbCreaPoly(Fl_Widget*);
-  			static void statCreaCheckPoly(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCheckPoly(w);}	
+  			static void statCreaCheckPoly(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCheckPoly(w);}
 			void cbCreaCheckPoly(Fl_Widget*);
-  			static void statCreaCheckPitch(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCheckPitch(w);}	
+  			static void statCreaCheckPitch(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaCheckPitch(w);}
 			void cbCreaCheckPitch(Fl_Widget*);
-  			static void statCreaSampleOpen(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaSampleOpen(w);}	
+  			static void statCreaSampleOpen(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaSampleOpen(w);}
 			void cbCreaSampleOpen(Fl_Widget*);
 
 			//audio
-  			static void statCreaVolume(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaVolume(w);}	
+  			static void statCreaVolume(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaVolume(w);}
 			void cbCreaVolume(Fl_Widget*);
-  			static void statCreaPan(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaPan(w);}	
+  			static void statCreaPan(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaPan(w);}
 			void cbCreaPan(Fl_Widget*);
-  			static void statCreaAudioOutput(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaAudioOutput(w);}	
+  			static void statCreaAudioOutput(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaAudioOutput(w);}
 			void cbCreaAudioOutput(Fl_Widget*);
 
 			//midi
-  			static void statCreaMidiSel(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiSel(w);}	
+  			static void statCreaMidiSel(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiSel(w);}
 			void cbCreaMidiSel(Fl_Widget*);
-  			static void statCreaMidiAct(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiAct(w);}	
+  			static void statCreaMidiAct(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiAct(w);}
 			void cbCreaMidiAct(Fl_Widget*);
-  			static void statCreaMidiCC(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiCC(w);}	
+  			static void statCreaMidiCC(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiCC(w);}
 			void cbCreaMidiCC(Fl_Widget*);
-  			static void statCreaMidiChan(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiChan(w);}	
+  			static void statCreaMidiChan(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiChan(w);}
 			void cbCreaMidiChan(Fl_Widget*);
-  			static void statCreaMidiMin(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiMin(w);}	
+  			static void statCreaMidiMin(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiMin(w);}
 			void cbCreaMidiMin(Fl_Widget*);
-  			static void statCreaMidiRoot(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiRoot(w);}	
+  			static void statCreaMidiRoot(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiRoot(w);}
 			void cbCreaMidiRoot(Fl_Widget*);
-  			static void statCreaMidiRootFine(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiRootFine(w);}	
+  			static void statCreaMidiRootFine(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiRootFine(w);}
 			void cbCreaMidiRootFine(Fl_Widget*);
-  			static void statCreaMidiMax(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiMax(w);}	
+  			static void statCreaMidiMax(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiMax(w);}
 			void cbCreaMidiMax(Fl_Widget*);
-  			static void statCreaMidiPiano(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiPiano(w);}	
+  			static void statCreaMidiPiano(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiPiano(w);}
 			void cbCreaMidiPiano(Fl_Widget*);
-  			static void statCreaMidiLearn(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiLearn(w);}	
+  			static void statCreaMidiLearn(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbCreaMidiLearn(w);}
 			void cbCreaMidiLearn(Fl_Widget*);
-			
+
 			//exec tab
 			//lists
-  			static void statExecSetupList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbExecSetupList(w);}	
+  			static void statExecSetupList(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbExecSetupList(w);}
 			void cbExecSetupList(Fl_Widget*);
 
 			void showMessage(bool,std::string);
@@ -189,7 +189,7 @@ class execWindow : public Fl_Double_Window
 			void learnMidi(int,int,int);
 
 			void updateExecTab();
-			
+
 			void displaySetup(int);
 			void displayKit(int);
 			void displayInst(int);
@@ -197,14 +197,14 @@ class execWindow : public Fl_Double_Window
 			void updateMidi();
 
   private:
-			tapeutape *tap;	
+			tapeutape *tap;
 			bool fileSaved;
 
 			Fl_Menu_Bar *menu;
 
 			messageWindow* messages;
-			
-			Fl_Group* status;			
+
+			Fl_Group* status;
 
 			Fl_Tabs * tabs;
 
@@ -222,15 +222,15 @@ class execWindow : public Fl_Double_Window
   			Fl_Hold_Browser **setupLists;
 
 
-			Fl_Group* creaTab;			
+			Fl_Group* creaTab;
   			Fl_Hold_Browser *creaSetupList;
   			Fl_Hold_Browser *creaKitList;
   			Fl_Hold_Browser *creaInstList;
   			Fl_Hold_Browser *creaVarList;
 			Fl_Tabs * creaTabs;
-			Fl_Group* creaGlobalTab;			
-			Fl_Group* creaAudioTab;			
-			Fl_Group* creaMidiTab;			
+			Fl_Group* creaGlobalTab;
+			Fl_Group* creaAudioTab;
+			Fl_Group* creaMidiTab;
 			Fl_Button *creaNew;
 			Fl_Button *creaRemove;
 			Fl_Toggle_Button *creaCopyPaste;
@@ -247,7 +247,7 @@ class execWindow : public Fl_Double_Window
 			Fl_Check_Button *creaCheckCut;
 			Fl_Check_Button *creaCheckPoly;
 			Fl_Check_Button *creaCheckPitch;
-			
+
 
 			Fl_Value_Slider *creaVolume;
 			Fl_Value_Slider *creaPan;
@@ -276,7 +276,7 @@ class execWindow : public Fl_Double_Window
 			std::string lastSampleDir;
 
 			int creaMidiType,creaMidiCnt;
-			
+
 
 			std::string statusStr;
 };

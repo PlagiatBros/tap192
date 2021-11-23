@@ -45,7 +45,7 @@ kit::~kit()
 {
 	for(unsigned int i=0; i< instruments.size();++i)
 		delete instruments[i];
-	instruments.clear(); 
+	instruments.clear();
 }
 
 void kit::setName(std::string n)
@@ -105,14 +105,14 @@ void kit::exec(double globalVolume)
 		double panRight = sqrt(2)/2.0*(cos(instruments[j]->getPan()*(M_PI/4.0)) + sin(instruments[j]->getPan()*(M_PI/4.0)));
 		panRight=(panRight<0.0001)? 0 : panRight;
 		panLeft=(panLeft<0.0001)? 0 : panLeft;
-	
-		for(unsigned short n=instruments[j]->getMinNote();  
+
+		for(unsigned short n=instruments[j]->getMinNote();
 			n<=instruments[j]->getMaxNote();n++)  //for each note of the instrument
 		{
-			//compute the offset to pitchShift (Thanks pete bessman) (temporary solution) 
+			//compute the offset to pitchShift (Thanks pete bessman) (temporary solution)
 			double pitch = 1;
-			if(instruments[j]->getPitchOverRange())	
-			 	pitch=pow(2.0, ((double)(n - instruments[j]->getRootNote()) + instruments[j]->getRootNoteFine())/12.0); 
+			if(instruments[j]->getPitchOverRange())
+			 	pitch=pow(2.0, ((double)(n - instruments[j]->getRootNote()) + instruments[j]->getRootNoteFine())/12.0);
 			//FIXME TESTER FINE , voir dans SPECIMEN patch.c pour la fonction interpolate.
 
 
@@ -136,13 +136,13 @@ void kit::showTaps(int c)
 		cout<<"channel "<<c<<endl<<endl;
 		for(int n=0;n<11;++n)
 		{
-			cout<<"note "<<n<<endl;	
+			cout<<"note "<<n<<endl;
 			for(int v=0;v<128;++v)
 			{
 				cout<<"veloc "<<v;
 				for(int t=0;t<taps[c-1][n][v].size();++t)
 					cout<<((vector<tap*>)taps[c-1][n][v])[t]->getVariation()->getSample()->getName()<<",";
-				cout<<"|";		
+				cout<<"|";
 			}
 			cout<<endl;
 		}

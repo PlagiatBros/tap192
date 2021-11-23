@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef _INSTRUMENT_H
 #define _INSTRUMENT_H
 
@@ -68,7 +68,7 @@ class instrument
 		inline int getPlayMode(){return m_playMode;}
 		inline int getPlayLoop(){return m_playLoop;}
 		inline int getPlayReverse(){return m_playReverse;}
-		
+
 		//used in the exec mode
 		inline unsigned int getPolyphony(){return polyphony;};
 		inline void setPolyphony(unsigned int p){polyphony=p;playingCount=0;};
@@ -85,7 +85,7 @@ class instrument
 				}
 				//else
 				++playingCount;
-				//if polyphony number reached 
+				//if polyphony number reached
 				if(playingCount>polyphony)
 					count=true;
 			}
@@ -101,13 +101,13 @@ class instrument
 				ans=true;
 				count=false;
 			}
-			
+
 			return ans;
 		};
 		inline const int& getJackStereoChannel(){return jackStereoChannel;};
 		inline double getVolume(){return volume;};
 		inline double getPan(){return pan;};
-	
+
 	private:
 		std::vector<variation*> variations;
 		std::string name;
@@ -119,7 +119,7 @@ class instrument
 		int m_playMode;
 		int m_playLoop;
 		int m_playReverse;
-		
+
 		//used in the exec mode
 		unsigned int playingCount;
 		bool count;

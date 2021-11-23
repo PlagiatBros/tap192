@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef _TARDI_SAMPLE_H
 #define _TARDI_SAMPLE_H
 
@@ -37,7 +37,7 @@ class tardiSample : public Fl_Widget
 {
 	public 	:
 			tardiSample(int , int , int , int , const char*);
-			~tardiSample();	
+			~tardiSample();
 			void draw();
 			int handle(int);
 			void setBuffers(float**);
@@ -46,14 +46,14 @@ class tardiSample : public Fl_Widget
 			void handlePush(int,int);
 			void handleDrag(int,int);
 			void handleRelease(int,int);
-	private : 		
+	private :
 			int nbChannels;
-			float zoom;	
+			float zoom;
 			int step;
 			float** buffers;
 			long e1X,e2X,e3X,e4X;
 			float e1Y,e2Y,e3Y,e4Y;
-			long framesCount;	
+			long framesCount;
 			int pointSize;
 
 			int selectedWidget;

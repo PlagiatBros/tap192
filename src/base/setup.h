@@ -20,12 +20,12 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #ifndef _SETUP_H
 #define _SETUP_H
 
 
-#include "kit.h" 
+#include "kit.h"
 #include <iostream>
 #include <cstdlib>
 #include <vector>
@@ -49,9 +49,9 @@ class setup
 		void setCC(short,short);
 		short getChannel();
 		short getCC();
-	
+
 	private:
-		std::vector<kit*> kits;	
+		std::vector<kit*> kits;
 		unsigned short currentKit;
 		short channel,cc;
 		std::string name;

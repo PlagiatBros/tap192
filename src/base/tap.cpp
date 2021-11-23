@@ -45,5 +45,3 @@ std::string tap::getSampleName()
 		return "no sample yet";
 	}
 }
-
-

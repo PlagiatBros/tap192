@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
- 
+
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Hold_Browser.H>
@@ -40,29 +40,29 @@
 #ifndef _TARDI_FL_FILE_BROWSER_H
 #define _TARDI_FL_FILE_BROWSER_H
 
-class tardiFlFileBrowser : public Fl_Window 
+class tardiFlFileBrowser : public Fl_Window
 {
 	public:
 			tardiFlFileBrowser();
 			~tardiFlFileBrowser();
 
-  			static void statList(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbList(w);}	
+  			static void statList(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbList(w);}
 			void cbList(Fl_Widget*);
-  			static void statPrevButton(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbPrevButton(w);}	
+  			static void statPrevButton(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbPrevButton(w);}
 			void cbPrevButton(Fl_Widget*);
-  			static void statNextButton(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbNextButton(w);}	
+  			static void statNextButton(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbNextButton(w);}
 			void cbNextButton(Fl_Widget*);
-  			static void statPathButton(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbPathButton(w);}	
+  			static void statPathButton(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbPathButton(w);}
 			void cbPathButton(Fl_Widget*);
-  			static void statFileName(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbFileName(w);}	
+  			static void statFileName(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbFileName(w);}
 			void cbFileName(Fl_Widget*);
-  			static void statOk(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbOk(w);}	
+  			static void statOk(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbOk(w);}
 			void cbOk(Fl_Widget*);
-  			static void statCancel(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbCancel(w);}	
+  			static void statCancel(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbCancel(w);}
 			void cbCancel(Fl_Widget*);
-  			static void statHidden(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbHidden(w);}	
+  			static void statHidden(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbHidden(w);}
 			void cbHidden(Fl_Widget*);
-  			static void statAdd(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbAdd(w);}	
+  			static void statAdd(Fl_Widget* w,void* f){tardiFlFileBrowser *tmpf = static_cast<tardiFlFileBrowser *>(f);tmpf->cbAdd(w);}
 			void cbAdd(Fl_Widget*);
 
 			void open(std::string,std::string,std::string);
@@ -82,12 +82,12 @@ class tardiFlFileBrowser : public Fl_Window
   			Fl_Hold_Browser *filesList;
 			Fl_Button *addButton;
 			Fl_Toggle_Button *hiddenButton;
-			
-			Fl_Input *fileName;	
+
+			Fl_Input *fileName;
 
 			Fl_Return_Button *okButton;
 			Fl_Button *cancelButton;
-			
+
 
 			std::string currentDir;
 			bool showHidden;
