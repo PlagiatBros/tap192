@@ -617,24 +617,39 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
 {
 	//test if it changes one of the setups
 	for(unsigned int i=0;i<setups.size();++i)
-		if(setups[i]->getChannel()-1 == chan && setups[i]->getCC() == cc)
+	{
+		if(setups[i]->getChannel()-1 == chan && setups[i]->getCC() == cc && cc < 126)
 		{
 			int kit = setups[i]->changeKit(val);
 
-			// CC 126 & 127 (whatever the channel) reserved for Reverse mode toggle
-			if(cc > 125)
-			{
-				//choper l'instrument, trouver son channel, et sa note, comparer, setReverseMode
-				for(unsigned int i=0;i<kit.instruments.size();i++)
-					if(kit.instrument[i].getMidiChannel() == chan)
-						kit.instrument[i].setPlayReverse(127-cc);
-			}
 
 			#ifdef WITH_GUI
 				Fl::lock();
 				execWin->changeKit(i,kit+1);
 				Fl::unlock();
 			#endif
+		}
+
+		// CC 126 & 127 (whatever the channel) reserved for Reverse mode toggle
+		if(cc > 125)
+		{
+			int cK = setups[i]->getCurrentKit();
+
+			//choper l'instrument, trouver son channel, et sa note, comparer, setReverseMode
+			for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++)
+			{
+				int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
+				int iMaxN = setups[i]->getKit(cK)->getInstrument(j)->getMaxNote();
+				int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();
+				if(iChan-1 == chan && val <= iMaxN && val >= iMinN)
+				{
+					printf("Toggle\n");
+					setups[i]->getKit(cK)->getInstrument(j)->setPlayReverse(127-cc);
+					showMessage(false,"Reverse mode Toggle");
+				}
+			}
+		}
+
 	}
 }
 
