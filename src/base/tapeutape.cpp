@@ -635,7 +635,8 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
 		{
 			int cK = setups[i]->getCurrentKit();
 
-			//choper l'instrument, trouver son channel, et sa note, comparer, setReverseMode
+			// CC 126 set the instrument(s) bound to note "val" in Reverse mode
+			// CC 127 set the instrument(s) bound to note "val" in Forward mode
 			for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++)
 			{
 				int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
@@ -643,9 +644,7 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
 				int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();
 				if(iChan-1 == chan && val <= iMaxN && val >= iMinN)
 				{
-					printf("Toggle\n");
 					setups[i]->getKit(cK)->getInstrument(j)->setPlayReverse(127-cc);
-					showMessage(false,"Reverse mode Toggle");
 				}
 			}
 		}
