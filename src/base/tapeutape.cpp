@@ -615,26 +615,12 @@ short tapeutape::getSetupCC()
 
 void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short val)
 {
-	//test if it changes one of the setups
 	for(unsigned int i=0;i<setups.size();++i)
 	{
-		if(setups[i]->getChannel()-1 == chan && setups[i]->getCC() == cc && cc < 126)
-		{
-			int kit = setups[i]->changeKit(val);
+		int cK = setups[i]->getCurrentKit();
 
-
-			#ifdef WITH_GUI
-				Fl::lock();
-				execWin->changeKit(i,kit+1);
-				Fl::unlock();
-			#endif
-		}
-
-		// CC 126 & 127 (whatever the channel) reserved for Reverse mode toggle
 		if(cc > 125)
 		{
-			int cK = setups[i]->getCurrentKit();
-
 			// CC 126 set the instrument(s) bound to note "val" in Reverse mode
 			// CC 127 set the instrument(s) bound to note "val" in Forward mode
 			for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++)
@@ -648,7 +634,40 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
 				}
 			}
 		}
+		else
+		if(cc > 123)
+		{
+			// CC 125 set the instrument(s) bound to note "val" in Loop mode
+			// CC 124 set the instrument(s) bound to note "val" in SingleShot mode
 
+			for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++)
+			{
+				int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
+				int iMaxN = setups[i]->getKit(cK)->getInstrument(j)->getMaxNote();
+				int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();
+				if(iChan-1 == chan && val <= iMaxN && val >= iMinN)
+				{
+					setups[i]->getKit(cK)->getInstrument(j)->setPlayLoop(125-cc);
+				}
+			}
+		}
+		else
+		if(cc > 121)
+		{
+			// CC 123 set the instrument(s) bound to note "val" in Normal mode
+			// CC 122 set the instrument(s) bound to note "val" in Trigger mode
+
+			for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++)
+			{
+				int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
+				int iMaxN = setups[i]->getKit(cK)->getInstrument(j)->getMaxNote();
+				int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();
+				if(iChan-1 == chan && val <= iMaxN && val >= iMinN)
+				{
+					setups[i]->getKit(cK)->getInstrument(j)->setPlayMode(123-cc);
+				}
+			}
+		}
 	}
 }
 
