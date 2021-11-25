@@ -31,9 +31,24 @@ extern bool global_nsm_visible;
 
 using namespace std;
 
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+#define MENUBAR_HEIGHT 26
+#define TAB_HEIGHT 32
+#define CREAPANEL_HEIGHT 220
+#define BUTTON_HEIGHT 26
 
-execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Window(w,h,titre),tap(t),fileSaved(true),copyType(0),lastSampleDir("")
+execWindow::execWindow(const char* titre,tapeutape *t):
+	Flat_Double_Window(WINDOW_WIDTH,WINDOW_HEIGHT,titre),
+	tap(t),
+	fileSaved(true),
+	copyType(0),
+	lastSampleDir("")
 {
+	int w = WINDOW_WIDTH;
+	int h = WINDOW_HEIGHT;
+	int y;
+
 	setupLists = NULL;
 
 	//fltk init
@@ -42,64 +57,65 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 	//window class
 	this->iconlabel(std::string("/usr/local/share/pixmaps/tapeutape.png").c_str());
 
-	//default theme
-	Fl::set_color(FL_BACKGROUND_COLOR,136,136,136);
-	Fl::set_color(FL_BACKGROUND2_COLOR,0,0,0);
-	Fl::set_color(FL_FOREGROUND_COLOR,255,255,255);
-	Fl::set_color(FL_INACTIVE_COLOR,200,200,200);
-	Fl::set_color(FL_SELECTION_COLOR,200,200,200);
-
 	//callback
 	this->callback(statWindow,this);
 
 	//menu
 	Fl_Menu_Item menuitems[] =
 	{
-  		{ "&Menu",0, 0, 0, FL_SUBMENU },
+  		{ "&File",0, 0, 0, FL_SUBMENU },
     			{ "&Open File",FL_CTRL + 'o',(Fl_Callback *)statOpen,this },
     			{ "&Save File",FL_CTRL + 's',(Fl_Callback *)statSave,this},
     			{ "S&ave File as",FL_CTRL + FL_SHIFT + 's',(Fl_Callback *)statSaveAs,this},
-    			{ "Import kits",FL_CTRL + 'i',(Fl_Callback *)statImport,this},
     			//{ "O&ptions", FL_CTRL + 'p',NULL,0},
     			{ "&Messages", FL_CTRL + 'm', statMessages,this},
     			{ global_nsm_opional_gui ? "&Hide" : "&Quit",FL_CTRL + 'q', (Fl_Callback *)statQuit,this},
 			{0},
 		{0}
 	};
-	menu = new Fl_Menu_Bar(0, 0, w, 30);
+	menu = new Flat_Menu_Bar(-1, 0, w+2, MENUBAR_HEIGHT);
 	menu->copy(menuitems);
+	add(*menu);
+
+	//main wrapper
+	tabsWrapper = new Flat_Group(0,MENUBAR_HEIGHT,w,h-MENUBAR_HEIGHT*2);
+	add(*tabsWrapper);
+	resizable(tabsWrapper);
 
 	//status
-	status = new Fl_Group(0,h-15,w,15,"");
+	status = new Flat_Group(-1,h-MENUBAR_HEIGHT,w+2,MENUBAR_HEIGHT+1,"");
 	status->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
+	status->box(FL_BORDER_BOX);
+	add(*status);
 
 	//messages
 	messages = new messageWindow(300,150,"Messages");
 
 	//create the tabs
-	tabs = new Fl_Tabs(0,30,w,h-50);
-	this->insert(*tabs,0);
+	tabs = new Flat_Tabs(0,MENUBAR_HEIGHT,w,h-MENUBAR_HEIGHT*2);
+	tabsWrapper->add(*tabs);
 	tabs->when(FL_WHEN_CHANGED);
 	tabs->callback(statTabs,this);
-	execTab = new Fl_Group(0,50,w,h,"Execution");
-	creaTab = new Fl_Group(0,50,w,h,"Creation");
-	setTab = new Fl_Group(0,50,w,h,"Settings");
+	execTab = new Flat_Group(0,MENUBAR_HEIGHT+TAB_HEIGHT,w,h,"Execution");
+	creaTab = new Flat_Group(0,MENUBAR_HEIGHT+TAB_HEIGHT,w,h,"Creation");
+	setTab = new Flat_Group(0,MENUBAR_HEIGHT+TAB_HEIGHT,w,h,"Settings");
 	tabs->insert(*setTab,0);
 	tabs->insert(*creaTab,1);
 	tabs->insert(*execTab,2);
+	tabs->resizable(creaTab);
 
 
 	//settings
-	setVolume = new Fl_Value_Slider(10,80,150,20,"Global Volume ");
+	setVolume = new Flat_Value_Slider(10,80,150,20,"Global Volume ");
 	setVolume->align(FL_ALIGN_LEFT|FL_ALIGN_TOP);
 	setVolume->type(FL_HOR_FILL_SLIDER);
 	setVolume->bounds(0.0,3.0);
 	setVolume->value(1.0);
 	setVolume->callback(statSetVolume,this);
-	setCheckPoly = new Fl_Check_Button(10,130,20,20,"Limit Polyphony ");
+	setCheckPoly = new Flat_Check_Button(10,130,20,20,"Limit Polyphony ");
 	setCheckPoly->align(FL_ALIGN_LEFT|FL_ALIGN_TOP);
 	setCheckPoly->callback(statSetCheckPoly,this);
-	setPoly = new Fl_Counter(40,130,70,20,"");
+	setPoly = new Flat_Counter(40,130,70,20,"");
 	setPoly->type(FL_SIMPLE_COUNTER);
 	setPoly->step(1);
 	setPoly->bounds(1,100);
@@ -113,9 +129,9 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 	setOutName->align(FL_ALIGN_LEFT);
 	setOutName->callback(statSetOutName,this);
 	setOutName->when(FL_WHEN_CHANGED);
-	setOutNew = new Fl_Button(220,180,20,20,"@+");
+	setOutNew = new Flat_Button(220,180,20,20,"@+");
 	setOutNew->callback(statSetOutNew,this);
-	setOutRemove = new Fl_Button(250,180,20,20,"@line");
+	setOutRemove = new Flat_Button(250,180,20,20,"@line");
 	setOutRemove->callback(statSetOutRemove,this);
 	setTab->insert(*setVolume,0);
 	setTab->insert(*setCheckPoly,1);
@@ -126,68 +142,102 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 	setTab->insert(*setOutName,6);
 
 	//creation tab
-	creaSetupList = new Fl_Hold_Browser(0,70,w/4,h-220,"Setups");
+	y = MENUBAR_HEIGHT+TAB_HEIGHT;
+
+
+
+	creaPack = new Flat_Group(10, y,w-20,h-CREAPANEL_HEIGHT-MENUBAR_HEIGHT*2-TAB_HEIGHT-BUTTON_HEIGHT - 20);
+
+	y += 30;
+	int _h = h - y - CREAPANEL_HEIGHT - BUTTON_HEIGHT - 20 - MENUBAR_HEIGHT;
+	creaSetupList = new Fl_Hold_Browser(10,y,(w-50)/4,_h,"Setups");
 	creaSetupList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaSetupList->callback(statCreaSetupList,this);
-	creaKitList = new Fl_Hold_Browser(w/4,70,w/4,h-220,"Kits");
+	creaKitList = new Fl_Hold_Browser(20 + (w-50)/4,y,(w-50)/4,_h,"Kits");
 	creaKitList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaKitList->callback(statCreaKitList,this);
-	creaInstList = new Fl_Hold_Browser(2*w/4,70,w/4,h-220,"Instruments");
+	creaInstList = new Fl_Hold_Browser(30 + 2*(w-50)/4,y,(w-50)/4,_h,"Instruments");
 	creaInstList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaInstList->callback(statCreaInstList,this);
-	creaVarList = new Fl_Hold_Browser(3*w/4,70,w/4,h-220,"Variations");
+	creaVarList = new Fl_Hold_Browser(40 + 3*(w-50)/4,y,(w-50)/4,_h,"Variations");
 	creaVarList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaVarList->callback(statCreaVarList,this);
-	creaTabs = new Fl_Tabs(0,h-150,w,135,"");
-	creaTab->insert(*creaSetupList,0);
-	creaTab->insert(*creaKitList,1);
-	creaTab->insert(*creaInstList,2);
-	creaTab->insert(*creaVarList,3);
-	creaTab->insert(*creaTabs,4);
+
+	y = h-CREAPANEL_HEIGHT-MENUBAR_HEIGHT - 20 - BUTTON_HEIGHT;
+	creaBtns = new Flat_Group(10, y, w-20, BUTTON_HEIGHT + 20,"");
+	y += 10;
+	creaNew = new Flat_Button(10,y,40,BUTTON_HEIGHT,"Add");
+	creaNew->callback(statCreaNew,this);
+	creaNew->tooltip("Add an element to the list");
+	creaCopyPaste = new Flat_Toggle_Button(60,y,50,BUTTON_HEIGHT,"Copy");
+	creaCopyPaste->callback(statCreaCopyPaste,this);
+	creaCopyPaste->tooltip("Copy/Paste the element");
+	creaUp = new Flat_Button(120,y,40,BUTTON_HEIGHT,"Up");
+	creaUp->callback(statCreaUp,this);
+	creaUp->tooltip("Move the element up");
+	creaDown = new Flat_Button(170,y,50,BUTTON_HEIGHT,"Down");
+	creaDown->callback(statCreaDown,this);
+	creaDown->tooltip("Move the element down");
+	creaRemove = new Flat_Button(230,y,60,BUTTON_HEIGHT,"Delete");
+	creaRemove->callback(statCreaRemove,this);
+	creaRemove->tooltip("Remove the element");
+	creaBtns->insert(*creaNew,0);
+	creaBtns->insert(*creaCopyPaste,1);
+	creaBtns->insert(*creaUp,2);
+	creaBtns->insert(*creaDown,3);
+	creaBtns->insert(*creaRemove,4);
+	creaBtns->resizable(0);
+
+	y = h-CREAPANEL_HEIGHT-MENUBAR_HEIGHT;
+	creaTabsWrapper = new Flat_Group(0,y,w+1,CREAPANEL_HEIGHT,"");
+	creaTabsWrapper->box(FL_BORDER_BOX);
+	creaTabs = new Flat_Tabs(0,y+1,w+1,CREAPANEL_HEIGHT-1,"");
+	creaTabsWrapper->insert(*creaTabs,0);
+	creaPack->insert(*creaSetupList,0);
+	creaPack->insert(*creaKitList,1);
+	creaPack->insert(*creaInstList,2);
+	creaPack->insert(*creaVarList,3);
+	creaTab->insert(*creaPack,0);
+	creaTab->insert(*creaBtns,1);
+	creaTab->insert(*creaTabsWrapper,2);
+	creaTab->resizable(creaPack);
+
 	creaActiveList=-1;
 	creaSelectedKit=-1;
 	creaSelectedSetup=-1;
 	creaSelectedInst=-1;
 	creaSelectedVar=-1;
 
-	creaGlobalTab = new Fl_Group(0,h-130,w,115,"Global");
-	creaAudioTab = new Fl_Group(0,h-130,w,115,"Audio");
-	creaMidiTab = new Fl_Group(0,h-130,w,115,"Midi");
+	y += TAB_HEIGHT;
+	creaGlobalTab = new Flat_Group(0, y,w,CREAPANEL_HEIGHT-TAB_HEIGHT,"Global");
+	creaAudioTab = new Flat_Group(0, y,w,CREAPANEL_HEIGHT-TAB_HEIGHT,"Audio");
+	creaMidiTab = new Flat_Group(0, y,w,CREAPANEL_HEIGHT-TAB_HEIGHT,"Midi");
 	creaTabs->insert(*creaGlobalTab,0);
 	creaTabs->insert(*creaAudioTab,1);
 	creaTabs->insert(*creaMidiTab,2);
+	creaGlobalTab->resizable(0);
+	// creaAudioTab->resizable(0);
+	// creaMidiTab->resizable(0);
+	// creaTabs->resizable(0);
 
-	creaNew = new Fl_Button(w-130,h-125,20,20,"@+");
-	creaNew->callback(statCreaNew,this);
-	creaNew->tooltip("Add an element to the list");
-	creaCopyPaste = new Fl_Toggle_Button(w-105,h-125,20,20,"C");
-	creaCopyPaste->callback(statCreaCopyPaste,this);
-	creaCopyPaste->tooltip("Copy/Paste the element");
-	creaUp = new Fl_Button(w-80,h-125,20,20,"@8->");
-	creaUp->callback(statCreaUp,this);
-	creaUp->tooltip("Move the element up");
-	creaDown = new Fl_Button(w-55,h-125,20,20,"@2->");
-	creaDown->callback(statCreaDown,this);
-	creaDown->tooltip("Move the element down");
-	creaRemove = new Fl_Button(w-30,h-125,20,20,"@line");
-	creaRemove->callback(statCreaRemove,this);
-	creaRemove->tooltip("Remove the element");
-	creaName = new Fl_Input(110,h-120,70,20,"Name ");
+
+	y += 10;
+	creaName = new Fl_Input(60,y,200,20,"Name ");
 	creaName->align(FL_ALIGN_LEFT);
 	creaName->callback(statCreaName,this);
 	creaName->when(FL_WHEN_CHANGED);
-	creaPlayMode= new Fl_Choice(100,h-95,80,20,"Play Mode ");
+	creaPlayMode= new Flat_Choice(90,y + 30,80,20,"Play Mode ");
 	creaPlayMode->callback(statCreaPlayMode,this);
 	creaPlayMode->add("Normal");
 	creaPlayMode->add("Trigger");
 	creaPlayMode->value(0);
-	creaPlayLoop = new Fl_Check_Button(230,h-95,20,20,"Loop");
+	creaPlayLoop = new Flat_Check_Button(220, y + 30,20,20,"Loop");
 	creaPlayLoop->align(FL_ALIGN_LEFT);
 	creaPlayLoop->callback(statCreaPlayMode,this);
-	creaPlayReverse = new Fl_Check_Button(320,h-95,20,20,"Reverse");
+	creaPlayReverse = new Flat_Check_Button(310, y +30,20,20,"Reverse");
 	creaPlayReverse->align(FL_ALIGN_LEFT);
 	creaPlayReverse->callback(statCreaPlayMode,this);
-	creaPoly = new Fl_Counter(110,h-70,70,20,"");
+	creaPoly = new Flat_Counter(110,y+60,70,20,"");
 	creaPoly->align(FL_ALIGN_LEFT);
 	creaPoly->type(FL_SIMPLE_COUNTER);
 	creaPoly->step(1);
@@ -195,27 +245,22 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 	creaPoly->value(1);
 	creaPoly->callback(statCreaPoly,this);
 	creaPoly->deactivate();
-	creaCheckPoly = new Fl_Check_Button(10,h-70,20,20,"Polyphony");
+	creaCheckPoly = new Flat_Check_Button(10,y+60,20,20,"Polyphony");
 	creaCheckPoly->callback(statCreaCheckPoly,this);
 	creaPoly->align(FL_ALIGN_RIGHT);
-	creaCut = new Fl_Choice(90,h-45,90,20,"");
+	creaCut = new Flat_Choice(90,h-45,90,20,"");
 	creaCut->align(FL_ALIGN_LEFT);
 	creaCut->callback(statCreaCut,this);
 	creaCut->deactivate();
-	creaCheckCut = new Fl_Check_Button(10,h-45,20,20,"Cut");
+	creaCheckCut = new Flat_Check_Button(10,y+90,20,20,"Cut");
 	creaCheckCut->align(FL_ALIGN_RIGHT);
 	creaCheckCut->callback(statCreaCheckCut,this);
-	creaCheckPitch = new Fl_Check_Button(320,h-70,20,20,"Pitch Over Range");
+	creaCheckPitch = new Flat_Check_Button(320,y+60,20,20,"Pitch Over Range");
 	creaCheckPitch->align(FL_ALIGN_LEFT);
 	creaCheckPitch->callback(statCreaCheckPitch,this);
-	creaSampleName = new Fl_Output(70,h-90,250,20,"Sample ");
-	creaSampleOpen = new Fl_Button(70,h-60,50,20,"Open");
+	creaSampleName = new Fl_Output(72,y,250,20,"Sample ");
+	creaSampleOpen = new Flat_Button(10,y+30,60,BUTTON_HEIGHT,"Open");
 	creaSampleOpen->callback(statCreaSampleOpen,this);
-	creaGlobalTab->insert(*creaNew,0);
-	creaGlobalTab->insert(*creaCopyPaste,1);
-	creaGlobalTab->insert(*creaRemove,2);
-	creaGlobalTab->insert(*creaUp,3);
-	creaGlobalTab->insert(*creaDown,4);
 	creaGlobalTab->insert(*creaName,5);
 	creaGlobalTab->insert(*creaPlayMode,6);
 	creaGlobalTab->insert(*creaPlayLoop,6);
@@ -238,44 +283,49 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 	creaSampleName->hide();
 	creaSampleOpen->hide();
 
-	creaVolume = new Fl_Value_Slider(100,h-120,150,20,"Volume");
+
+	Flat_Group * audioControls= new Flat_Group(0, y, w, 100);
+	audioControls->resizable(0);
+	creaVolume = new Flat_Value_Slider(70,y,150,20,"Volume");
 	creaVolume->align(FL_ALIGN_LEFT);
 	creaVolume->type(FL_HOR_FILL_SLIDER);
 	creaVolume->bounds(0.0,3.0);
 	creaVolume->callback(statCreaVolume,this);
-	creaPan = new Fl_Value_Slider(100,h-90,150,20,"Pan");
+	creaPan = new Flat_Value_Slider(40,y+30,150,20,"Pan");
 	creaPan->align(FL_ALIGN_LEFT);
 	creaPan->type(FL_HOR_SLIDER);
 	creaPan->bounds(-1.0,1.0);
 	creaPan->value(0.0);
 	creaPan->callback(statCreaPan,this);
-	creaAudioOutput = new Fl_Choice(150,h-60,100,20,"Audio Output");
+	creaAudioOutput = new Flat_Choice(107,y+60,100,20,"Audio Output");
 	creaAudioOutput->callback(statCreaAudioOutput,this);
-	creaSample = new tardiSample(70,h-120,200,100,"Sample");
-	creaAudioTab->insert(*creaVolume,0);
-	creaAudioTab->insert(*creaPan,1);
-	creaAudioTab->insert(*creaAudioOutput,2);
-	creaAudioTab->insert(*creaSample,3);
+	audioControls->end();
+	creaSample = new tardiSample(10,y,w-20,100,"Sample");
+	creaAudioTab->insert(*audioControls,0);
+	creaAudioTab->insert(*creaSample,1);
+	creaAudioTab->resizable(creaSample);
 	creaVolume->hide();
 	creaPan->hide();
 	creaAudioOutput->hide();
 	creaSample->hide();
 
-	creaMidiSel = new Fl_Choice(80,h-125,200,20,"");
+	Flat_Group * midiControls= new Flat_Group(0, y, w, 100);
+	midiControls->resizable(0);
+	creaMidiSel = new Flat_Choice(10,y,200,20,"");
 	creaMidiSel->callback(statCreaMidiSel,this);
-	creaMidiAct = new Fl_Check_Button(20,h-85,20,20,"Active");
+	creaMidiAct = new Flat_Check_Button(25,y+105,20,20,"Active");
 	creaMidiAct->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaMidiAct->callback(statCreaMidiAct,this);
 	creaMidiAct->hide();
-	creaMidiChan = new Fl_Counter(60,h-85,50,20,"Channel");
+	creaMidiChan = new Flat_Counter(10,y+50,62,20,"Channel");
 	creaMidiChan->type(FL_SIMPLE_COUNTER);
 	creaMidiChan->align(FL_ALIGN_TOP);
 	creaMidiChan->step(1);
 	creaMidiChan->bounds(1,16);
 	creaMidiChan->deactivate();
-	creaMidiChan->hide();
+	creaMidiChan->deactivate();
 	creaMidiChan->callback(statCreaMidiCC,this);
-	creaMidiCC = new Fl_Counter(170,h-85,50,20,"Control");
+	creaMidiCC = new Flat_Counter(140,y+50,50,20,"Control");
 	creaMidiCC->type(FL_SIMPLE_COUNTER);
 	creaMidiCC->align(FL_ALIGN_TOP);
 	creaMidiCC->step(1);
@@ -283,51 +333,51 @@ execWindow::execWindow(int w,int h,const char* titre,tapeutape *t):Fl_Double_Win
 	creaMidiCC->deactivate();
 	creaMidiCC->hide();
 	creaMidiCC->callback(statCreaMidiCC,this);
-	creaMidiMin = new Fl_Counter(115,h-85,50,20,"Min");
+	creaMidiMin = new Flat_Counter(82,y+50,50,20,"Min");
 	creaMidiMin->type(FL_SIMPLE_COUNTER);
 	creaMidiMin->align(FL_ALIGN_TOP);
 	creaMidiMin->step(1);
 	creaMidiMin->bounds(0,127);
 	creaMidiMin->callback(statCreaMidiMin,this);
 	creaMidiMin->hide();
-	creaMidiRoot = new Fl_Counter(170,h-85,50,20,"Root");
+	creaMidiRoot = new Flat_Counter(142,y+50,50,20,"Root");
 	creaMidiRoot->type(FL_SIMPLE_COUNTER);
 	creaMidiRoot->align(FL_ALIGN_TOP);
 	creaMidiRoot->step(1);
 	creaMidiRoot->bounds(0,127);
 	creaMidiRoot->callback(statCreaMidiRoot,this);
 	creaMidiRoot->hide();
-	creaMidiRootFine = new Fl_Value_Slider(160,h-62,100,10,"Tune");
+	creaMidiRootFine = new Flat_Value_Slider(50,y+85,100,20,"Tune");
 	creaMidiRootFine->align(FL_ALIGN_LEFT);;
 	creaMidiRootFine->type(FL_HOR_SLIDER);
 	creaMidiRootFine->bounds(-1.0,1.0);
 	creaMidiRootFine->value(0.0);
 	creaMidiRootFine->callback(statCreaMidiRootFine,this);
 	creaMidiRootFine->hide();
-	creaMidiMax = new Fl_Counter(225,h-85,50,20,"Max");
+	creaMidiMax = new Flat_Counter(202,y+50,50,20,"Max");
 	creaMidiMax->type(FL_SIMPLE_COUNTER);
 	creaMidiMax->align(FL_ALIGN_TOP);
 	creaMidiMax->step(1);
 	creaMidiMax->bounds(0,127);
 	creaMidiMax->callback(statCreaMidiMax,this);
 	creaMidiMax->hide();
-	creaMidiLearn = new Fl_Button(280,h-85,50,20,"Learn");
+	creaMidiLearn = new Flat_Button(262,y+50,50,20,"Learn");
 	creaMidiLearn->type(FL_TOGGLE_BUTTON);
 	creaMidiLearn->callback(statCreaMidiLearn,this);
 	creaMidiLearn->hide();
-	creaMidiPiano = new tardiPiano(5,h-50,w-10,30,"");
+	midiControls->end();
+	creaMidiPiano = new tardiPiano(10,y+120,w-20,30,"");
 	creaMidiPiano->callback(statCreaMidiPiano,this);
 	creaMidiPiano->hide();
-	creaMidiTab->insert(*creaMidiSel,0);
-	creaMidiTab->insert(*creaMidiAct,1);
-	creaMidiTab->insert(*creaMidiCC,2);
-	creaMidiTab->insert(*creaMidiChan,3);
-	creaMidiTab->insert(*creaMidiLearn,4);
-	creaMidiTab->insert(*creaMidiPiano,5);
-
-	//execution tab
+	creaMidiTab->insert(*midiControls,0);
+	creaMidiTab->insert(*creaMidiPiano,1);
+	creaMidiTab->resizable(creaMidiPiano);
 
 	visible = false;
+
+	//flat theme
+	tabsWrapper->color(COLOR_REAR);
+	creaTabsWrapper->color(COLOR_REAR);
 }
 
 execWindow::~execWindow()
@@ -424,38 +474,23 @@ void execWindow::init()
 void execWindow::cbOpen(Fl_Widget* w)
 {
 	//open file dialog
-	tardiFlFileBrowser *tFB = new tardiFlFileBrowser();
-	tFB->open("Open .tap file ","{*.tap}",tap->getCompleteFileName());
-	while(tFB->shown())
-	{
-		Fl::wait();
-	}
-	char* newFile=tFB->getResult();
-	if(newFile)
-	{
-		tap->load(newFile);
-		tap->start();
-		delete [] newFile;
-	}
-	delete tFB;
-}
+	Fl_Native_File_Chooser *fb = new Fl_Native_File_Chooser();
+	fb->title("Open .tap file");
+	fb->type(Fl_Native_File_Chooser::BROWSE_FILE);
+	fb->filter("Tapeutape session\t*.tap");
 
-void execWindow::cbImport(Fl_Widget* w)
-{
-	//open file dialog
-	tardiFlFileBrowser *tFB = new tardiFlFileBrowser();
-	tFB->open("Import Kits from a Directory","{}",tap->getCompleteFileName());
-	while(tFB->shown())
+	string dir = "/home/";
+	size_t found = tap->getCompleteFileName().find_last_of("/");
+	if(found!=tap->getCompleteFileName().npos)
 	{
-		Fl::wait();
+		dir=tap->getCompleteFileName().substr(0,found+1);
 	}
-	char* newFile=tFB->getResult();
-	if(newFile)
-	{
-		tap->import(newFile);
-		delete [] newFile;
+	fb->directory(dir.c_str());
+	if (!fb->show()) {
+		tap->load((char *)fb->filename());
+		tap->start();
 	}
-	delete tFB;
+	delete fb;
 }
 
 void execWindow::cbSave(Fl_Widget* w)
@@ -479,24 +514,36 @@ void execWindow::cbSave(Fl_Widget* w)
 
 void execWindow::cbSaveAs(Fl_Widget* w)
 {
-	//save file dialog
-	tardiFlFileBrowser *tFB = new tardiFlFileBrowser();
-	tFB->open("Save .tap file","{*.tap}",tap->getCompleteFileName());
-	while(tFB->shown())
+	//open file dialog
+	Fl_Native_File_Chooser *fb = new Fl_Native_File_Chooser();
+	fb->title("Save .tap file");
+	fb->type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+	fb->filter("Tapeutape session\t*.tap");
+	fb->options(Fl_Native_File_Chooser::SAVEAS_CONFIRM|Fl_Native_File_Chooser::USE_FILTER_EXT);
+
+	string dir = "/home/";
+	size_t found = tap->getCompleteFileName().find_last_of("/");
+	if(found!=tap->getCompleteFileName().npos)
 	{
-		Fl::wait();
+		dir=tap->getCompleteFileName().substr(0,found+1);
 	}
-	char* newFile=tFB->getResult();
-	if (newFile)
-	{
-		tap->save(newFile);
+	fb->directory(dir.c_str());
+	if (!fb->show()) {
+		string fn = fb->filename();
+		string suffix = fn.substr( fn.find_last_of(".") + 1, string::npos);
+		for (basic_string<char>::iterator p = suffix.begin();
+				p != suffix.end(); p++) {
+			*p = tolower(*p);
+		}
+		if (suffix != "tap") fn = fn + ".tap";
+
+		tap->save((char *)fn.c_str());
 		std::string f = tap->getFileName();
 		std::string m = "Saved as "+f;
 		setStatus(m);
 		fileSaved=true;
-		delete [] newFile;
 	}
-	delete tFB;
+	delete fb;
 }
 
 void execWindow::cbQuit(Fl_Widget* w)
@@ -1054,7 +1101,7 @@ void execWindow::displayVar(int v)
 	creaMidiMin->show();
 	creaMidiMax->show();
 	creaMidiRootFine->hide();
-	creaMidiChan->hide();
+	creaMidiChan->deactivate();
 	creaMidiPiano->hide();
 
 	//midi
@@ -1189,7 +1236,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 					{
 						copySetup = new setup(*(tap->getSetup(creaSelectedSetup)));
 						copyType=1;
-						creaCopyPaste->label("P");
+						creaCopyPaste->label("Paste");
 						showMessage(false,"Setup "+copySetup->getName()+" copied");
 					}
 					else
@@ -1227,7 +1274,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 					{
 						copyKit = new kit(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)));
 						copyType=2;
-						creaCopyPaste->label("P");
+						creaCopyPaste->label("Paste");
 						showMessage(false,"Kit "+copyKit->getName()+" copied");
 					}
 					else
@@ -1265,7 +1312,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 					{
 						copyInst = new instrument(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)));
 						copyType=3;
-						creaCopyPaste->label("P");
+						creaCopyPaste->label("Paste");
 						showMessage(false,"Instrument "+copyInst->getName()+" copied");
 					}
 					else
@@ -1305,7 +1352,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 					{
 						copyVar = new variation(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->getVariation(creaSelectedVar)));
 						copyType=4;
-						creaCopyPaste->label("P");
+						creaCopyPaste->label("Paste");
 						showMessage(false,"Variation "+copyVar->getSample()->getName()+" copied");
 					}
 					else
@@ -1719,17 +1766,24 @@ void execWindow::cbCreaSampleOpen(Fl_Widget*)
 		{
 			previousDir=tap->getCompleteFileName();
 		}
-		tardiFlFileBrowser *tFB = new tardiFlFileBrowser();
-		tFB->open("Open audio file ","{*.wav,*.flac,*.aiff}",previousDir);
-		while(tFB->shown())
+
+		//open file dialog
+		Fl_Native_File_Chooser *fb = new Fl_Native_File_Chooser();
+		fb->title("Open audio file");
+		fb->type(Fl_Native_File_Chooser::BROWSE_FILE);
+		fb->filter("Audio file\t*.{wav,flac,aiff}");
+
+		string dir = "/home/";
+		size_t found = tap->getCompleteFileName().find_last_of("/");
+		if(found!=tap->getCompleteFileName().npos)
 		{
-			Fl::wait();
+			dir=tap->getCompleteFileName().substr(0,found+1);
 		}
-		char* audioFile=tFB->getResult();
-		char* audioFileR=NULL;
-		//if got something
-		if(audioFile)
-		{
+		fb->directory(dir.c_str());
+		if (!fb->show()) {
+
+			char* audioFile = (char *)fb->filename();
+			char* audioFileR=NULL;
 			lastSampleDir=audioFile;
 
 			//cut the file name
@@ -1761,7 +1815,7 @@ void execWindow::cbCreaSampleOpen(Fl_Widget*)
 			}
 			delete [] audioFile;
 		}
-		delete tFB;
+		delete fb;
 	}
 }
 

@@ -30,7 +30,7 @@
 #include <FL/fl_draw.H>
 #include <iostream>
 #include <math.h>
-
+#include "flatWidgets.h"
 
 using namespace std;
 

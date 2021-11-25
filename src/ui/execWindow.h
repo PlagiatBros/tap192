@@ -22,32 +22,23 @@
  */
 
 #include <FL/Fl.H>
-#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Item.H>
-#include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Hold_Browser.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Input.H>
-#include <FL/Fl_Tabs.H>
-#include <FL/Fl_Group.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Toggle_Button.H>
-#include <FL/Fl_Counter.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Progress.H>
-#include <FL/Fl_Check_Button.H>
-#include <FL/Fl_Value_Slider.H>
 #include <FL/fl_ask.H>
 #include <iostream>
 #include <string>
 
+#include "flatWidgets.h"
 #include "addKitDialog.h"
 #include "messageWindow.h"
 #include "tardiSample.h"
 #include "tardiPiano.h"
-#include "tardiFlFileBrowser.h"
 #include "../base/setup.h"
 #include "../base/kit.h"
 #include "../base/instrument.h"
@@ -58,10 +49,10 @@
 
 class tapeutape;
 
-class execWindow : public Fl_Double_Window
+class execWindow : public Flat_Double_Window
 {
   public:
-			execWindow(int ,int ,const char*,tapeutape* );
+			execWindow(const char*,tapeutape* );
 			~execWindow();
 
 
@@ -79,9 +70,6 @@ class execWindow : public Fl_Double_Window
 			void cbQuit(Fl_Widget*);
   			static void statMessages(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbMessages(w);}
 			void cbMessages(Fl_Widget*);
-  			static void statImport(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbImport(w);}
-			void cbImport(Fl_Widget*);
-
 
 			//tabs
   			static void statTabs(Fl_Widget* w,void* f){execWindow *tmpf = static_cast<execWindow *>(f);tmpf->cbTabs(w);}
@@ -205,69 +193,76 @@ class execWindow : public Fl_Double_Window
 			tapeutape *tap;
 			bool fileSaved;
 
-			Fl_Menu_Bar *menu;
+
+            Flat_Group * mainGroup;
+
+			Flat_Menu_Bar *menu;
 
 			messageWindow* messages;
 
-			Fl_Group* status;
+			Flat_Group* status;
 
-			Fl_Tabs * tabs;
+            Flat_Group * tabsWrapper;
+			Flat_Tabs * tabs;
 
-			Fl_Group* setTab;
-			Fl_Value_Slider *setVolume;
+			Flat_Group* setTab;
+			Flat_Value_Slider *setVolume;
   			Fl_Hold_Browser *setOutList;
-			Fl_Button *setOutNew;
-			Fl_Button *setOutRemove;
+			Flat_Button *setOutNew;
+			Flat_Button *setOutRemove;
 			Fl_Input *setOutName;
-			Fl_Check_Button *setCheckPoly;
-			Fl_Counter *setPoly;
+			Flat_Check_Button *setCheckPoly;
+			Flat_Counter *setPoly;
 
 
-			Fl_Group* execTab;
+			Flat_Group* execTab;
   			Fl_Hold_Browser **setupLists;
 
 
-			Fl_Group* creaTab;
+            Flat_Group* creaTab;
+            Flat_Group* creaPack;
+			Flat_Group* creaBtns;
   			Fl_Hold_Browser *creaSetupList;
   			Fl_Hold_Browser *creaKitList;
   			Fl_Hold_Browser *creaInstList;
   			Fl_Hold_Browser *creaVarList;
-			Fl_Tabs * creaTabs;
-			Fl_Group* creaGlobalTab;
-			Fl_Group* creaAudioTab;
-			Fl_Group* creaMidiTab;
-			Fl_Button *creaNew;
-			Fl_Button *creaRemove;
-			Fl_Toggle_Button *creaCopyPaste;
-			Fl_Button *creaUp;
-			Fl_Button *creaDown;
+            Flat_Group * creaTabsWrapper;
+			Flat_Tabs * creaTabs;
+			Flat_Group* creaGlobalTab;
+			Flat_Group* creaAudioTab;
+			Flat_Group* creaMidiTab;
+			Flat_Button *creaNew;
+			Flat_Button *creaRemove;
+			Flat_Toggle_Button *creaCopyPaste;
+			Flat_Button *creaUp;
+			Flat_Button *creaDown;
 			Fl_Input *creaName;
 			Fl_Output *creaSampleName;
-			Fl_Button *creaSampleOpen;
-			Fl_Counter *creaPoly;
-			Fl_Choice *creaCut;
-			Fl_Choice *creaPlayMode;
-			Fl_Check_Button *creaPlayLoop;
-			Fl_Check_Button *creaPlayReverse;
-			Fl_Check_Button *creaCheckCut;
-			Fl_Check_Button *creaCheckPoly;
-			Fl_Check_Button *creaCheckPitch;
+			Flat_Button *creaSampleOpen;
+			Flat_Counter *creaPoly;
+			Flat_Choice *creaCut;
+			Flat_Choice *creaPlayMode;
+			Flat_Check_Button *creaPlayLoop;
+			Flat_Check_Button *creaPlayReverse;
+			Flat_Check_Button *creaCheckCut;
+			Flat_Check_Button *creaCheckPoly;
+			Flat_Check_Button *creaCheckPitch;
 
 
-			Fl_Value_Slider *creaVolume;
-			Fl_Value_Slider *creaPan;
-			Fl_Choice *creaAudioOutput;
+			Flat_Value_Slider *creaVolume;
+			Flat_Value_Slider *creaPan;
+			Flat_Choice *creaAudioOutput;
 			tardiSample *creaSample;
 			tardiPiano *creaMidiPiano;
-			Fl_Choice *creaMidiSel;
-			Fl_Check_Button *creaMidiAct;
-			Fl_Counter *creaMidiCC;
-			Fl_Counter *creaMidiMax;
-			Fl_Counter *creaMidiRoot;
-			Fl_Value_Slider *creaMidiRootFine;
-			Fl_Counter *creaMidiMin;
-			Fl_Counter *creaMidiChan;
-			Fl_Button *creaMidiLearn;
+			Flat_Choice *creaMidiSel;
+			Flat_Check_Button *creaMidiAct;
+			Flat_Counter *creaMidiCC;
+			Flat_Counter *creaMidiMax;
+			Flat_Counter *creaMidiRoot;
+			Flat_Value_Slider *creaMidiRootFine;
+			Flat_Counter *creaMidiMin;
+			Flat_Counter *creaMidiChan;
+			Flat_Button *creaMidiLearn;
 			int creaActiveList;
 			int creaSelectedSetup;
 			int creaSelectedKit;

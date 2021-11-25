@@ -111,7 +111,7 @@ void tardiPiano::draw()
 		{
 			case 0:
 				{
-					fl_draw_box(FL_THIN_UP_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,FL_BACKGROUND_COLOR);
+					fl_draw_box(FL_THIN_UP_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,COLOR_WHITE);
 				}
 				break;
 			case 2:
@@ -149,12 +149,12 @@ void tardiPiano::draw()
 		{
 			case 1:
 				{
-					fl_draw_box(FL_FLAT_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,FL_SELECTION_COLOR);
+					fl_draw_box(FL_FLAT_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,COLOR_BLACK);
 				}
 				break;
 			case 3:
 				{
-					fl_draw_box(FL_FLAT_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,FL_FOREGROUND_COLOR);
+					fl_draw_box(FL_FLAT_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,COLOR_KEYSELECT);
 				}
 				break;
 			case 5:

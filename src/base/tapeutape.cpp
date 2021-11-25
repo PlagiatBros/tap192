@@ -34,9 +34,7 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 
 	#ifdef WITH_GUI
 		//start the ui
-		execWin = new execWindow(350,400,"Tapeutape",this);
-		execWin->size_range(350,400,0,0,0,0);
-		execWin->resizable(execWin);
+		execWin = new execWindow("Tapeutape",this);
 	#endif
 
 	//ring buffer
