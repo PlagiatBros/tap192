@@ -138,6 +138,10 @@ void midiProcess::midiLoop()
 				if(ev->type == SND_SEQ_EVENT_CONTROLLER) { //send to the different setups
 					tapeu->processCC(ev->data.control.channel,ev->data.control.param,ev->data.control.value);
 				}
+        else
+        if (ev->type == SND_SEQ_EVENT_PGMCHANGE) { //send to the different setups
+          tapeu->processPC(ev->data.control.channel, ev->data.control.value);
+        }
 
     				snd_seq_free_event(ev);
   			} while (snd_seq_event_input_pending(seqHandle, 0) > 0);

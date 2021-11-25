@@ -117,6 +117,7 @@ class tapeutape
 		void stopMidiLearn();
 		void processMidiLearn(int,int,int);
 		void processCC(unsigned short, unsigned short,unsigned short);
+		void processPC(unsigned short, unsigned short);
 		inline void addAudioEvent(const audioEvent& newEvent){jack->addAudioEvent(newEvent);}
 
 		// nsm

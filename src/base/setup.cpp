@@ -69,6 +69,11 @@ kit* setup::getKit(int ind)
 		return NULL;
 }
 
+int setup::getCurrentKit()
+{
+	return currentKit;
+}
+
 void setup::addKit(kit* k)
 {
 	kits.push_back(k);

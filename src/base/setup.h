@@ -42,6 +42,7 @@ class setup
 		const std::vector<tap*>& getTap(const unsigned short&, const unsigned short&, const unsigned short&);
 		int getNbKits();
 		kit *getKit(int);
+		int getCurrentKit();
 		void addKit(kit*);
 		void setKit(int,kit*);
 		void removeKit(int );
