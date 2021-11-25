@@ -655,9 +655,10 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
 void tapeutape::processPC(unsigned short chan, unsigned short pc)
 {
 	//test if it changes one of the setups
+	int ipc = static_cast <int>(pc);
 	for(unsigned int i=0;i<setups.size();++i)
 	{
-		if(setups[i]->getChannel()-1 == chan)
+		if(setups[i]->getChannel()-1 == chan && ipc < setups[i]->getNbKits()+1)
 		{
 			int kit = setups[i]->changeKit(pc);
 
