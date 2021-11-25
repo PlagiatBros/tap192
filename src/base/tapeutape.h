@@ -46,6 +46,8 @@
 #include "../audio/sample.h"
 #include "../audio/jackProcess.h"
 
+#include "../osc/osc.h"
+
 #ifdef WITH_GUI
 	#include "../ui/execWindow.h"
 #endif
@@ -63,7 +65,7 @@
 class tapeutape
 {
 	public:
-		tapeutape(int,char**);
+		tapeutape(char*);
 		~tapeutape();
 		void showMessage(bool,std::string);
 
@@ -119,6 +121,21 @@ class tapeutape
 		void processCC(unsigned short, unsigned short,unsigned short);
 		void processPC(unsigned short, unsigned short);
 		inline void addAudioEvent(const audioEvent& newEvent){jack->addAudioEvent(newEvent);}
+
+		//OSC server
+		OSCServer *oscServer;
+    static int oscCallback(const char *path, const char *types, lo_arg ** argv,
+                    int argc, void *data, void *user_data);
+    enum OSC_COMMANDS {
+        OSC_ZERO = 0,
+        SET_GLOBAL_VOLUME,
+				SETUP_KIT_SELECT
+    };
+    std::map<std::string, int> oscCommands = {
+        {"/set/global/volume",  SET_GLOBAL_VOLUME},
+				{"/setup/kit/select", SETUP_KIT_SELECT}
+    };
+
 
 		// nsm
 		bool isDirty();

@@ -6,7 +6,8 @@ base = Glob('src/base/*.cpp')
 audio = Glob('src/audio/*.cpp')
 midi = Glob('src/midi/*.cpp')
 ui = Glob('src/ui/*.cpp')
-sources = base+audio+midi
+osc = Glob('src/osc/*.cpp')
+sources = base+audio+midi+osc
 
 # LANGUAGE
 optlang = ARGUMENTS.get('lang','en')

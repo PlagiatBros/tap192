@@ -26,13 +26,25 @@
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
+#include <getopt.h>
 #include "tapeutape.h"
 
 #include "../nsm/nsm.h"
 
 using namespace std;
 
-string global_filename = "";
+char *global_oscport;
+
+// struct for command parsing
+static struct
+option long_options[] = {
+    {"help",     0, 0, 'h'},
+    {"osc-port", 1, 0, 'p'},
+    {"version",  0, 0, 'v'},
+    {0, 0, 0, 0}
+
+};
+
 
 // nsm
 bool global_nsm_visible = false;
@@ -41,6 +53,7 @@ bool global_nsm_opional_gui = false;
 nsm_client_t *nsm = 0;
 bool nsm_replied = false;
 string nsm_folder = "";
+string global_filename;
 
 tapeutape * tap_instance;
 
@@ -78,6 +91,36 @@ nsm_open_cb(const char *name, const char *display_name, const char *client_id, c
 
 int main(int argc, char** argv)
 {
+    // opts
+    while (1)
+    {
+        int c, option_index=0;
+        c = getopt_long(argc, argv, "p:h", long_options, &option_index);
+
+        if (c == -1) break;
+
+        switch (c)
+        {
+            case 'p':
+                global_oscport = optarg;
+                break;
+            case '?':
+            case 'h':
+                cout << "" << endl;
+                cout << "tapeutape - Midi & OSC controlable Sample Player" << endl;
+                cout << endl;
+                cout << "Usage: tapeutape [options] [file]" << endl;
+                cout << endl;
+                cout << "Options:" << endl;
+                cout << "  -h, --help              show available options" << endl;
+                cout << "  -p, --osc-port <port>   osc input port (udp port number or unix socket path) // default: 12345" << endl;
+                return 0;
+                break;
+          }
+      }
+      if (optind < argc)
+          global_filename = argv[optind++];
+
     // nsm
     const char *nsm_url = getenv( "NSM_URL" );
     if (nsm_url) {
@@ -96,8 +139,8 @@ int main(int argc, char** argv)
             nsm_set_hide_callback(nsm, nsm_hide_cb, 0);
         }
 
-        tap_instance = new tapeutape(argc,argv);
-		global_filename = nsm_folder + "/sampler.tap";
+        tap_instance = new tapeutape((char *)global_filename.c_str());
+        global_filename = nsm_folder + "/sampler.tap";
         std::ifstream infile(global_filename);
         if(!infile.good())
 		    tap_instance->save((char *)global_filename.c_str());
@@ -110,7 +153,7 @@ int main(int argc, char** argv)
         nsm_set_save_callback(nsm, nsm_save_cb, 0);
     }
 	else
-		tap_instance = new tapeutape(argc,argv);
+		tap_instance = new tapeutape((char *)global_filename.c_str());
 
     int r;
 	#ifdef WITH_GUI

@@ -176,6 +176,8 @@ class execWindow : public Flat_Double_Window
 			void changeKit(int,int);
 			void learnMidi(int,int,int);
 
+      void setGlobalVolume(double);
+
 			void updateExecTab();
 
 			void displaySetup(int);

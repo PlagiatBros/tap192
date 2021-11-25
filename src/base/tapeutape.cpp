@@ -21,14 +21,17 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "tapeutape.h"
 
+#include "tapeutape.h"
 #include "../nsm/nsm.h"
 extern nsm_client_t *nsm;
 
+
+extern char *global_oscport;
+
 using namespace std;
 
-tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),fileName(""),jack(NULL),midi(NULL),eventsRingBuffer(NULL),loop(true)
+tapeutape::tapeutape(char *fn):polyphony(100),globalVolume(1.0),fileName(""),jack(NULL),midi(NULL),eventsRingBuffer(NULL),loop(true)
 {
 	fileName="";
 
@@ -48,7 +51,7 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 	}
 
 
-	//midiProcess init and start
+	//midiProcess init
 	midi = new midiProcess(this,jack->getClient(),MIDI_PRIORITY,eventsRingBuffer);
 	showMessage(false,"Starting MIDI");
 	if(midi->midiInit())
@@ -56,9 +59,18 @@ tapeutape::tapeutape(int argc,char** argv):polyphony(100),globalVolume(1.0),file
 		showMessage(true,"Error Starting Midi ");
 	}
 
+	//OSCServer init and start
+  if (global_oscport != 0) {
+        oscServer = new OSCServer(global_oscport);
+        oscServer->start();
+        oscServer->add_method(NULL, NULL, &tapeutape::oscCallback, this);
+  }
+
+
+
 	//if a file name was specified
-	if(argc==2)
-		load(argv[1]);
+	if(fn != "")
+		load(fn);
 
 	//start
 	start();
@@ -125,6 +137,168 @@ tapeutape::~tapeutape()
 	jack_ringbuffer_free(eventsRingBuffer);
 }
 
+
+int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
+                int argc, void *data, void *user_data)
+{
+
+    tapeutape *t = (tapeutape *)user_data;
+
+    int command = t->oscCommands[(std::string) path];
+    if (!command) return 0;
+
+    switch (command) {
+				case SET_GLOBAL_VOLUME:
+						if (argc > 0)
+						{
+								double gv;
+								if (types[0] == 'i')	gv = (double)(argv[0]->i);
+								else if (types[0] == 'f') gv = argv[0]->f;
+								else break;
+								t->setGlobalVolume(gv);
+						}
+						break;
+				case SETUP_KIT_SELECT:
+						int sn=-1, kn=-1;
+						string snc="", knc="";
+						if (argc > 1)
+						{
+								if (types[0] == 'i')
+								{
+									sn = argv[0]->i;
+								 	if (types[1] == 'i')
+									{
+										kn = argv[1]->i;
+									}
+									else if(types[1] == 's')
+									{
+										knc = (std::string) &argv[1]->s;
+									}
+								}
+								else if (types[0] == 's')
+								{
+									snc = (std::string) &argv[0]->s;
+								 	if (types[1] == 'i')
+									{
+										kn = argv[1]->i;
+									}
+									else if(types[1] == 's')
+									{
+										knc = (std::string) &argv[1]->s;
+									}
+								}
+								else break;
+						}
+						else
+						if (argc > 0)
+						{
+								if (types[0] == 'i')
+								{
+									kn = argv[0]->i;
+								}
+								else if (types[0] == 's')
+								{
+									knc = (std::string) &argv[0]->s;
+								}
+								else break;
+						}
+
+						if (snc !="") // setup(s) defined by name
+						{
+							for (unsigned int i=0;i<t->setups.size();++i)
+							{
+								if(!snc.compare(t->setups[i]->getName())) {
+									if (kn !=-1 )	// kit defined by number
+									{
+										int kit = t->setups[i]->changeKit(kn);
+										Fl::lock();
+										t->execWin->changeKit(i,kit+1);
+										Fl::unlock();
+										string mes = "Kit changed to " + to_string(kn) + ":'"  + t->setups[i]->getKit(kn)->getName() + "' in Setup " + to_string(i) + ":'" + t->setups[i]->getName() + "'";
+										t->showMessage(false, mes);
+									}
+									else if (knc !="") // kit(s) defined by name
+									{
+										for (unsigned int j=0;j<t->setups[i]->getNbKits();++j)
+										{
+											if(!knc.compare(t->setups[i]->getKit(j)->getName()))
+											{
+												int kit = t->setups[i]->changeKit(j);
+												Fl::lock();
+												t->execWin->changeKit(i,kit+1);
+												Fl::unlock();
+												string mes = "Kit changed to " + to_string(j) + ":'"  + t->setups[i]->getKit(j)->getName() + "' in Setup " + to_string(i) + ":'" + t->setups[i]->getName() + "'";
+												t->showMessage(false, mes);
+											}
+										}
+									}
+								}
+							}
+						}
+
+						if (sn !=-1) // setup defined by number
+						{
+							if (kn != -1) // kit(s) defined by number
+							{
+								int kit = t->setups[sn]->changeKit(kn);
+								Fl::lock();
+								t->execWin->changeKit(sn,kit+1);
+								Fl::unlock();
+								string mes = "Kit changed to " + to_string(kn) + ":'"  + t->setups[sn]->getKit(kn)->getName() + "' in Setup " + to_string(sn) + ":'" + t->setups[sn]->getName() + "'";
+								t->showMessage(false, mes);
+							}
+							else
+							if (knc != "") // kit defined by name
+							{
+								for (unsigned int j=0;j<t->setups[sn]->getNbKits();++j)
+								{
+									if (!knc.compare(t->setups[sn]->getKit(j)->getName()))
+									{
+										int kit = t->setups[sn]->changeKit(j);
+										Fl::lock();
+										t->execWin->changeKit(sn,kit+1);
+										Fl::unlock();
+										string mes = "Kit changed to " + to_string(j) + ":'"  + t->setups[sn]->getKit(j)->getName() + "' in Setup " + to_string(sn) + ":'" + t->setups[sn]->getName() + "'";
+										t->showMessage(false, mes);
+									}
+								}
+							}
+						}
+						else if (sn == -1 && argc == 1) // setup not defined (one arg only)
+						{
+							for (unsigned int i=0;i<t->setups.size();++i)
+							{
+								if (kn != -1) // kit(s) defined by number
+								{
+									int kit = t->setups[i]->changeKit(kn);
+									Fl::lock();
+									t->execWin->changeKit(i,kit+1);
+									Fl::unlock();
+									string mes = "Kit changed to " + to_string(kn) + ":'"  + t->setups[i]->getKit(kn)->getName() + "' in Setup " + to_string(i) + ":'" + t->setups[i]->getName() + "'";
+									t->showMessage(false, mes);
+								}
+								else
+								if (knc != "") // kit defined by name
+								{
+									for (unsigned int j=0;j<t->setups[i]->getNbKits();++j)
+									{
+										if (!knc.compare(t->setups[i]->getKit(j)->getName()))
+										{
+											int kit = t->setups[i]->changeKit(j);
+											Fl::lock();
+											t->execWin->changeKit(i,kit+1);
+											Fl::unlock();
+											string mes = "Kit changed to " + to_string(j) + ":'"  + t->setups[i]->getKit(j)->getName() + "' in Setup " + to_string(i) + ":'" + t->setups[i]->getName() + "'";
+											t->showMessage(false, mes);
+										}
+									}
+								}
+							}
+						}
+						break;
+    }
+    return 0;
+}
 
 
 void tapeutape::showMessage(bool t,std::string mess)
@@ -692,6 +866,7 @@ void tapeutape::processPC(unsigned short chan, unsigned short pc)
 void tapeutape::setGlobalVolume(double gv)
 {
 	globalVolume = gv;
+	execWin->setGlobalVolume(gv);
 }
 
 double tapeutape::getGlobalVolume()

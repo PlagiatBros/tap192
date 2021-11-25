@@ -2016,6 +2016,11 @@ void execWindow::learnMidi(int ch,int ccn,int vel)
 	updateMidi();
 }
 
+void execWindow::setGlobalVolume(double gv)
+{
+	setVolume->value(gv);
+}
+
 void execWindow::cbCreaMidiMin(Fl_Widget*)
 {
 	creaMidiPiano->setLSelect((int)(creaMidiMin->value()));
