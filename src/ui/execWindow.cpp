@@ -309,12 +309,12 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 	creaAudioOutput->hide();
 	creaSample->hide();
 
-	Flat_Group * midiControls= new Flat_Group(0, y, w, 100);
+	Flat_Group * midiControls= new Flat_Group(0, y, w, 200);
 	midiControls->resizable(0);
 	creaMidiSel = new Flat_Choice(10,y,200,20,"");
 	creaMidiSel->callback(statCreaMidiSel,this);
-	creaMidiAct = new Flat_Check_Button(25,y+105,20,20,"Active");
-	creaMidiAct->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
+	creaMidiAct = new Flat_Check_Button(60,y+95,20,20,"Active");
+	creaMidiAct->align(FL_ALIGN_LEFT);
 	creaMidiAct->callback(statCreaMidiAct,this);
 	creaMidiAct->hide();
 	creaMidiChan = new Flat_Counter(10,y+50,62,20,"Channel");
