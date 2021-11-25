@@ -1,8 +1,8 @@
 /***************************************************************************
  *            tapeutape.cpp
  *
- *  Copyright  2005  Florent Berthaut
- *  florentberthaut@no-log.org
+ *  Copyright  2005 - 2013 Florent Berthaut, 2019 Jean-Emmanuel Doucet & Aurélien Roux
+ *  florentberthaut@no-log.org jean-emmanuel.doucet@groolot.net orl@ammd.net
  ****************************************************************************/
 
 /*

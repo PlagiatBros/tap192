@@ -2,8 +2,8 @@
  *            main.cc
  *
  *  Mon Sep  4 10:12:59 2006
- *  Copyright  2006  Florent Berthaut
- *  florentberthaut@no-log.org
+ *  Copyright  2006 - 2013 Florent Berthaut, 2019 Jean-Emmanuel Doucet & Aurélien Roux
+ *  florentberthaut@no-log.org jean-emmanuel.doucet@groolot.net orl@ammd.net
  ****************************************************************************/
 
 /*
