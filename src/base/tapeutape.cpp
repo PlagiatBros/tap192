@@ -148,87 +148,135 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
     if (!command) return 0;
 
     switch (command) {
-				case SET_GLOBAL_VOLUME:
-						if (argc > 0)
-						{
-								double gv;
-								if (types[0] == 'i')	gv = (double)(argv[0]->i);
-								else if (types[0] == 'f') gv = argv[0]->f;
-								else break;
-								t->setGlobalVolume(gv);
-						}
-						break;
-				case GET_GLOBAL_VOLUME:
-						if (argc > 0)
-						{
-								char *address;
-            		if (argc == 2) {
-                		address = &argv[0]->s;
-            		} else {
-                		address = lo_address_get_url(lo_message_get_source(data));
-            		}
-								// oscserver send
-						}
-				case SETUP_KIT_SELECT:
-						int sn=-1, kn=-1;
-						string snc="", knc="";
-						if (argc > 1)
-						{
-								if (types[0] == 'i')
-								{
-									sn = argv[0]->i;
-								 	if (types[1] == 'i') kn = argv[1]->i;
-									else if(types[1] == 's') knc = (std::string) &argv[1]->s;
-								}
-								else if (types[0] == 's')
-								{
-									snc = (std::string) &argv[0]->s;
-								 	if (types[1] == 'i') kn = argv[1]->i;
-									else if(types[1] == 's') knc = (std::string) &argv[1]->s;
-								}
-								else break;
-						}
-						else
-						if (argc > 0)
-						{
-								if (types[0] == 'i') kn = argv[0]->i;
-								else if (types[0] == 's')	knc = (std::string) &argv[0]->s;
-								else break;
-						}
+		case SET_GLOBAL_VOLUME:
+			if (argc > 0)
+			{
+					double gv;
+					if (types[0] == 'i')	gv = (double)(argv[0]->i);
+					else if (types[0] == 'f') gv = argv[0]->f;
+					else break;
+					t->setGlobalVolume(gv);
+			}
+			break;
+		case GET_GLOBAL_VOLUME:
+			if (argc > 0)
+			{
+				char *address;
+    			if (argc == 1) {
+        			address = &argv[0]->s;
+    			} else {
+        			address = lo_address_get_url(lo_message_get_source(data));
+    			}
 
-						if (snc !="") // setup(s) defined by name
-						{
-							for (unsigned int i=0;i<t->setups.size();++i)
-							{
-								if(!snc.compare(t->setups[i]->getName())) {
-									if (kn !=-1 )	t->changeKit(i, kn); // kit defined by number
-									else if (knc !="") // kit(s) defined by name
-										for (unsigned int j=0;j<t->setups[i]->getNbKits();++j)
-											if(!knc.compare(t->setups[i]->getKit(j)->getName())) t->changeKit(i, j);
-								}
-							}
-						}
+				lo_address lo_add = lo_address_new_from_url(address);
+				if (lo_add != NULL) {
+					string spath = path;
+					spath.replace(spath.find("get"), 3, "tapeutape");
+					lo_message msg = lo_message_new();
+					lo_message_add_double(msg, t->getGlobalVolume());
+					lo_send_message(lo_add, spath.c_str(), msg);
+					lo_address_free(lo_add);
+				}
+			}
+			break;
+		case KIT_SELECT:
+		{
+			int sn=-1, kn=-1;
+			string snc="", knc="";
+			if (argc > 1)
+			{
+					if (types[0] == 'i')
+					{
+						sn = argv[0]->i;
+					 	if (types[1] == 'i') kn = argv[1]->i;
+						else if(types[1] == 's') knc = (std::string) &argv[1]->s;
+					}
+					else if (types[0] == 's')
+					{
+						snc = (std::string) &argv[0]->s;
+					 	if (types[1] == 'i') kn = argv[1]->i;
+						else if(types[1] == 's') knc = (std::string) &argv[1]->s;
+					}
+					else break;
+			}
+			else
+			if (argc > 0)
+			{
+					if (types[0] == 'i') kn = argv[0]->i;
+					else if (types[0] == 's')	knc = (std::string) &argv[0]->s;
+					else break;
+			}
 
-						if (sn !=-1) // setup defined by number
+			if (snc !="") // setup(s) defined by name
+			{
+				for (unsigned int i=0;i<t->setups.size();++i)
+				{
+					if(!snc.compare(t->setups[i]->getName())) {
+						if (kn !=-1 )	t->changeKit(i, kn); // kit defined by number
+						else if (knc !="") // kit(s) defined by name
+							for (unsigned int j=0;j<t->setups[i]->getNbKits();++j)
+								if(!knc.compare(t->setups[i]->getKit(j)->getName())) t->changeKit(i, j);
+					}
+				}
+			}
+
+			if (sn !=-1) // setup defined by number
+			{
+				if (kn != -1) t->changeKit(sn,kn); // kit(s) defined by number
+				else
+				if (knc != "") // kit defined by name
+					for (unsigned int j=0;j<t->setups[sn]->getNbKits();++j)
+						if (!knc.compare(t->setups[sn]->getKit(j)->getName())) t->changeKit(sn,j);
+			}
+			else if (sn == -1 && argc == 1) // setup not defined (one arg only)
+			{
+				for (unsigned int i=0;i<t->setups.size();++i)
+				{
+					if (kn != -1) t->changeKit(i,kn);// kit(s) defined by number
+					else
+					if (knc != "") // kit defined by name
+						for (unsigned int j=0;j<t->setups[i]->getNbKits();++j)
+							if (!knc.compare(t->setups[i]->getKit(j)->getName())) t->changeKit(i,j);
+				}
+			}
+			break;
+		}
+		case KIT_GET_SELECTED:
+		{
+			if (argc > 0)
+			{
+				char *address;
+				string by;
+				if (argc == 2) {
+					address = &argv[0]->s;
+					by = &argv[1]->s;
+				} else {
+					address = lo_address_get_url(lo_message_get_source(data));
+					by = &argv[0]->s;
+				}
+
+				lo_address lo_add = lo_address_new_from_url(address);
+				if (lo_add != NULL) {
+					string spath = path;
+					spath.replace(spath.find("get"), 3, "tapeutape");
+					lo_message msg = lo_message_new();
+					for (int i=0;i<t->setups.size();i++)
+					{
+						if (!by.compare("by_name"))
 						{
-							if (kn != -1) t->changeKit(sn,kn); // kit(s) defined by number
-							else
-							if (knc != "") // kit defined by name
-								for (unsigned int j=0;j<t->setups[sn]->getNbKits();++j)
-									if (!knc.compare(t->setups[sn]->getKit(j)->getName())) t->changeKit(sn,j);
+							cout << lo_message_add_string(msg, t->setups[i]->getName().c_str());
+							cout << lo_message_add_string(msg, t->setups[i]->getKit(t->setups[i]->getCurrentKit())->getName().c_str());
+						} else {
+							lo_message_add_int32(msg, i);
+							lo_message_add_int32(msg, t->setups[i]->getCurrentKit());
 						}
-						else if (sn == -1 && argc == 1) // setup not defined (one arg only)
-						{
-							for (unsigned int i=0;i<t->setups.size();++i)
-							{
-								if (kn != -1) t->changeKit(i,kn);// kit(s) defined by number
-								else
-								if (knc != "") // kit defined by name
-									for (unsigned int j=0;j<t->setups[i]->getNbKits();++j)
-										if (!knc.compare(t->setups[i]->getKit(j)->getName())) t->changeKit(i,j);
-							}
-						}
-						break;
+					}
+					lo_send_message(lo_add, spath.c_str(), msg);
+					lo_address_free(lo_add);
+				}
+			}
+			break;
+		}
     }
     return 0;
 }
