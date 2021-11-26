@@ -112,6 +112,7 @@ class tapeutape
 		int getJackStereoChannel(std::string);
 		jackProcess* getJackProcess();
 		void setSampleRate(int);
+		void changeKit(int, int);
 
 		//Midi Part
 		midiProcess* getMidiProcess();
@@ -129,11 +130,19 @@ class tapeutape
     enum OSC_COMMANDS {
         OSC_ZERO = 0,
         SET_GLOBAL_VOLUME,
+				GET_GLOBAL_VOLUME,
 				SETUP_KIT_SELECT
     };
     std::map<std::string, int> oscCommands = {
-        {"/set/global/volume",  SET_GLOBAL_VOLUME},
-				{"/setup/kit/select", SETUP_KIT_SELECT}
+        {"/set/global_volume",  SET_GLOBAL_VOLUME},
+				{"/get/global_volume",  GET_GLOBAL_VOLUME},
+
+				{"/kit/set/selected", SETUP_KIT_SELECT}
+/*				{"/kit/get/selected", SETUP_KIT_GET_SELECTED},
+				{"/kit/set/volume", SETUP_KIT_SET_VOLUME},
+				{"/kit/get/volume", SETUP_KIT_SET_VOLUME},
+
+				{"//kit/select", SETUP_KIT_SELECT},*/
     };
 
 
