@@ -147,6 +147,9 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
     int command = t->oscCommands[(std::string) path];
     if (!command) return 0;
 
+	int sn=-1, kn=-1;
+	string snc="", knc="";
+
     switch (command) {
 		case SET_GLOBAL_VOLUME:
 			if (argc > 0)
@@ -179,10 +182,11 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				}
 			}
 			break;
+		case KIT_SET_SELECTED:
 		case KIT_SELECT:
 		{
-			int sn=-1, kn=-1;
-			string snc="", knc="";
+			sn=-1; kn=-1;
+			snc=""; knc="";
 			if (argc > 1)
 			{
 					if (types[0] == 'i')
@@ -275,6 +279,80 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					lo_address_free(lo_add);
 				}
 			}
+			break;
+		}
+		case KIT_SET_VOLUME:
+		{
+			sn=-1; kn=-1;
+			snc=""; knc="";
+			float kv;
+			if (argc > 2) { // Si Setup précisé
+				if (types[0] == 's') {
+					snc = &argv[0]->s;
+					if (types[1] == 's') {
+						knc = &argv[1]->s;
+					} else if (types[1] == 'i') {
+						kn = argv[1]->i;
+					} else break;
+				} else if (types[0] == 'i') {
+					sn = argv[0]->i;
+					if (types[1] == 's') {
+						knc = &argv[1]->s;
+					} else if (types[1] == 'i') {
+						kn = argv[1]->i;
+					} else break;
+				} else break;
+
+				if (types[2] == 'd'){
+					kv = (float) argv[2]->d;
+				} else if (types[2] == 'f') {
+					kv = argv[2]->f;
+				} else if (types[2] == 'i') {
+					kv = (float) argv[2]->i;
+				} else break;
+
+				if (snc != "") // setup by name
+					for (int i=0; i<t->setups.size(); i++)
+						if (!snc.compare(t->setups[i]->getName())) sn = i;
+				if (sn < t->setups.size()) {
+					if (knc !="") { // kit by name
+						for (int i=0; i<t->setups.size(); i++){
+							if (!knc.compare(t->setups[i]->getKit(kn)->getName())) t->setups[i]->getKit(kn)->setVolume(kv);
+						}
+					} else if (kn != -1 && kn < t->setups[sn]->getNbKits()) {
+						t->setups[sn]->getKit(kn)->setVolume(kv);
+					} else break;
+				}
+
+
+			} else if (argc > 1) { // Si Setup non précisé
+				if (types[0] == 's') {
+					knc = &argv[0]->s;
+				} else if (types[0] == 'i') {
+					kn = argv[0]->i;
+				} else break;
+
+				if (types[1] == 'd'){
+					kv = (float) argv[1]->d;
+				} else if (types[1] == 'f') {
+					kv = argv[1]->f;
+				} else if (types[1] == 'i') {
+					kv = (float) argv[1]->i;
+				} else break;
+
+				for(int i=0; i<t->setups.size(); i++){
+					if (knc != "")
+						for (int j=0; i<t->setups[i]->getNbKits(); i++)
+							if (!knc.compare(t->setups[i]->getKit(j)->getName())) kn = j;
+
+					t->setups[i]->getKit(kn)->setVolume(kv);
+				}
+			}
+			break;
+		}
+		case KIT_GET_VOLUME:
+		{
+			cout << "Kit GET Volume" << endl;
 			break;
 		}
     }
