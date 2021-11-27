@@ -147,13 +147,15 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
     int command = t->oscCommands[(std::string) path];
     if (!command) return 0;
 
-	int sn=-1, kn=-1;
-	string snc="", knc="";
+	int sn=-1, kn=-1, in=-1;
+	string snc="", knc="", inc="";
 	char *address;
-	string by;
+	string spath, by;
 
     switch (command) {
+// General OSC methods
 		case SET_GLOBAL_VOLUME:
+		// 'd' : global_volume
 			if (argc > 0)
 			{
 					double gv;
@@ -164,31 +166,33 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			}
 			break;
 		case GET_GLOBAL_VOLUME:
-			if (argc > 0)
-			{
-    			if (argc == 1) {
-        			address = &argv[0]->s;
-    			} else {
-        			address = lo_address_get_url(lo_message_get_source(data));
-    			}
+		// noargs : message will be sent to sender's address
+		// 's' : address
+			if (argc == 1) {
+    			address = &argv[0]->s;
+			} else {
+    			address = lo_address_get_url(lo_message_get_source(data));
+			}
 
-				lo_address lo_add = lo_address_new_from_url(address);
-				if (lo_add != NULL) {
-					string spath = path;
-					spath.replace(spath.find("get"), 3, "tapeutape");
-					lo_message msg = lo_message_new();
-					lo_message_add_double(msg, t->getGlobalVolume());
-					lo_send_message(lo_add, spath.c_str(), msg);
-					lo_address_free(lo_add);
-				}
+			lo_address lo_add = lo_address_new_from_url(address);
+			if (lo_add != NULL) {
+				spath = path;
+				spath.replace(spath.find("get"), 3, "tapeutape");
+				lo_message msg = lo_message_new();
+				lo_message_add_double(msg, t->getGlobalVolume());
+				lo_send_message(lo_add, spath.c_str(), msg);
+				lo_address_free(lo_add);
 			}
 			break;
+
+
+// Kit OSC methods
 		case KIT_SET_SELECTED:
 		case KIT_SELECT:
+		// 'ii', 'is', 'si', 'ss' : Setup, Kit
 			sn=-1; kn=-1;
 			snc=""; knc="";
-			if (argc > 1)
-			{
+			if (argc > 1) {
 				if (types[0] == 'i')
 				{
 					sn = argv[0]->i;
@@ -202,10 +206,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					else if(types[1] == 's') knc = &argv[1]->s;
 				}
 				else break;
-			}
-			else
-			if (argc > 0)
-			{
+			} else if (argc > 0) {
 					if (types[0] == 'i') kn = argv[0]->i;
 					else if (types[0] == 's')	knc = &argv[0]->s;
 					else break;
@@ -242,67 +243,128 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 		case KIT_GET_SELECTED_BYNAME:
 			by = "by_name";
 		case KIT_GET_SELECTED:
-			if (argc > 0)
-			{
-				if (argc == 1) {
-					address = &argv[0]->s;
-					//by = &argv[1]->s;
-				} else {
-					address = lo_address_get_url(lo_message_get_source(data));
-					//by = &argv[0]->s;
-				}
+		// noargs : message will be sent to the sender's address
+		// 's' : address
+			if (argc == 1) {
+				address = &argv[0]->s;
+			} else {
+				address = lo_address_get_url(lo_message_get_source(data));
+			}
 
-				lo_address lo_add = lo_address_new_from_url(address);
-				if (lo_add != NULL) {
-					string spath = path;
-					//spath.prepend("/tapeutape");
-					spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
-					lo_message msg = lo_message_new();
-					for (int i=0;i<t->setups.size();i++)
+			lo_address lo_add = lo_address_new_from_url(address);
+			if (lo_add != NULL) {
+				spath = path;
+				spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
+				lo_message msg = lo_message_new();
+				for (int i=0;i<t->setups.size();i++)
+				{
+					if (!by.compare("by_name"))
 					{
-						if (!by.compare("by_name"))
-						{
-							lo_message_add_string(msg, t->setups[i]->getName().c_str());
-							lo_message_add_string(msg, t->setups[i]->getKit(t->setups[i]->getCurrentKit())->getName().c_str());
-						} else {
-							lo_message_add_int32(msg, i);
-							lo_message_add_int32(msg, t->setups[i]->getCurrentKit());
-						}
+						lo_message_add_string(msg, t->setups[i]->getName().c_str());
+						lo_message_add_string(msg, t->setups[i]->getKit(t->setups[i]->getCurrentKit())->getName().c_str());
+					} else {
+						lo_message_add_int32(msg, i);
+						lo_message_add_int32(msg, t->setups[i]->getCurrentKit());
 					}
-					lo_send_message(lo_add, spath.c_str(), msg);
-					lo_address_free(lo_add);
-					by = "";
 				}
+				lo_send_message(lo_add, spath.c_str(), msg);
+				lo_address_free(lo_add);
+				by = "";
 			}
 			break;
 		case KIT_SET_VOLUME:
-			sn=-1; kn=-1;
-			snc=""; knc="";
-			float kv;
-			if (argc > 2) { // Si Setup précisé
-				if (types[0] == 's') {
-					snc = &argv[0]->s;
-					if (types[1] == 's') {
-						knc = &argv[1]->s;
-					} else if (types[1] == 'i') {
-						kn = argv[1]->i;
-					} else break;
-				} else if (types[0] == 'i') {
-					sn = argv[0]->i;
-					if (types[1] == 's') {
-						knc = &argv[1]->s;
-					} else if (types[1] == 'i') {
-						kn = argv[1]->i;
-					} else break;
-				} else break;
+		// 'ssd', 'ssf', 'ssi',
+		// 'sid', 'sif', 'sii',
+		// 'isd', 'isf', 'isi',
+		// 'iid', 'iif', 'iii' : Setup, Kit, Volume
+			if (argc > 0) {
+				double kv;
 
-				if (types[2] == 'd'){
-					kv = argv[2]->d;
-				} else if (types[2] == 'f') {
-					kv = (double) argv[2]->f;
-				} else if (types[2] == 'i') {
-					kv = (double) argv[2]->i;
-				} else break;
+				sn=-1; kn=-1;
+				snc=""; knc="";
+				if (argc > 2) { // Si Setup précisé
+					if (types[0] == 's') snc = &argv[0]->s;
+					else if (types[0] == 'i') sn = argv[0]->i;
+					else break;
+
+					if (types[1] == 's') knc = &argv[1]->s;
+					else if (types[1] == 'i') kn = argv[1]->i;
+					else break;
+
+					if (types[2] == 'd') kv = argv[2]->d;
+					else if (types[2] == 'f') kv = (double) argv[2]->f;
+					else if (types[2] == 'i') kv = (double) argv[2]->i;
+					else break;
+
+					if (snc != "") { // setup by name
+						sn = t->getSetupIdByName(snc);
+					}
+					if (sn < t->setups.size()) {
+						snc = "";
+						if (knc != "") { // kit by name
+							kn = t->getKitIdByName(knc, snc, sn);
+						}
+
+						if (kn < t->setups[sn]->getNbKits()) { // kit by id
+							t->setups[sn]->getKit(kn)->setVolume(kv);
+						} else break;
+					}
+
+
+
+				} else if (argc > 1) { // Si Setup non précisé
+					if (types[0] == 's') knc = &argv[0]->s;
+					else if (types[0] == 'i') kn = argv[0]->i;
+					else break;
+
+					if (types[1] == 'd') kv = argv[1]->d;
+					else if (types[1] == 'f') kv = (double) argv[1]->f;
+					else if (types[1] == 'i') kv = (double) argv[1]->i;
+					else break;
+
+					for(int i=0; i<t->setups.size(); i++){
+						if (knc != "") {
+							kn = t->getKitIdByName(knc,snc,i);
+						}
+
+						if (kn < t->setups[i]->getNbKits()) {
+							t->setups[i]->getKit(kn)->setVolume(kv);
+						} else break;
+					}
+				}
+			}
+			break;
+		case KIT_GET_VOLUME_BYNAME:
+			by = "by_name";
+		case KIT_GET_VOLUME:
+		// 'ss', 'ii' : setup, kit
+		// 'sss', 'iis' : setup, kit, address
+			if (argc > 0)
+			{
+				sn=-1; kn=-1;
+				snc=""; knc="";
+
+				if (argc > 1) { // Si Setup précisé
+					if (types[0] == 's') snc = &argv[0]->s;
+					else if (types[0] == 'i') sn = argv[0]->i;
+					else break;
+
+					if (types[1] == 's') knc = &argv[1]->s;
+					else if (types[1] == 'i') kn = argv[1]->i;
+					else break;
+				}
+
+				if (argc == 3) {
+					address = &argv[2]->s;
+				} else {
+					address = lo_address_get_url(lo_message_get_source(data));
+				}
+
+				lo_address lo_add = lo_address_new_from_url(address);
+				spath = path;
+				spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
+				lo_message msg = lo_message_new();
+
 
 				if (snc != "") { // setup by name
 					sn = t->getSetupIdByName(snc);
@@ -314,104 +376,61 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					}
 
 					if (kn < t->setups[sn]->getNbKits()) { // kit by id
-						t->setups[sn]->getKit(kn)->setVolume(kv);
-					} else break;
-				}
+						if (lo_add != NULL) {
+							if (!by.compare("by_name")){
+								lo_message_add_string(msg, t->setups[sn]->getName().c_str());
+								lo_message_add_string(msg, t->setups[sn]->getKit(kn)->getName().c_str());
+							} else {
+								lo_message_add_int32(msg, sn);
+								lo_message_add_int32(msg, kn);
+							}
+							lo_message_add_double(msg, t->setups[sn]->getKit(kn)->getVolume());
+							lo_send_message(lo_add, spath.c_str(), msg);
+							lo_address_free(lo_add);
 
-
-
-			} else if (argc > 1) { // Si Setup non précisé
-				if (types[0] == 's') {
-					knc = &argv[0]->s;
-				} else if (types[0] == 'i') {
-					kn = argv[0]->i;
-				} else break;
-
-				if (types[1] == 'd'){
-					kv = argv[1]->d;
-				} else if (types[1] == 'f') {
-					kv = (double) argv[1]->f;
-				} else if (types[1] == 'i') {
-					kv = (double) argv[1]->i;
-				} else break;
-
-				for(int i=0; i<t->setups.size(); i++){
-					if (knc != "") {
-						kn = t->getKitIdByName(knc,snc,i);
-					}
-
-					if (kn < t->setups[i]->getNbKits()) {
-						t->setups[i]->getKit(kn)->setVolume(kv);
+							by = "";
+						}
 					} else break;
 				}
 			}
 			break;
-		case KIT_GET_VOLUME_BYNAME:
-			by = "by_name";
-		case KIT_GET_VOLUME:
-		// 'ss', 'ii' : setup, kit
-		// 'sss', 'iis' : setup, kit, port
-			sn=-1; kn=-1;
-			snc=""; knc="";
 
-			if (argc > 1) { // Si Setup précisé
-				if (types[0] == 's') {
-					snc = &argv[0]->s;
-					if (types[1] == 's') {
-						knc = &argv[1]->s;
-					} else if (types[1] == 'i') {
-						kn = argv[1]->i;
-					} else break;
-				} else if (types[0] == 'i') {
-					sn = argv[0]->i;
-					if (types[1] == 's') {
-						knc = &argv[1]->s;
-					} else if (types[1] == 'i') {
-						kn = argv[1]->i;
-					} else break;
-				} else break;
-			}
-
-			if (argc == 3) {
-				address = &argv[2]->s;
-			} else {
-				address = lo_address_get_url(lo_message_get_source(data));
-			}
-
-			lo_address lo_add = lo_address_new_from_url(address);
-			string spath = path;
-			spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
-			lo_message msg = lo_message_new();
-
-
-			if (snc != "") { // setup by name
-				sn = t->getSetupIdByName(snc);
-			}
-			if (sn < t->setups.size()) {
-				snc = "";
-				if (knc != "") { // kit by name
-					kn = t->getKitIdByName(knc, snc, sn);
+// Instruments OSC methods
+		case INSTRUMENT_SET_VOLUME:
+		// Setup (s,i), Kit (s,i), Instrument (s,i), Volume (d,f,i)
+		// Kit (s,i), Instrument (s,i), Volume (d,f,i)
+		// Instrument (s,i), Volume (d,f,i)
+			if (argc > 0) {
+				double iv;
+				int argind=0;
+				if (argc > 3) {
+					if (types[argind] == 's') snc = &argv[argind]->s;
+					else if (types[argind] == 'i') sn = argv[argind]->i;
+					else break;
+					argind++;
+				} else if (argc > 2) {
+					if (types[argind] == 's') knc = &argv[argind]->s;
+					else if (types[argind] == 'i') kn = argv[argind]->i;
+					else break;
+					argind++;
+				} else if (argc > 1) {
+					if (types[argind] == 's') inc = &argv[argind]->s;
+					else if (types[argind] == 'i') in = argv[argind]->i;
+					else break;
+					argind++;
+				} else if (argc == 1) {
+					if (types[argind] == 'd') iv = argv[argind]->d;
+					else if (types[argind] == 'f') iv = (double) argv[argind]->f;
+					else if (types[argind] == 'i') iv = (double) argv[argind]->i;
+					else break;
 				}
 
-				if (kn < t->setups[sn]->getNbKits()) { // kit by id
-					if (lo_add != NULL) {
-						if (!by.compare("by_name")){
-							lo_message_add_string(msg, t->setups[sn]->getName().c_str());
-							lo_message_add_string(msg, t->setups[sn]->getKit(kn)->getName().c_str());
-						} else {
-							lo_message_add_int32(msg, sn);
-							lo_message_add_int32(msg, kn);
-						}
-						lo_message_add_double(msg, t->setups[sn]->getKit(kn)->getVolume());
-						lo_send_message(lo_add, spath.c_str(), msg);
-						lo_address_free(lo_add);
+				if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
+				if (knc != "" && sn < setups.size()) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
 
-						by = "";
-					}
-				} else break;
+				if (inc != "") in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
+
 			}
-
-
 			break;
     }
     return 0;
@@ -788,6 +807,14 @@ int tapeutape::getKitIdByName(string name, string snc, int sn)
 			}
 		}
 	}
+	return -1;
+}
+
+instrument* getInstrumentByName(string name, string snc, int sn, string knc, int kn){
+	return NULL;
+}
+
+int getInstrumentIdByName(string name, string snc, string sn, string knc, int kn){
 	return -1;
 }
 
