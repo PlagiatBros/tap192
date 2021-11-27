@@ -50,7 +50,7 @@ class kit
 		float compVolume(float,unsigned short,unsigned short,unsigned short);
 		void exec(double);
 
-		inline void setVolume(float vol){m_volume=vol;}
+		inline void setVolume(double vol){m_volume=vol;}
 		inline float getVolume(){return m_volume;}
 
 	private:
