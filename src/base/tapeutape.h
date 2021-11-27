@@ -139,8 +139,10 @@ class tapeutape
 		KIT_SELECT,
 		KIT_SET_SELECTED,
 		KIT_GET_SELECTED,
+		KIT_GET_SELECTED_BYNAME,
 		KIT_SET_VOLUME,
 		KIT_GET_VOLUME,
+		KIT_GET_VOLUME_BYNAME,
 
 		INSTRUMENT_SET_VOLUME,
 		INSTRUMENT_GET_VOLUME,
@@ -172,8 +174,10 @@ class tapeutape
 		{"/kit/select", 		KIT_SELECT},
 		{"/kit/set/selected", 	KIT_SET_SELECTED},
 		{"/kit/get/selected", 	KIT_GET_SELECTED},
+		{"/kit/get/selected/by_name", 	KIT_GET_SELECTED_BYNAME},
 		{"/kit/set/volume",		KIT_SET_VOLUME},
 		{"/kit/get/volume",		KIT_GET_VOLUME},
+		{"/kit/get/volume/by_name",		KIT_GET_VOLUME_BYNAME},
 
 		{"/instrument/set/volume",			INSTRUMENT_SET_VOLUME},
 		{"/instrument/get/volume",			INSTRUMENT_GET_VOLUME},

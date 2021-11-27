@@ -149,6 +149,8 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 
 	int sn=-1, kn=-1;
 	string snc="", knc="";
+	char *address;
+	string by;
 
     switch (command) {
 		case SET_GLOBAL_VOLUME:
@@ -164,7 +166,6 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 		case GET_GLOBAL_VOLUME:
 			if (argc > 0)
 			{
-				char *address;
     			if (argc == 1) {
         			address = &argv[0]->s;
     			} else {
@@ -238,31 +239,31 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				}
 			}
 			break;
+		case KIT_GET_SELECTED_BYNAME:
+			by = "by_name";
 		case KIT_GET_SELECTED:
-		{
 			if (argc > 0)
 			{
-				char *address;
-				string by;
-				if (argc == 2) {
+				if (argc == 1) {
 					address = &argv[0]->s;
-					by = &argv[1]->s;
+					//by = &argv[1]->s;
 				} else {
 					address = lo_address_get_url(lo_message_get_source(data));
-					by = &argv[0]->s;
+					//by = &argv[0]->s;
 				}
 
 				lo_address lo_add = lo_address_new_from_url(address);
 				if (lo_add != NULL) {
 					string spath = path;
-					spath.replace(spath.find("get"), 3, "tapeutape");
+					//spath.prepend("/tapeutape");
+					spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
 					lo_message msg = lo_message_new();
 					for (int i=0;i<t->setups.size();i++)
 					{
 						if (!by.compare("by_name"))
 						{
-							cout << lo_message_add_string(msg, t->setups[i]->getName().c_str());
-							cout << lo_message_add_string(msg, t->setups[i]->getKit(t->setups[i]->getCurrentKit())->getName().c_str());
+							lo_message_add_string(msg, t->setups[i]->getName().c_str());
+							lo_message_add_string(msg, t->setups[i]->getKit(t->setups[i]->getCurrentKit())->getName().c_str());
 						} else {
 							lo_message_add_int32(msg, i);
 							lo_message_add_int32(msg, t->setups[i]->getCurrentKit());
@@ -270,12 +271,11 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					}
 					lo_send_message(lo_add, spath.c_str(), msg);
 					lo_address_free(lo_add);
+					by = "";
 				}
 			}
 			break;
-		}
 		case KIT_SET_VOLUME:
-		{
 			sn=-1; kn=-1;
 			snc=""; knc="";
 			float kv;
@@ -305,23 +305,15 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				} else break;
 
 				if (snc != "") { // setup by name
-					cout << "Setup by name" << endl;
 					sn = t->getSetupIdByName(snc);
 				}
-/*					for (int i=0; i<t->setups.size(); i++)
-						if (!snc.compare(t->setups[i]->getName())) sn = i;*/
 				if (sn < t->setups.size()) {
 					snc = "";
 					if (knc != "") { // kit by name
-						cout << "kit by name : ";
 						kn = t->getKitIdByName(knc, snc, sn);
-						cout << kn << endl;
-/*						for (int i=0; i<t->setups.size(); i++){
-							if (!knc.compare(t->setups[i]->getKit(kn)->getName())) t->setups[i]->getKit(kn)->setVolume(kv);*/
 					}
 
 					if (kn < t->setups[sn]->getNbKits()) { // kit by id
-						cout << "Set volume for kit " << kn << " in setup " << sn << endl;
 						t->setups[sn]->getKit(kn)->setVolume(kv);
 					} else break;
 				}
@@ -346,8 +338,6 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				for(int i=0; i<t->setups.size(); i++){
 					if (knc != "") {
 						kn = t->getKitIdByName(knc,snc,i);
-/*						for (int j=0; i<t->setups[i]->getNbKits(); i++)
-							if (!knc.compare(t->setups[i]->getKit(j)->getName())) kn = j;*/
 					}
 
 					if (kn < t->setups[i]->getNbKits()) {
@@ -356,12 +346,73 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				}
 			}
 			break;
-		}
+		case KIT_GET_VOLUME_BYNAME:
+			by = "by_name";
 		case KIT_GET_VOLUME:
-		{
-			cout << "Kit GET Volume" << endl;
+		// 'ss', 'ii' : setup, kit
+		// 'sss', 'iis' : setup, kit, port
+			sn=-1; kn=-1;
+			snc=""; knc="";
+
+			if (argc > 1) { // Si Setup précisé
+				if (types[0] == 's') {
+					snc = &argv[0]->s;
+					if (types[1] == 's') {
+						knc = &argv[1]->s;
+					} else if (types[1] == 'i') {
+						kn = argv[1]->i;
+					} else break;
+				} else if (types[0] == 'i') {
+					sn = argv[0]->i;
+					if (types[1] == 's') {
+						knc = &argv[1]->s;
+					} else if (types[1] == 'i') {
+						kn = argv[1]->i;
+					} else break;
+				} else break;
+			}
+
+			if (argc == 3) {
+				address = &argv[2]->s;
+			} else {
+				address = lo_address_get_url(lo_message_get_source(data));
+			}
+
+			lo_address lo_add = lo_address_new_from_url(address);
+			string spath = path;
+			spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
+			lo_message msg = lo_message_new();
+
+
+			if (snc != "") { // setup by name
+				sn = t->getSetupIdByName(snc);
+			}
+			if (sn < t->setups.size()) {
+				snc = "";
+				if (knc != "") { // kit by name
+					kn = t->getKitIdByName(knc, snc, sn);
+				}
+
+				if (kn < t->setups[sn]->getNbKits()) { // kit by id
+					if (lo_add != NULL) {
+						if (!by.compare("by_name")){
+							lo_message_add_string(msg, t->setups[sn]->getName().c_str());
+							lo_message_add_string(msg, t->setups[sn]->getKit(kn)->getName().c_str());
+						} else {
+							lo_message_add_int32(msg, sn);
+							lo_message_add_int32(msg, kn);
+						}
+						lo_message_add_double(msg, t->setups[sn]->getKit(kn)->getVolume());
+						lo_send_message(lo_add, spath.c_str(), msg);
+						lo_address_free(lo_add);
+
+						by = "";
+					}
+				} else break;
+			}
+
+
 			break;
-		}
     }
     return 0;
 }

@@ -51,7 +51,7 @@ class kit
 		void exec(double);
 
 		inline void setVolume(double vol){m_volume=vol;}
-		inline float getVolume(){return m_volume;}
+		inline double getVolume(){return m_volume;}
 
 	private:
 		std::vector<instrument*> instruments;
