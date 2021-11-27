@@ -184,67 +184,60 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			break;
 		case KIT_SET_SELECTED:
 		case KIT_SELECT:
-		{
 			sn=-1; kn=-1;
 			snc=""; knc="";
 			if (argc > 1)
 			{
-					if (types[0] == 'i')
-					{
-						sn = argv[0]->i;
-					 	if (types[1] == 'i') kn = argv[1]->i;
-						else if(types[1] == 's') knc = (std::string) &argv[1]->s;
-					}
-					else if (types[0] == 's')
-					{
-						snc = (std::string) &argv[0]->s;
-					 	if (types[1] == 'i') kn = argv[1]->i;
-						else if(types[1] == 's') knc = (std::string) &argv[1]->s;
-					}
-					else break;
+				if (types[0] == 'i')
+				{
+					sn = argv[0]->i;
+				 	if (types[1] == 'i') kn = argv[1]->i;
+					else if(types[1] == 's') knc = &argv[1]->s;
+				}
+				else if (types[0] == 's')
+				{
+					snc = &argv[0]->s;
+				 	if (types[1] == 'i') kn = argv[1]->i;
+					else if(types[1] == 's') knc = &argv[1]->s;
+				}
+				else break;
 			}
 			else
 			if (argc > 0)
 			{
 					if (types[0] == 'i') kn = argv[0]->i;
-					else if (types[0] == 's')	knc = (std::string) &argv[0]->s;
+					else if (types[0] == 's')	knc = &argv[0]->s;
 					else break;
 			}
 
-			if (snc !="") // setup(s) defined by name
+			if (snc != "") // setup(s) defined by name
 			{
-				for (unsigned int i=0;i<t->setups.size();++i)
-				{
-					if(!snc.compare(t->setups[i]->getName())) {
-						if (kn !=-1 )	t->changeKit(i, kn); // kit defined by number
-						else if (knc !="") // kit(s) defined by name
-							for (unsigned int j=0;j<t->setups[i]->getNbKits();++j)
-								if(!knc.compare(t->setups[i]->getKit(j)->getName())) t->changeKit(i, j);
-					}
+				sn = t->getSetupIdByName(snc);
+				if (kn !=-1 ) t->changeKit(sn, kn); // kit defined by number
+				else if (knc !="") { // kit(s) defined by name
+					kn = t->getKitIdByName(knc, snc);
+					if( kn != -1) t->changeKit(sn, kn);
 				}
-			}
-
-			if (sn !=-1) // setup defined by number
-			{
+			} else if (sn !=-1) { // setup defined by number
 				if (kn != -1) t->changeKit(sn,kn); // kit(s) defined by number
-				else
-				if (knc != "") // kit defined by name
-					for (unsigned int j=0;j<t->setups[sn]->getNbKits();++j)
-						if (!knc.compare(t->setups[sn]->getKit(j)->getName())) t->changeKit(sn,j);
+				else if (knc != "") { // kit defined by name
+					kn = t->getKitIdByName(knc,snc,sn);
+					if (kn != -1) t->changeKit(sn, kn);
+				}
 			}
 			else if (sn == -1 && argc == 1) // setup not defined (one arg only)
 			{
 				for (unsigned int i=0;i<t->setups.size();++i)
 				{
-					if (kn != -1) t->changeKit(i,kn);// kit(s) defined by number
-					else
-					if (knc != "") // kit defined by name
-						for (unsigned int j=0;j<t->setups[i]->getNbKits();++j)
-							if (!knc.compare(t->setups[i]->getKit(j)->getName())) t->changeKit(i,j);
+					if (kn != -1 && kn < t->setups[i]->getNbKits()) {
+						t->changeKit(i,kn); // kit(s) defined by number
+					} else if (knc != "") { // kit defined by name
+						kn = t->getKitIdByName(knc, snc, i);
+						if(kn != -1) t->changeKit(i,kn);
+					}
 				}
 			}
 			break;
-		}
 		case KIT_GET_SELECTED:
 		{
 			if (argc > 0)
@@ -631,11 +624,32 @@ setup* tapeutape::getSetup(int ind)
 		return NULL;
 }
 
+setup* tapeutape::getSetupByName(string name)
+{
+	for (int i=0;i<setups.size();i++)
+	{
+		if (!name.compare(setups[i]->getName())) {
+			return setups[i];
+		}
+	}
+	return NULL;
+}
+
+int tapeutape::getSetupIdByName(string name)
+{
+	for (int i=0;i<setups.size();i++)
+	{
+		if (!name.compare(setups[i]->getName())) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 void tapeutape::setSetup(int ind,setup* s)
 {
 	setups[ind]=s;
 }
-
 
 void tapeutape::addSetup(setup* s)
 {
@@ -646,6 +660,70 @@ void tapeutape::removeSetup(int i)
 {
 	delete(setups[i]);
 	setups.erase(setups.begin()+i);
+}
+
+kit* tapeutape::getKit(int ind, string snc="", int sn=-1)
+{
+	if(ind>=0 && ind<(int)(setups.size())) {
+		if (snc != "" && sn == -1) { // kit number ind in setup by name
+			for (int i;i<setups.size();i++){
+				if (!snc.compare(setups[i]->getName())) {
+					return setups[i]->getKit(ind);
+				}
+			}
+		} else if (snc =="" && sn != -1 && sn < setups.size()) { // kit number ind in setup by id
+			return setups[sn]->getKit(ind);
+		} else return NULL;
+	}
+	return NULL;
+}
+
+kit* tapeutape::getKitByName(string name, string snc, int sn)
+{
+	if (snc != "" && sn == -1) { // kit name in setup by name
+		for (int i=0;i<setups.size();i++){
+			if (!snc.compare(setups[i]->getName())) {
+				for (int j;j<setups[i]->getNbKits();j++) {
+					if (!name.compare(setups[i]->getKit(j)->getName())) {
+						return setups[i]->getKit(j);
+					}
+				}
+			}
+		}
+	} else if (snc == "" && sn != -1) { // kit name in setup by id
+		if (sn < setups.size()){
+			for (int j=0;j<setups[sn]->getNbKits();j++) {
+				if (!name.compare(setups[sn]->getKit(j)->getName())) {
+					return setups[sn]->getKit(j);
+				}
+			}
+		}
+	}
+	return NULL;
+}
+
+int tapeutape::getKitIdByName(string name, string snc, int sn)
+{
+	if (snc != "" && sn == -1) { // kit id in setup by name
+		for (int i=0;i<setups.size();i++){
+			if (!snc.compare(setups[i]->getName())) {
+				for (int j=0;j<setups[i]->getNbKits();j++) {
+					if (!name.compare(setups[i]->getKit(j)->getName())) {
+						return j;
+					}
+				}
+			}
+		}
+	} else if (snc == "" && sn != -1) { // kit name in setup by id
+		if (sn < setups.size()){
+			for (int j=0;j<setups[sn]->getNbKits();j++) {
+				if (!name.compare(setups[sn]->getKit(j)->getName())) {
+					return j;
+				}
+			}
+		}
+	}
+	return -1;
 }
 
 int tapeutape::getNbSamples()

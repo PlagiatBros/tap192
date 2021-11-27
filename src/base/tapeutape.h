@@ -77,12 +77,15 @@ class tapeutape
 		void import(char*);
 
 		int getNbKits();
-		kit *getKit(int);
+		kit *getKit(int,string,int);
 		void addKit(kit*);
 		void removeKit(int);
-		kit* getKitByName(char*);
+		kit *getKitByName(string name,string snc="",int sn=-1);
+		int getKitIdByName(string name,string snc="",int sn=-1);
 		int getNbSetups();
 		setup *getSetup(int);
+		setup *getSetupByName(string);
+		int getSetupIdByName(string);
 		void addSetup(setup*);
 		void removeSetup(int);
 		void setSetup(int ,setup* );
@@ -100,6 +103,7 @@ class tapeutape
 		std::string getFileName();
 		std::string getCompleteFileName();
 		void createTaps();
+		void changeKit(int, int);
 
 
 		//Jack Part
@@ -112,7 +116,7 @@ class tapeutape
 		int getJackStereoChannel(std::string);
 		jackProcess* getJackProcess();
 		void setSampleRate(int);
-		void changeKit(int, int);
+
 
 		//Midi Part
 		midiProcess* getMidiProcess();
