@@ -31,6 +31,8 @@ extern bool global_nsm_visible;
 
 using namespace std;
 
+#define WINDOW_MINWIDTH 400
+#define WINDOW_MINHEIGHT 500
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define MENUBAR_HEIGHT 26
@@ -45,6 +47,9 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 	copyType(0),
 	lastSampleDir("")
 {
+
+	size_range(WINDOW_MINWIDTH, WINDOW_MINHEIGHT);
+
 	int w = WINDOW_WIDTH;
 	int h = WINDOW_HEIGHT;
 	int y;
@@ -106,16 +111,16 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 
 
 	//settings
-	setVolume = new Flat_Value_Slider(10,80,150,20,"Global Volume ");
-	setVolume->align(FL_ALIGN_LEFT|FL_ALIGN_TOP);
+	setVolume = new Flat_Value_Slider(134,80,150,20,"Global Volume    ");
+	setVolume->align(FL_ALIGN_LEFT);
 	setVolume->type(FL_HOR_FILL_SLIDER);
 	setVolume->bounds(0.0,3.0);
 	setVolume->value(1.0);
 	setVolume->callback(statSetVolume,this);
-	setCheckPoly = new Flat_Check_Button(10,130,20,20,"Limit Polyphony ");
-	setCheckPoly->align(FL_ALIGN_LEFT|FL_ALIGN_TOP);
+	setCheckPoly = new Flat_Check_Button(129,120,20,20,"Limit Polyphony ");
+	setCheckPoly->align(FL_ALIGN_LEFT);
 	setCheckPoly->callback(statSetCheckPoly,this);
-	setPoly = new Flat_Counter(40,130,70,20,"");
+	setPoly = new Flat_Counter(151,120,70,20,"");
 	setPoly->type(FL_SIMPLE_COUNTER);
 	setPoly->step(1);
 	setPoly->bounds(1,100);
@@ -125,13 +130,13 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 	setOutList = new Fl_Hold_Browser(10,180,200,100,"Stereo Outputs");
 	setOutList->align(FL_ALIGN_TOP|FL_ALIGN_LEFT);
 	setOutList->callback(statSetOutList,this);
-	setOutName = new Fl_Input(220,210,70,20,"");
-	setOutName->align(FL_ALIGN_LEFT);
+	setOutName = new Fl_Input(220,180,70,20,"Name");
+	setOutName->align(FL_ALIGN_TOP|FL_ALIGN_LEFT);
 	setOutName->callback(statSetOutName,this);
 	setOutName->when(FL_WHEN_CHANGED);
-	setOutNew = new Flat_Button(220,180,20,20,"@+");
+	setOutNew = new Flat_Button(10,290,40,BUTTON_HEIGHT,"Add");
 	setOutNew->callback(statSetOutNew,this);
-	setOutRemove = new Flat_Button(250,180,20,20,"@line");
+	setOutRemove = new Flat_Button(60,290,80,BUTTON_HEIGHT,"Remove");
 	setOutRemove->callback(statSetOutRemove,this);
 	setTab->insert(*setVolume,0);
 	setTab->insert(*setCheckPoly,1);
@@ -140,6 +145,7 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 	setTab->insert(*setOutNew,4);
 	setTab->insert(*setOutRemove,5);
 	setTab->insert(*setOutName,6);
+	setTab->resizable(0);
 
 	//creation tab
 	y = MENUBAR_HEIGHT+TAB_HEIGHT;
@@ -464,7 +470,8 @@ void execWindow::init()
 
 	updateExecTab();
 
-	tabs->value(execTab);
+	tabs->value(setTab);
+	// tabs->value(execTab);
 
 	this->redraw();
 	Fl::check();
