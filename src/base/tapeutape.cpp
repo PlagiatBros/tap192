@@ -147,10 +147,10 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
     int command = t->oscCommands[(std::string) path];
     if (!command) return 0;
 
-	int sn=-1, kn=-1, in=-1;
+	int sn=-1, kn=-1, in=-1, whatset = 0;
 	string snc="", knc="", inc="";
 	char *address;
-	string spath, by;
+	string spath, by, ixwhat="miditune";
 	lo_address lo_add;
 
     switch (command) {
@@ -398,11 +398,16 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 
 // Instruments OSC methods
 		case INSTRUMENT_SET_VOLUME:
-		// Setup (s,i), Kit (s,i), Instrument (s,i), Volume (d,f,i)
+			ixwhat = "volume";
+			whatset = 1;
+		case INSTRUMENT_SET_PAN:
+			if (!whatset) ixwhat = "pan";
+		case INSTRUMENT_SET_MIDITUNE:
+		// Setup (s,i), Kit (s,i), Instrument (s,i), Volume|Pan|MidiTune (d,f,i)
 		// Kit (s,i), Instrument (s,i), Volume (d,f,i)
 		// Instrument (s,i), Volume (d,f,i)
 			if (argc > 0) {
-				double iv;
+				double ix;
 				int argind=0;
 				if (argc > 3) {
 					if (types[argind] == 's') snc = &argv[argind]->s;
@@ -423,17 +428,18 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					argind++;
 				}
 
-				cout << argind << endl;
-				if (types[argind] == 'd') { iv = argv[argind]->d; cout << "d" <<endl;}
-				else if (types[argind] == 'f') { iv = (double) argv[argind]->f; cout << "f" << endl;}
-				else if (types[argind] == 'i') { iv = (double) argv[argind]->i; cout << "i" << endl;}
+				if (types[argind] == 'd') ix = argv[argind]->d;
+				else if (types[argind] == 'f') ix = (double) argv[argind]->f;
+				else if (types[argind] == 'i') ix = (double) argv[argind]->i;
 				else break;
 
 				if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
 				if (knc != "" && sn < t->setups.size()) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
 				if (inc != "" && kn < t->setups[sn]->getNbKits()) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
 				if(in != -1 && kn != -1 && sn != -1) {
-					t->setups[sn]->getKit(kn)->getInstrument(in)->setVolume(iv);
+					if (!ixwhat.compare("volume")) t->setups[sn]->getKit(kn)->getInstrument(in)->setVolume(ix);
+					else if (!ixwhat.compare("pan")) t->setups[sn]->getKit(kn)->getInstrument(in)->setPan(ix);
+					else if (!ixwhat.compare("miditune")) t->setups[sn]->getKit(kn)->getInstrument(in)->setRootNoteFine((float)ix);
 				}
 			}
 			break;
