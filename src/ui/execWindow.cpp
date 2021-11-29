@@ -130,7 +130,7 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 	setOutList = new Fl_Hold_Browser(10,180,200,100,"Stereo Outputs");
 	setOutList->align(FL_ALIGN_TOP|FL_ALIGN_LEFT);
 	setOutList->callback(statSetOutList,this);
-	setOutName = new Fl_Input(220,180,70,20,"Name");
+	setOutName = new Fl_Input(220,180,100,20,"Output name");
 	setOutName->align(FL_ALIGN_TOP|FL_ALIGN_LEFT);
 	setOutName->callback(statSetOutName,this);
 	setOutName->when(FL_WHEN_CHANGED);
