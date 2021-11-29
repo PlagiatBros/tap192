@@ -38,7 +38,7 @@ enum O_TYPES {
 enum X_TYPES {
 	VOLUME = 0,
 	PAN,
-	MIDITUNE
+	MIDITUNE,
 };
 
 using namespace std;
@@ -162,7 +162,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 
 
 	//int sn=-1, kn=-1, in=-1, whatset = 0;
-	int sn=-1, kn=-1, in=-1, o_what, x_what;
+	int sn=-1, kn=-1, in=-1, o_what, x_what, get=0;
 	string snc="", knc="", inc="";
 	char *address;
 	//string spath, by, xwhat="miditune";
@@ -289,7 +289,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				by = "";
 			}
 			break;
-		case KIT_GET_VOLUME_BYNAME:
+/*		case KIT_GET_VOLUME_BYNAME:
 			by = "by_name";
 		case KIT_GET_VOLUME:
 		// 'ss', 'ii' : setup, kit
@@ -349,23 +349,42 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				}
 			}
 			break;
-
+*/
 		case KIT_SET_VOLUME:
+		// Setup (s,i), Kit (s,i), Volume (d,f,i)
+		// Kit (s,i), Volume (d,f,i)
 			o_what = KIT; x_what = VOLUME;
 			break;
 		case INSTRUMENT_SET_VOLUME:
+		// Setup (s,i), Kit (s,i), Instrument (s,i), Volume (d,f,i)
+		// Kit (s,i), Instrument (s,i), Volume (d,f,i)
+		// Instrument (s,i), Volume (d,f,i)
 			o_what = INSTRUMENT; x_what = VOLUME;
 			break;
 		case INSTRUMENT_SET_PAN:
+		// Setup (s,i), Kit (s,i), Instrument (s,i), Pan (d,f,i)
+		// Kit (s,i), Instrument (s,i), Pan (d,f,i)
+		// Instrument (s,i), Pan (d,f,i)
 			o_what = INSTRUMENT; x_what = PAN;
 			break;
 		case INSTRUMENT_SET_MIDITUNE:
+		// Setup (s,i), Kit (s,i), Instrument (s,i), Miditune (d,f,i)
+		// Kit (s,i), Instrument (s,i), Miditune (d,f,i)
+		// Instrument (s,i), Miditune (d,f,i)
 			o_what = INSTRUMENT; x_what = MIDITUNE;
 			break;
 
+		case KIT_GET_VOLUME_BYNAME:
+			by = "by_name";
+		case KIT_GET_VOLUME:
+		// 'ss', 'ii' : setup, kit
+		// 'sss', 'iis' : setup, kit, address
+			o_what = KIT; x_what = VOLUME;
+			get = 0;
+			break;
     }
 
-	if (argc > 0) {
+	if (argc > 0 && !get) {
 		double x;
 		int argind=0;
 
@@ -437,13 +456,96 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				} else {
 					t->setups[sn]->getKit(kn)->setVolume(x);
 				}
+				break;
 			case SETUP:
 				break;
 		}
 
+	} else if(get) {
+		// Setup
+		if (types[0] == 's') snc = &argv[0]->s;
+		else if (types[0] == 'i') sn = argv[0]->i;
+
+		// Kit
+		if (types[1] == 's') knc = &argv[1]->s;
+		else if (types[1] == 'i') kn = argv[1]->i;
+
+		if (argc > 2) {
+			// Instrument
+			if (o_what == INSTRUMENT) {
+				if (types[2] == 's') inc = &argv[1]->s;
+				else if (types[2] == 'i') in = argv[1]->i;
+			} else {
+				address = &argv[0]->s;
+			}
+		}
+		if (argc > 3) {
+			address = &argv[0]->s;
+		}
+
+		if (address == "") {
+   			address = lo_address_get_url(lo_message_get_source(data));
+		}
+
+
+
+/*	if (argc > 0)
+	{
+		sn=-1; kn=-1;
+		snc=""; knc="";
+
+		if (argc > 1) { // Si Setup précisé
+			if (types[0] == 's') snc = &argv[0]->s;
+			else if (types[0] == 'i') sn = argv[0]->i;
+			else break;
+
+			if (types[1] == 's') knc = &argv[1]->s;
+			else if (types[1] == 'i') kn = argv[1]->i;
+			else break;
+		}
+
+		if (argc == 3) {
+			address = &argv[2]->s;
+		} else {
+			address = lo_address_get_url(lo_message_get_source(data));
+		}
+
+		lo_add = lo_address_new_from_url(address);
+		spath = path;
+		spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
+		lo_message msg = lo_message_new();
+
+
+		if (snc != "") { // setup by name
+			sn = t->getSetupIdByName(snc);
+		}
+		if (sn < t->setups.size()) {
+			snc = "";
+			if (knc != "") { // kit by name
+				kn = t->getKitIdByName(knc, snc, sn);
+			}
+
+			if (kn < t->setups[sn]->getNbKits()) { // kit by id
+				if (lo_add != NULL) {
+					if (!by.compare("by_name")){
+						lo_message_add_string(msg, t->setups[sn]->getName().c_str());
+						lo_message_add_string(msg, t->setups[sn]->getKit(kn)->getName().c_str());
+					} else {
+						lo_message_add_int32(msg, sn);
+						lo_message_add_int32(msg, kn);
+					}
+					lo_message_add_double(msg, t->setups[sn]->getKit(kn)->getVolume());
+					lo_send_message(lo_add, spath.c_str(), msg);
+					lo_address_free(lo_add);
+
+					by = "";
+				}
+			} else break;
+		}
 	}
-
-
+	break;
+*/
+	}
     return 0;
 }
 
