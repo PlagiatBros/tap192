@@ -87,7 +87,7 @@ class tapeutape
 		setup *getSetupByName(string);
 		int getSetupIdByName(string);
 		instrument *getInstrumentByName(string,string,int,string,int);
-		int *getInstrumentIdByName(string,string,int,string,int);
+		int getInstrumentIdByName(string,string,int,string,int);
 		void addSetup(setup*);
 		void removeSetup(int);
 		void setSetup(int ,setup* );
@@ -131,85 +131,80 @@ class tapeutape
 
 		//OSC server
 		OSCServer *oscServer;
-    static int oscCallback(const char *path, const char *types, lo_arg ** argv,
-                    int argc, void *data, void *user_data);
-    enum OSC_COMMANDS {
-        OSC_ZERO = 0,
-        SET_GLOBAL_VOLUME,
-		GET_GLOBAL_VOLUME,
+	    static int oscCallback(const char *path, const char *types, lo_arg ** argv,
+	                    int argc, void *data, void *user_data);
+	    enum OSC_COMMANDS {
+	        OSC_ZERO = 0,
+	        SET_GLOBAL_VOLUME,
+			GET_GLOBAL_VOLUME,
 
-		KIT_SELECT,
-		KIT_SET_SELECTED,
-		KIT_GET_SELECTED,
-		KIT_GET_SELECTED_BYNAME,
-		KIT_SET_VOLUME,
-		KIT_GET_VOLUME,
-		KIT_GET_VOLUME_BYNAME,
+			KIT_SELECT,
+			KIT_SET_SELECTED,
+			KIT_GET_SELECTED,
+			KIT_GET_SELECTED_BYNAME,
+			KIT_SET_VOLUME,
+			KIT_GET_VOLUME,
+			KIT_GET_VOLUME_BYNAME,
 
-		INSTRUMENT_SET_VOLUME,
-		INSTRUMENT_GET_VOLUME,
-		INSTRUMENT_SET_PAN,
-		INSTRUMENT_GET_PAN,
-		INSTRUMENT_SET_OUTPUT,
-		INSTRUMENT_GET_OUTPUT,
-		INSTRUMENT_SET_PLAYMODE,
-		INSTRUMENT_GET_PLAYMODE,
-		INSTRUMENT_SET_PLAYLOOP,
-		INSTRUMENT_GET_PLAYLOOP,
-		INSTRUMENT_SET_PLAYREVERSE,
-		INSTRUMENT_GET_PLAYREVERSE,
-		INSTRUMENT_SET_PITCHOVERRANGE,
-		INSTRUMENT_GET_PITCHOVERRANGE,
-		INSTRUMENT_SET_MIDITUNE,
-		INSTRUMENT_GET_MIDITUNE,
-		INSTRUMENT_TRIG,
-		INSTRUMENT_TRIGREVERSE,
-		INSTRUMENT_PLAY,
-		INSTRUMENT_PLAYLOOP,
-		INSTRUMENT_PLAYREVERSE,
-		INSTRUMENT_STOP
-    };
-    std::map<std::string, int> oscCommands = {
-        {"/set/global_volume",  SET_GLOBAL_VOLUME},
-		{"/get/global_volume",  GET_GLOBAL_VOLUME},
+			INSTRUMENT_SET_VOLUME,
+			INSTRUMENT_GET_VOLUME,
+			INSTRUMENT_SET_PAN,
+			INSTRUMENT_GET_PAN,
+			INSTRUMENT_SET_OUTPUT,
+			INSTRUMENT_GET_OUTPUT,
+			INSTRUMENT_SET_PLAYMODE,
+			INSTRUMENT_GET_PLAYMODE,
+			INSTRUMENT_SET_PLAYLOOP,
+			INSTRUMENT_GET_PLAYLOOP,
+			INSTRUMENT_SET_PLAYREVERSE,
+			INSTRUMENT_GET_PLAYREVERSE,
+			INSTRUMENT_SET_PITCHOVERRANGE,
+			INSTRUMENT_GET_PITCHOVERRANGE,
+			INSTRUMENT_SET_MIDITUNE,
+			INSTRUMENT_GET_MIDITUNE,
+			INSTRUMENT_TRIG,
+			INSTRUMENT_TRIGREVERSE,
+			INSTRUMENT_PLAY,
+			INSTRUMENT_PLAYLOOP,
+			INSTRUMENT_PLAYREVERSE,
+			INSTRUMENT_STOP
+	    };
+	    std::map<std::string, int> oscCommands = {
+	        {"/set/global_volume",  SET_GLOBAL_VOLUME},
+			{"/get/global_volume",  GET_GLOBAL_VOLUME},
 
-		{"/kit/select", 		KIT_SELECT},
-		{"/kit/set/selected", 	KIT_SET_SELECTED},
-		{"/kit/get/selected", 	KIT_GET_SELECTED},
-		{"/kit/get/selected/by_name", 	KIT_GET_SELECTED_BYNAME},
-		{"/kit/set/volume",		KIT_SET_VOLUME},
-		{"/kit/get/volume",		KIT_GET_VOLUME},
-		{"/kit/get/volume/by_name",		KIT_GET_VOLUME_BYNAME},
+			{"/kit/select", 		KIT_SELECT},
+			{"/kit/set/selected", 	KIT_SET_SELECTED},
+			{"/kit/get/selected", 	KIT_GET_SELECTED},
+			{"/kit/get/selected/by_name", 	KIT_GET_SELECTED_BYNAME},
+			{"/kit/set/volume",		KIT_SET_VOLUME},
+			{"/kit/get/volume",		KIT_GET_VOLUME},
+			{"/kit/get/volume/by_name",		KIT_GET_VOLUME_BYNAME},
 
-		{"/instrument/set/volume",			INSTRUMENT_SET_VOLUME},
-		{"/instrument/get/volume",			INSTRUMENT_GET_VOLUME},
-		{"/instrument/set/pan",				INSTRUMENT_SET_PAN},
-		{"/instrument/get/pan",				INSTRUMENT_GET_PAN},
-		{"/instrument/set/output",			INSTRUMENT_SET_OUTPUT},
-		{"/instrument/get/output",			INSTRUMENT_GET_OUTPUT},
-		{"/instrument/set/playmode",		INSTRUMENT_SET_PLAYMODE},
-		{"/instrument/get/playmode",		INSTRUMENT_GET_PLAYMODE},
-		{"/instrument/set/playloop",		INSTRUMENT_SET_PLAYLOOP},
-		{"/instrument/get/playloop",		INSTRUMENT_GET_PLAYLOOP},
-		{"/instrument/set/playreverse",		INSTRUMENT_SET_PLAYREVERSE},
-		{"/instrument/get/playreverse",		INSTRUMENT_GET_PLAYREVERSE},
-		{"/instrument/set/pitchoverrange",	INSTRUMENT_SET_PITCHOVERRANGE},
-		{"/instrument/get/pitchoverrange",	INSTRUMENT_GET_PITCHOVERRANGE},
-		{"/instrument/set/miditune",		INSTRUMENT_SET_MIDITUNE},
-		{"/instrument/get/miditune",		INSTRUMENT_GET_MIDITUNE},
-		{"/instrument/trig",				INSTRUMENT_TRIG},
-		{"/instrument/trigreverse",			INSTRUMENT_TRIGREVERSE},
-		{"/instrument/play",				INSTRUMENT_PLAY},
-		{"/instrument/playreverse",			INSTRUMENT_PLAYREVERSE},
-		{"/instrument/playloop",			INSTRUMENT_PLAYLOOP},
-		{"/instrument/stop",				INSTRUMENT_STOP}
+			{"/instrument/set/volume",			INSTRUMENT_SET_VOLUME},
+			{"/instrument/get/volume",			INSTRUMENT_GET_VOLUME},
+			{"/instrument/set/pan",				INSTRUMENT_SET_PAN},
+			{"/instrument/get/pan",				INSTRUMENT_GET_PAN},
+			{"/instrument/set/output",			INSTRUMENT_SET_OUTPUT},
+			{"/instrument/get/output",			INSTRUMENT_GET_OUTPUT},
+			{"/instrument/set/playmode",		INSTRUMENT_SET_PLAYMODE},
+			{"/instrument/get/playmode",		INSTRUMENT_GET_PLAYMODE},
+			{"/instrument/set/playloop",		INSTRUMENT_SET_PLAYLOOP},
+			{"/instrument/get/playloop",		INSTRUMENT_GET_PLAYLOOP},
+			{"/instrument/set/playreverse",		INSTRUMENT_SET_PLAYREVERSE},
+			{"/instrument/get/playreverse",		INSTRUMENT_GET_PLAYREVERSE},
+			{"/instrument/set/pitchoverrange",	INSTRUMENT_SET_PITCHOVERRANGE},
+			{"/instrument/get/pitchoverrange",	INSTRUMENT_GET_PITCHOVERRANGE},
+			{"/instrument/set/miditune",		INSTRUMENT_SET_MIDITUNE},
+			{"/instrument/get/miditune",		INSTRUMENT_GET_MIDITUNE},
+			{"/instrument/trig",				INSTRUMENT_TRIG},
+			{"/instrument/trigreverse",			INSTRUMENT_TRIGREVERSE},
+			{"/instrument/play",				INSTRUMENT_PLAY},
+			{"/instrument/playreverse",			INSTRUMENT_PLAYREVERSE},
+			{"/instrument/playloop",			INSTRUMENT_PLAYLOOP},
+			{"/instrument/stop",				INSTRUMENT_STOP}
 
-/*				{"/kit/get/selected", SETUP_KIT_GET_SELECTED},
-				{"/kit/set/volume", SETUP_KIT_SET_VOLUME},
-				{"/kit/get/volume", SETUP_KIT_SET_VOLUME},
-
-				{"//kit/select", SETUP_KIT_SELECT},*/
-    };
+	    };
 
 
 		// nsm

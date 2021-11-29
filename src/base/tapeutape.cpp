@@ -151,6 +151,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 	string snc="", knc="", inc="";
 	char *address;
 	string spath, by;
+	lo_address lo_add;
 
     switch (command) {
 // General OSC methods
@@ -174,7 +175,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
     			address = lo_address_get_url(lo_message_get_source(data));
 			}
 
-			lo_address lo_add = lo_address_new_from_url(address);
+			lo_add = lo_address_new_from_url(address);
 			if (lo_add != NULL) {
 				spath = path;
 				spath.replace(spath.find("get"), 3, "tapeutape");
@@ -251,7 +252,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				address = lo_address_get_url(lo_message_get_source(data));
 			}
 
-			lo_address lo_add = lo_address_new_from_url(address);
+			lo_add = lo_address_new_from_url(address);
 			if (lo_add != NULL) {
 				spath = path;
 				spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
@@ -360,7 +361,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					address = lo_address_get_url(lo_message_get_source(data));
 				}
 
-				lo_address lo_add = lo_address_new_from_url(address);
+				lo_add = lo_address_new_from_url(address);
 				spath = path;
 				spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
 				lo_message msg = lo_message_new();
@@ -426,16 +427,15 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				}
 
 				if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
-				if (knc != "" && sn < setups.size()) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
+				if (knc != "" && sn < t->setups.size()) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
 
-				if (inc != "") in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
+				if (inc != "" && kn < t->setups[sn]->getNbKits()) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
 
 			}
 			break;
     }
     return 0;
 }
-
 
 void tapeutape::showMessage(bool t,std::string mess)
 {
@@ -810,11 +810,38 @@ int tapeutape::getKitIdByName(string name, string snc, int sn)
 	return -1;
 }
 
-instrument* getInstrumentByName(string name, string snc, int sn, string knc, int kn){
+instrument* tapeutape::getInstrumentByName(string name, string snc, int sn, string knc, int kn){
 	return NULL;
 }
 
-int getInstrumentIdByName(string name, string snc, string sn, string knc, int kn){
+int tapeutape::getInstrumentIdByName(string name, string snc, int sn, string knc, int kn){
+	if (snc != "" && sn == -1) { // if setup by name
+		for (int i=0;i<setups.size();i++){
+			if (!snc.compare(setups[i]->getName())) {
+				sn = i;
+			}
+		}
+	}
+
+	if (knc != "" && kn == -1) { // if kit by name
+		for (int i=0;i<setups[sn]->getNbKits();i++) {
+			if (!knc.compare(setups[sn]->getKit(i)->getName())) {
+				kn = i;
+			}
+		}
+	}
+
+
+	if (sn < setups.size() && sn != -1) {
+		if (kn < setups[sn]->getNbKits() && kn != -1){
+			for (int i=0;i<setups[sn]->getKit(kn)->getNbInstruments(); i++){
+				if (!name.compare(setups[sn]->getKit(kn)->getInstrument(i)->getName())){
+					return i;
+				}
+			}
+		}
+	}
+
 	return -1;
 }
 
