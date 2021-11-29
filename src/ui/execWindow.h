@@ -35,7 +35,6 @@
 #include <string>
 
 #include "flatWidgets.h"
-#include "addKitDialog.h"
 #include "messageWindow.h"
 #include "tardiSample.h"
 #include "tardiPiano.h"
