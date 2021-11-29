@@ -29,6 +29,18 @@ extern nsm_client_t *nsm;
 
 extern char *global_oscport;
 
+enum O_TYPES {
+	SETUP = 0,
+	KIT,
+	INSTRUMENT
+};
+
+enum X_TYPES {
+	VOLUME = 0,
+	PAN,
+	MIDITUNE
+};
+
 using namespace std;
 
 tapeutape::tapeutape(char *fn):polyphony(100),globalVolume(1.0),fileName(""),jack(NULL),midi(NULL),eventsRingBuffer(NULL),loop(true)
@@ -147,10 +159,14 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
     int command = t->oscCommands[(std::string) path];
     if (!command) return 0;
 
-	int sn=-1, kn=-1, in=-1, whatset = 0;
+
+
+	//int sn=-1, kn=-1, in=-1, whatset = 0;
+	int sn=-1, kn=-1, in=-1, o_what, x_what;
 	string snc="", knc="", inc="";
 	char *address;
-	string spath, by, ixwhat="miditune";
+	//string spath, by, xwhat="miditune";
+	string spath, by;
 	lo_address lo_add;
 
     switch (command) {
@@ -273,68 +289,6 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				by = "";
 			}
 			break;
-		case KIT_SET_VOLUME:
-		// 'ssd', 'ssf', 'ssi',
-		// 'sid', 'sif', 'sii',
-		// 'isd', 'isf', 'isi',
-		// 'iid', 'iif', 'iii' : Setup, Kit, Volume
-			if (argc > 0) {
-				double kv;
-
-				sn=-1; kn=-1;
-				snc=""; knc="";
-				if (argc > 2) { // Si Setup précisé
-					if (types[0] == 's') snc = &argv[0]->s;
-					else if (types[0] == 'i') sn = argv[0]->i;
-					else break;
-
-					if (types[1] == 's') knc = &argv[1]->s;
-					else if (types[1] == 'i') kn = argv[1]->i;
-					else break;
-
-					if (types[2] == 'd') kv = argv[2]->d;
-					else if (types[2] == 'f') kv = (double) argv[2]->f;
-					else if (types[2] == 'i') kv = (double) argv[2]->i;
-					else break;
-
-					if (snc != "") { // setup by name
-						sn = t->getSetupIdByName(snc);
-					}
-					if (sn < t->setups.size()) {
-						snc = "";
-						if (knc != "") { // kit by name
-							kn = t->getKitIdByName(knc, snc, sn);
-						}
-
-						if (kn < t->setups[sn]->getNbKits()) { // kit by id
-							t->setups[sn]->getKit(kn)->setVolume(kv);
-						} else break;
-					}
-
-
-
-				} else if (argc > 1) { // Si Setup non précisé
-					if (types[0] == 's') knc = &argv[0]->s;
-					else if (types[0] == 'i') kn = argv[0]->i;
-					else break;
-
-					if (types[1] == 'd') kv = argv[1]->d;
-					else if (types[1] == 'f') kv = (double) argv[1]->f;
-					else if (types[1] == 'i') kv = (double) argv[1]->i;
-					else break;
-
-					for(int i=0; i<t->setups.size(); i++){
-						if (knc != "") {
-							kn = t->getKitIdByName(knc,snc,i);
-						}
-
-						if (kn < t->setups[i]->getNbKits()) {
-							t->setups[i]->getKit(kn)->setVolume(kv);
-						} else break;
-					}
-				}
-			}
-			break;
 		case KIT_GET_VOLUME_BYNAME:
 			by = "by_name";
 		case KIT_GET_VOLUME:
@@ -396,54 +350,100 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			}
 			break;
 
-// Instruments OSC methods
-		case INSTRUMENT_SET_VOLUME:
-			ixwhat = "volume";
-			whatset = 1;
-		case INSTRUMENT_SET_PAN:
-			if (!whatset) ixwhat = "pan";
-		case INSTRUMENT_SET_MIDITUNE:
-		// Setup (s,i), Kit (s,i), Instrument (s,i), Volume|Pan|MidiTune (d,f,i)
-		// Kit (s,i), Instrument (s,i), Volume (d,f,i)
-		// Instrument (s,i), Volume (d,f,i)
-			if (argc > 0) {
-				double ix;
-				int argind=0;
-				if (argc > 3) {
-					if (types[argind] == 's') snc = &argv[argind]->s;
-					else if (types[argind] == 'i') sn = argv[argind]->i;
-					else break;
-					argind++;
-				}
-				if (argc > 2) {
-					if (types[argind] == 's') knc = &argv[argind]->s;
-					else if (types[argind] == 'i') kn = argv[argind]->i;
-					else break;
-					argind++;
-				}
-				if (argc > 1) {
-					if (types[argind] == 's') inc = &argv[argind]->s;
-					else if (types[argind] == 'i') in = argv[argind]->i;
-					else break;
-					argind++;
-				}
-
-				if (types[argind] == 'd') ix = argv[argind]->d;
-				else if (types[argind] == 'f') ix = (double) argv[argind]->f;
-				else if (types[argind] == 'i') ix = (double) argv[argind]->i;
-				else break;
-
-				if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
-				if (knc != "" && sn < t->setups.size()) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
-				if (inc != "" && kn < t->setups[sn]->getNbKits()) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
-				if(in != -1 && kn != -1 && sn != -1) {
-					if (!ixwhat.compare("volume")) t->setups[sn]->getKit(kn)->getInstrument(in)->setVolume(ix);
-					else if (!ixwhat.compare("pan")) t->setups[sn]->getKit(kn)->getInstrument(in)->setPan(ix);
-					else if (!ixwhat.compare("miditune")) t->setups[sn]->getKit(kn)->getInstrument(in)->setRootNoteFine((float)ix);
-				}
-			}
+		case KIT_SET_VOLUME:
+			o_what = KIT; x_what = VOLUME;
 			break;
+		case INSTRUMENT_SET_VOLUME:
+			o_what = INSTRUMENT; x_what = VOLUME;
+			break;
+		case INSTRUMENT_SET_PAN:
+			o_what = INSTRUMENT; x_what = PAN;
+			break;
+		case INSTRUMENT_SET_MIDITUNE:
+			o_what = INSTRUMENT; x_what = MIDITUNE;
+			break;
+
     }
+
+	if (argc > 0) {
+		double x;
+		int argind=0;
+
+		if (argc > 3 && o_what == INSTRUMENT) {
+			if (types[argind] == 's') snc = &argv[argind]->s;
+			else if (types[argind] == 'i') sn = argv[argind]->i;
+			else return -1;
+			argind++;
+		}
+		if (argc > 2) {
+			if (o_what == KIT) {
+				if (types[argind] == 's') snc = &argv[argind]->s;
+				else if (types[argind] == 'i') sn = argv[argind]->i;
+				else return -1;
+			} else if (o_what == INSTRUMENT) {
+				if (types[argind] == 's') knc = &argv[argind]->s;
+				else if (types[argind] == 'i') kn = argv[argind]->i;
+				else return -1;
+			}
+			argind++;
+		}
+		if (argc > 1) {
+			if(o_what == SETUP) {
+				if (types[argind] == 's') snc = &argv[argind]->s;
+				else if (types[argind] == 'i') sn = argv[argind]->i;
+				else return -1;
+			} else if(o_what == KIT) {
+				if (types[argind] == 's') knc = &argv[argind]->s;
+				else if (types[argind] == 'i') kn = argv[argind]->i;
+				else return -1;
+			} else if(o_what == INSTRUMENT) {
+				if (types[argind] == 's') inc = &argv[argind]->s;
+				else if (types[argind] == 'i') in = argv[argind]->i;
+				else return -1;
+			}
+			argind++;
+		}
+
+		if (types[argind] == 'd') x = argv[argind]->d;
+		else if (types[argind] == 'f') x = (double) argv[argind]->f;
+		else if (types[argind] == 'i') x = (double) argv[argind]->i;
+		else return -1;
+
+		if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
+		if (knc != "" && sn < t->setups.size() && (o_what == KIT || o_what == INSTRUMENT)) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
+		if (inc != "" && kn < t->setups[sn]->getNbKits() && o_what == INSTRUMENT) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
+
+		switch(o_what){
+			case INSTRUMENT:
+				if(sn == -1) {
+					for(int i=0; i<t->setups.size(); i++){
+						if (kn == -1) {
+							for (int j=0; j<t->setups[i]->getNbKits(); j++){
+								t->setInstrumentParameter(i, j, in, x_what, x);
+							}
+						} else {
+							t->setInstrumentParameter(i, kn, in, x_what, x);
+						}
+					}
+				} else {
+					t->setInstrumentParameter(sn, kn, in, x_what, x);
+				}
+				break;
+			case KIT:
+				if(sn == -1) {
+					for(int i=0; i<t->setups.size(); i++){
+						t->setups[i]->getKit(kn)->setVolume(x);
+					}
+				} else {
+					t->setups[sn]->getKit(kn)->setVolume(x);
+				}
+			case SETUP:
+				break;
+		}
+
+	}
+
+
     return 0;
 }
 
@@ -854,6 +854,13 @@ int tapeutape::getInstrumentIdByName(string name, string snc, int sn, string knc
 
 	return -1;
 }
+
+void tapeutape::setInstrumentParameter(int sn, int kn, int in, int x_what, double x){
+	if (x_what == VOLUME) setups[sn]->getKit(kn)->getInstrument(in)->setVolume(x);
+	else if (x_what == PAN) setups[sn]->getKit(kn)->getInstrument(in)->setPan(x);
+	else if (x_what == MIDITUNE) setups[sn]->getKit(kn)->getInstrument(in)->setRootNoteFine(x);
+}
+
 
 int tapeutape::getNbSamples()
 {
