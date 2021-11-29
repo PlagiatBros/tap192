@@ -409,28 +409,32 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					else if (types[argind] == 'i') sn = argv[argind]->i;
 					else break;
 					argind++;
-				} else if (argc > 2) {
+				}
+				if (argc > 2) {
 					if (types[argind] == 's') knc = &argv[argind]->s;
 					else if (types[argind] == 'i') kn = argv[argind]->i;
 					else break;
 					argind++;
-				} else if (argc > 1) {
+				}
+				if (argc > 1) {
 					if (types[argind] == 's') inc = &argv[argind]->s;
 					else if (types[argind] == 'i') in = argv[argind]->i;
 					else break;
 					argind++;
-				} else if (argc == 1) {
-					if (types[argind] == 'd') iv = argv[argind]->d;
-					else if (types[argind] == 'f') iv = (double) argv[argind]->f;
-					else if (types[argind] == 'i') iv = (double) argv[argind]->i;
-					else break;
 				}
+
+				cout << argind << endl;
+				if (types[argind] == 'd') { iv = argv[argind]->d; cout << "d" <<endl;}
+				else if (types[argind] == 'f') { iv = (double) argv[argind]->f; cout << "f" << endl;}
+				else if (types[argind] == 'i') { iv = (double) argv[argind]->i; cout << "i" << endl;}
+				else break;
 
 				if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
 				if (knc != "" && sn < t->setups.size()) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
-
 				if (inc != "" && kn < t->setups[sn]->getNbKits()) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
-
+				if(in != -1 && kn != -1 && sn != -1) {
+					t->setups[sn]->getKit(kn)->getInstrument(in)->setVolume(iv);
+				}
 			}
 			break;
     }
