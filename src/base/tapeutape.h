@@ -88,6 +88,7 @@ class tapeutape
 		int getSetupIdByName(string);
 		instrument *getInstrumentByName(string,string,int,string,int);
 		int getInstrumentIdByName(string,string,int,string,int);
+		void setInstrumentParameter(int,int,int,int,double);
 		void addSetup(setup*);
 		void removeSetup(int);
 		void setSetup(int ,setup* );
@@ -137,6 +138,9 @@ class tapeutape
 	        OSC_ZERO = 0,
 	        SET_GLOBAL_VOLUME,
 			GET_GLOBAL_VOLUME,
+			GET_SETUPS_LIST,
+
+			SETUP_GET_KITS_LIST,
 
 			KIT_SELECT,
 			KIT_SET_SELECTED,
@@ -145,6 +149,7 @@ class tapeutape
 			KIT_SET_VOLUME,
 			KIT_GET_VOLUME,
 			KIT_GET_VOLUME_BYNAME,
+			KIT_GET_INSTRUMENTS_LIST,
 
 			INSTRUMENT_SET_VOLUME,
 			INSTRUMENT_GET_VOLUME,
@@ -172,6 +177,9 @@ class tapeutape
 	    std::map<std::string, int> oscCommands = {
 	        {"/set/global_volume",  SET_GLOBAL_VOLUME},
 			{"/get/global_volume",  GET_GLOBAL_VOLUME},
+			{"/get/setups_list", GET_SETUPS_LIST},
+
+			{"/setup/get/kit_lists", SETUP_GET_KITS_LIST},
 
 			{"/kit/select", 		KIT_SELECT},
 			{"/kit/set/selected", 	KIT_SET_SELECTED},
@@ -180,6 +188,7 @@ class tapeutape
 			{"/kit/set/volume",		KIT_SET_VOLUME},
 			{"/kit/get/volume",		KIT_GET_VOLUME},
 			{"/kit/get/volume/by_name",		KIT_GET_VOLUME_BYNAME},
+			{"/kit/get/instruments_list", KIT_GET_INSTRUMENTS_LIST},
 
 			{"/instrument/set/volume",			INSTRUMENT_SET_VOLUME},
 			{"/instrument/get/volume",			INSTRUMENT_GET_VOLUME},
