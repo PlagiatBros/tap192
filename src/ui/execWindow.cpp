@@ -127,7 +127,7 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 	setPoly->value(1);
 	setPoly->callback(statSetPoly,this);
 	setPoly->deactivate();
-	setOutList = new Fl_Hold_Browser(10,180,200,100,"Stereo Outputs");
+	setOutList = new Flat_Hold_Browser(10,180,200,100,"Stereo Outputs");
 	setOutList->align(FL_ALIGN_TOP|FL_ALIGN_LEFT);
 	setOutList->callback(statSetOutList,this);
 	setOutName = new Fl_Input(220,180,100,20,"Output name");
@@ -156,16 +156,16 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 
 	y += 30;
 	int _h = h - y - CREAPANEL_HEIGHT - BUTTON_HEIGHT - 20 - MENUBAR_HEIGHT;
-	creaSetupList = new Fl_Hold_Browser(10,y,(w-50)/4,_h,"Setups");
+	creaSetupList = new Flat_Hold_Browser(10,y,(w-50)/4,_h,"Setups");
 	creaSetupList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaSetupList->callback(statCreaSetupList,this);
-	creaKitList = new Fl_Hold_Browser(20 + (w-50)/4,y,(w-50)/4,_h,"Kits");
+	creaKitList = new Flat_Hold_Browser(20 + (w-50)/4,y,(w-50)/4,_h,"Kits");
 	creaKitList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaKitList->callback(statCreaKitList,this);
-	creaInstList = new Fl_Hold_Browser(30 + 2*(w-50)/4,y,(w-50)/4,_h,"Instruments");
+	creaInstList = new Flat_Hold_Browser(30 + 2*(w-50)/4,y,(w-50)/4,_h,"Instruments");
 	creaInstList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaInstList->callback(statCreaInstList,this);
-	creaVarList = new Fl_Hold_Browser(40 + 3*(w-50)/4,y,(w-50)/4,_h,"Variations");
+	creaVarList = new Flat_Hold_Browser(40 + 3*(w-50)/4,y,(w-50)/4,_h,"Variations");
 	creaVarList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaVarList->callback(statCreaVarList,this);
 
@@ -2156,12 +2156,12 @@ void execWindow::updateExecTab()
 	//create the lists of setups int the exec Tab
 	if(tap->getNbSetups()>0)
 	{
-		setupLists = new Fl_Hold_Browser*[tap->getNbSetups()];
+		setupLists = new Flat_Hold_Browser*[tap->getNbSetups()];
 		int width = w() / tap->getNbSetups();
 		for(int i=0;i<tap->getNbSetups();++i)
 		{
 			std::string name=tap->getSetup(i)->getName();
-			setupLists[i] = new Fl_Hold_Browser(i*width,80,width,h()-104,name.c_str());
+			setupLists[i] = new Flat_Hold_Browser(i*width,80,width,h()-104,name.c_str());
 			setupLists[i]->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 			setupLists[i]->callback(statExecSetupList,this);
 			for(int j=0;j<tap->getSetup(i)->getNbKits();++j)
@@ -2183,7 +2183,7 @@ void execWindow::cbExecSetupList(Fl_Widget* w)
 
 	if(s>=0 && s<tap->getNbSetups())
 	{
-		Fl_Hold_Browser* hb = (Fl_Hold_Browser*)w;
+		Flat_Hold_Browser* hb = (Flat_Hold_Browser*)w;
 		hb->value(tap->getSetup(s)->changeKit(hb->value()-1)+1);
 	}
 }

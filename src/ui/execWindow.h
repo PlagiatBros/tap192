@@ -25,7 +25,6 @@
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
-#include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
@@ -208,7 +207,7 @@ class execWindow : public Flat_Double_Window
 
 			Flat_Group* setTab;
 			Flat_Value_Slider *setVolume;
-  			Fl_Hold_Browser *setOutList;
+  			Flat_Hold_Browser *setOutList;
 			Flat_Button *setOutNew;
 			Flat_Button *setOutRemove;
 			Fl_Input *setOutName;
@@ -217,16 +216,16 @@ class execWindow : public Flat_Double_Window
 
 
 			Flat_Group* execTab;
-  			Fl_Hold_Browser **setupLists;
+  			Flat_Hold_Browser **setupLists;
 
 
             Flat_Group* creaTab;
             Flat_Group* creaPack;
 			Flat_Group* creaBtns;
-  			Fl_Hold_Browser *creaSetupList;
-  			Fl_Hold_Browser *creaKitList;
-  			Fl_Hold_Browser *creaInstList;
-  			Fl_Hold_Browser *creaVarList;
+  			Flat_Hold_Browser *creaSetupList;
+  			Flat_Hold_Browser *creaKitList;
+  			Flat_Hold_Browser *creaInstList;
+  			Flat_Hold_Browser *creaVarList;
             Flat_Group * creaTabsWrapper;
 			Flat_Tabs * creaTabs;
 			Flat_Group* creaGlobalTab;

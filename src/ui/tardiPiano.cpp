@@ -121,7 +121,7 @@ void tardiPiano::draw()
 				break;
 			case 4:
 				{
-					fl_draw_box(FL_THIN_UP_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,FL_RED);
+					fl_draw_box(FL_THIN_UP_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,COLOR_ACCENT);
 				}
 				break;
 			default:break;
@@ -159,7 +159,7 @@ void tardiPiano::draw()
 				break;
 			case 5:
 				{
-					fl_draw_box(FL_FLAT_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,FL_RED);
+					fl_draw_box(FL_FLAT_BOX,this->x()+(int)((float)this->w()*touches[i][0]),this->y(),(int)noteW,(int)noteH,COLOR_ACCENT);
 				}
 				break;
 			default:break;

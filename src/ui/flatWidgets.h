@@ -3,6 +3,7 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Toggle_Button.H>
 #include <FL/Fl_Value_Slider.H>
+#include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Slider.H>
 #include <FL/Fl_Value_Input.H>
@@ -71,6 +72,15 @@ class Flat_Button : public Fl_Button
             color(COLOR_RAISED);
             box(FL_BORDER_BOX);
             clear_visible_focus();
+        }
+};
+
+class Flat_Hold_Browser : public Fl_Hold_Browser
+{
+    public:
+        Flat_Hold_Browser(int X, int Y, int W, int H, const char *L = 0) : Fl_Hold_Browser(X,Y,W,H,L)
+        {
+            box(FL_BORDER_BOX);
         }
 };
 
