@@ -3,6 +3,9 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Toggle_Button.H>
 #include <FL/Fl_Value_Slider.H>
+#include <FL/Fl_Widget.H>
+#include <FL/Fl_Slider.H>
+#include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Group.H>
@@ -82,17 +85,60 @@ class Flat_Toggle_Button : public Fl_Toggle_Button
         }
 };
 
-
-class Flat_Value_Slider : public Fl_Value_Slider
+class Flat_Value_Slider : public Fl_Group
 {
+    private:
+        Fl_Slider slider;
+        Fl_Value_Input input;
     public:
-        Flat_Value_Slider(int X, int Y, int W, int H, const char *L = 0) : Fl_Value_Slider(X,Y,W,H,L)
+        Flat_Value_Slider(int X, int Y, int W, int H, const char *L = 0) :
+            Fl_Group(X,Y,W,H,L),
+            slider(X,Y,W,H,""),
+            input(X,Y,W,H, "")
         {
-            selection_color(COLOR_RAISED);
-            box(FL_BORDER_BOX);
-            clear_visible_focus();
+            insert(input, 0);
+            insert(slider, 1);
+            end();
+
+            int x,y;
+            measure_label(x,y);
+            slider.resize(20+x+40, Y, W-40, H);
+            input.resize(20+x, Y, 40, H);
+
+            input.type(FL_FLOAT_INPUT);
+            input.step(0.01);
+
+            slider.selection_color(COLOR_RAISED);
+
+            box(FL_NO_BOX);
+            slider.box(FL_BORDER_BOX);
+            slider.type(FL_HOR_FILL_SLIDER);
+            input.box(FL_BORDER_BOX);
+
+            input.callback(Flat_Value_Slider::inputCb, this);
+            slider.callback(Flat_Value_Slider::sliderCb, this);
+
+            input.clear_visible_focus();
+            slider.clear_visible_focus();
         }
+        float value(){return slider.value();};
+        void value(float f){slider.value(f);input.value(f);};
+        void bounds(float a, float b){slider.bounds(a, b);input.bounds(a, b);};
+        void type(uchar t){slider.type(t);};
+
+        static void sliderCb(Fl_Widget* w,void* f){
+            Flat_Value_Slider *self = (Flat_Value_Slider*) f;
+            self->input.value(self->slider.value());
+            self->do_callback();
+        };
+        static void inputCb(Fl_Widget* w,void* f){
+            Flat_Value_Slider *self = (Flat_Value_Slider*) f;
+            self->slider.value(self->input.value());
+            self->do_callback();
+        };
 };
+
+
 
 class Flat_Counter : public Fl_Counter
 {

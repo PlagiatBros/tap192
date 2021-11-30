@@ -290,7 +290,7 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 	creaSampleOpen->hide();
 
 
-	Flat_Group * audioControls= new Flat_Group(0, y, w, 100);
+	Flat_Group * audioControls= new Flat_Group(0, y, w, 200);
 	audioControls->resizable(0);
 	creaVolume = new Flat_Value_Slider(70,y,150,20,"Volume");
 	creaVolume->align(FL_ALIGN_LEFT);
