@@ -1271,7 +1271,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 						delete copySetup;
 						pasteError=true;
 					}
-					creaCopyPaste->label("C");
+					creaCopyPaste->label("Copy");
 				}
 			}
 			break;
@@ -1309,7 +1309,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 						delete copyKit;
 						pasteError=true;
 					}
-					creaCopyPaste->label("C");
+					creaCopyPaste->label("Copy");
 				}
 			}
 			break;
@@ -1349,7 +1349,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 						delete copyInst;
 						pasteError=true;
 					}
-					creaCopyPaste->label("C");
+					creaCopyPaste->label("Copy");
 				}
 			}
 			break;
@@ -1391,7 +1391,7 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 						delete copyVar;
 						pasteError=true;
 					}
-					creaCopyPaste->label("C");
+					creaCopyPaste->label("Copy");
 				}
 			}
 			break;
