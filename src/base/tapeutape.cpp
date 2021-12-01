@@ -340,24 +340,14 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			o_what = INSTRUMENT; x_what = PLAYMODE;
 			break;
 
-		case INSTRUMENT_TRIG:
-		// Setup (s,i), Kit (s,i), Instrument (s,i)
-		// Kit (s,i), Instrument (s,i)
-		// Instrument (s,i)
-			o_what = INSTRUMENT; x_what = TRIG;
-			playstop = 1;
-			break;
+
 		case INSTRUMENT_PLAY:
-		// Setup (s,i), Kit (s,i), Instrument (s,i), Velocity (i), Pitch (f)
-		// Kit (s,i), Instrument (s,i)
-		// Instrument (s,i)
+		// Setup (s,i), Kit (s,i), Instrument (s,i), Velocity (i), (Pitch (f))
 			o_what = INSTRUMENT; x_what = PLAY;
 			playstop = 1;
 			break;
 		case INSTRUMENT_STOP:
 		// Setup (s,i), Kit (s,i), Instrument (s,i)
-		// Kit (s,i), Instrument (s,i)
-		// Instrument (s,i)
 			o_what = INSTRUMENT; x_what = STOP;
 			playstop = 1;
 			break;
@@ -504,7 +494,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 		if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
 		if (knc != "" && sn < t->setups.size() && (o_what == KIT || o_what == INSTRUMENT)) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
 		if (inc != "" && kn < t->setups[sn]->getNbKits() && o_what == INSTRUMENT) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
-
+		if (in == -1 || in > t-> setups[sn]->getKit(kn)->getNbInstruments-1) return -1;
 		//cout << "sn :" << sn << ", kn: " << kn << ", in: " << in << ", x: " << x << endl;
 
 		switch(o_what){

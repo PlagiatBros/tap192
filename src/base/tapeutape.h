@@ -177,18 +177,8 @@ class tapeutape
 			INSTRUMENT_SET_PITCHOVERRANGE,
 			INSTRUMENT_GET_PITCHOVERRANGE,
 			INSTRUMENT_GET_PITCHOVERRANGE_BYNAME,
-			INSTRUMENT_TRIG,
-			INSTRUMENT_TRIG_BYNAME,
-			INSTRUMENT_TRIGREVERSE,
-			INSTRUMENT_TRIGREVERSE_BYNAME,
 			INSTRUMENT_PLAY,
-			INSTRUMENT_PLAY_BYNAME,
-			INSTRUMENT_PLAYLOOP,
-			INSTRUMENT_PLAYLOOP_BYNAME,
-			INSTRUMENT_PLAYREVERSE,
-			INSTRUMENT_PLAYREVERSE_BYNAME,
 			INSTRUMENT_STOP,
-			INSTRUMENT_STOP_BYNAME
 	    };
 	    std::map<std::string, int> oscCommands = {
 	        {"/set/global_volume",  SET_GLOBAL_VOLUME},
@@ -230,18 +220,8 @@ class tapeutape
 			{"/instrument/set/pitchoverrange",	INSTRUMENT_SET_PITCHOVERRANGE},
 			{"/instrument/get/pitchoverrange",	INSTRUMENT_GET_PITCHOVERRANGE},
 			{"/instrument/get/pitchoverrange/by_name",	INSTRUMENT_GET_PITCHOVERRANGE_BYNAME},
-			{"/instrument/trig",				INSTRUMENT_TRIG},
-			{"/instrument/trig/by_name",				INSTRUMENT_TRIG_BYNAME},
-			{"/instrument/trigreverse",			INSTRUMENT_TRIGREVERSE},
-			{"/instrument/trigreverse/by_name",			INSTRUMENT_TRIGREVERSE_BYNAME},
 			{"/instrument/play",				INSTRUMENT_PLAY},
-			{"/instrument/play/by_name",				INSTRUMENT_PLAY_BYNAME},
-			{"/instrument/playreverse",			INSTRUMENT_PLAYREVERSE},
-			{"/instrument/playreverse/by_name",			INSTRUMENT_PLAYREVERSE_BYNAME},
-			{"/instrument/playloop",			INSTRUMENT_PLAYLOOP},
-			{"/instrument/playloop/by_name",			INSTRUMENT_PLAYLOOP_BYNAME},
 			{"/instrument/stop",				INSTRUMENT_STOP},
-			{"/instrument/stop/by_name",				INSTRUMENT_STOP_BYNAME}
 	    };
 
 
