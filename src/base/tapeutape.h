@@ -90,7 +90,7 @@ class tapeutape
 		int getInstrumentIdByName(string,string,int,string,int);
 		void setInstrumentParameter(int,int,int,int,double);
 		double getInstrumentParameter(int,int,int,int);
-		void playstoptrigInstrument(int, int, int, int, const unsigned short);
+		void playstopInstrument(int sn, int kn, int in, int x_what, const unsigned short t_velocity, float pitch=1);
 		void addSetup(setup*);
 		void removeSetup(int);
 		void setSetup(int ,setup* );
