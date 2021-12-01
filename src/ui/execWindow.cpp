@@ -158,7 +158,7 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 
 	creaPack = new Flat_Group(10, y,w-20,h-CREAPANEL_HEIGHT-MENUBAR_HEIGHT*2-TAB_HEIGHT-BUTTON_HEIGHT - 20 - 30);
 
-	int _h = h - y - CREAPANEL_HEIGHT - BUTTON_HEIGHT - 20 - MENUBAR_HEIGHT+30;
+	int _h = h - y - CREAPANEL_HEIGHT - BUTTON_HEIGHT - 20 - MENUBAR_HEIGHT;
 	creaSetupList = new Flat_Hold_Browser(10,y,(w-50)/4,_h,"Setups");
 	creaSetupList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaSetupList->callback(statCreaSetupList,this);
