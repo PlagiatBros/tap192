@@ -1363,7 +1363,11 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 						copyVar = new variation(*(tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->getVariation(creaSelectedVar)));
 						copyType=4;
 						creaCopyPaste->label("Paste");
-						showMessage(false,"Variation "+copyVar->getSample()->getName()+" copied");
+						if (copyVar->getSample() != NULL) {
+							showMessage(false,"Variation "+copyVar->getSample()->getName()+" copied");
+						} else {
+							showMessage(false,"Variation copied");
+						}
 					}
 					else
 					{
@@ -1380,11 +1384,16 @@ void execWindow::cbCreaCopyPaste(Fl_Widget*)
 						tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->updateVariations(-1);
 						//recreate the tap list
 						tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
-						creaVarList->add(copyVar->getSample()->getName().c_str());
+						if (copyVar->getSample() != NULL) {
+							creaVarList->add(copyVar->getSample()->getName().c_str());
+							showMessage(false,"Variation "+copyVar->getSample()->getName()+" pasted");
+						} else {
+							creaVarList->add("no sample yet");
+							showMessage(false,"Variation pasted");
+						}
 						creaVarList->value(creaVarList->size());
 						creaSelectedVar=creaVarList->size()-1;
 						displayVar(creaSelectedVar);
-						showMessage(false,"Variation "+copyVar->getSample()->getName()+" pasted");
 					}
 					else
 					{
