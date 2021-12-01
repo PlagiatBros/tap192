@@ -97,8 +97,9 @@ tapeutape::tapeutape(char *fn):polyphony(100),globalVolume(1.0),fileName(""),jac
 
 
 	//if a file name was specified
-	if(fn != "")
+	if(((string) fn).compare("")){
 		load(fn);
+	}
 
 	//start
 	start();
@@ -437,12 +438,14 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 		float p=1;
 		int argind=0;
 
+		cout << argind << endl;
 		if ((argc > 3 && o_what == INSTRUMENT) || x_what == STOP) {
 			if (types[argind] == 's') snc = &argv[argind]->s;
 			else if (types[argind] == 'i') sn = argv[argind]->i;
 			else return -1;
 			argind++;
 		}
+		cout << argind << endl;
 		if (argc > 2) {
 			if (o_what == KIT) {
 				if (types[argind] == 's') snc = &argv[argind]->s;
@@ -455,6 +458,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			}
 			argind++;
 		}
+		cout << argind << endl;
 		if (argc > 1) {
 			if(o_what == SETUP) {
 				if (types[argind] == 's') snc = &argv[argind]->s;
@@ -471,14 +475,14 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			}
 			argind++;
 		}
-
+		cout << argind << endl;
 		if (argc > argind) {
 			if (types[argind] == 'd') x = argv[argind]->d;
 			else if (types[argind] == 'f') x = (double) argv[argind]->f;
 			else if (types[argind] == 'i') x = (double) argv[argind]->i;
 			else return -1;
 		}
-
+		cout << "avant playstop" << endl;
 		if (playstop) {
 			if (argc < 4) x = 127; // if no velocity defined
 			if (x < 0) x = 127; // if velocity below 0
@@ -490,12 +494,16 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			}
 			if (p < 0) p = 1; // if pitch below 0
 		}
-
+		cout << "avant détermination" << endl;
 		if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
-		if (knc != "" && sn < t->setups.size() && (o_what == KIT || o_what == INSTRUMENT)) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
-		if (inc != "" && kn < t->setups[sn]->getNbKits() && o_what == INSTRUMENT) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
-		if (in == -1 || in > t-> setups[sn]->getKit(kn)->getNbInstruments()-1) return -1;
-		//cout << "sn :" << sn << ", kn: " << kn << ", in: " << in << ", x: " << x << endl;
+		cout << "SN OK: " << sn << endl;
+		if (knc != "" && (o_what == KIT || o_what == INSTRUMENT)) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
+		cout << "KN OK: knc: " << knc << ", kn: " << kn << endl;
+		if (inc != "" && o_what == INSTRUMENT) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
+
+		cout << "MSG" << endl;
+		cout << "snc :" << snc << ", knc: " << knc << ", inc: " << inc << ", x: " << x << endl;
+		cout << "sn :" << sn << ", kn: " << kn << ", in: " << in << ", x: " << x << endl;
 
 		switch(o_what){
 			case INSTRUMENT:
@@ -503,17 +511,23 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					for(int i=0; i<t->setups.size(); i++){
 						if (kn == -1) {
 							for (int j=0; j<t->setups[i]->getNbKits(); j++){
-								if(playstop) t->playstopInstrument(i, j, in, x_what, (unsigned short) x, p);
-								else t->setInstrumentParameter(i, j, in, x_what, (double) x);
+								if(in != -1 && in < t->setups[i]->getKit(j)->getNbInstruments()){
+									if(playstop) t->playstopInstrument(i, j, in, x_what, (unsigned short) x, p);
+									else t->setInstrumentParameter(i, j, in, x_what, (double) x);
+								} else return -1;
 							}
 						} else {
-							if(playstop) t->playstopInstrument(i, kn, in, x_what, (unsigned short) x, p);
-							else t->setInstrumentParameter(i, kn, in, x_what, (double) x);
+							if(in != -1 && in < t->setups[i]->getKit(kn)->getNbInstruments()){
+								if(playstop) t->playstopInstrument(i, kn, in, x_what, (unsigned short) x, p);
+								else t->setInstrumentParameter(i, kn, in, x_what, (double) x);
+							} else return -1;
 						}
 					}
 				} else {
-					if(playstop) t->playstopInstrument(sn, kn, in, x_what, (unsigned short) x, p);
-					else t->setInstrumentParameter(sn, kn, in, x_what, (double) x);
+					if(in != -1 && in < t->setups[sn]->getKit(kn)->getNbInstruments()){
+						if(playstop) t->playstopInstrument(sn, kn, in, x_what, (unsigned short) x, p);
+						else t->setInstrumentParameter(sn, kn, in, x_what, (double) x);
+					} else return -1;
 				}
 				break;
 			case KIT:
@@ -636,7 +650,6 @@ std::string tapeutape::getCompleteFileName()
 
 int tapeutape::load(char * nomfic)
 {
-
 	execWin->reset();
 
 	//delete the setups/kits/instruments/variations

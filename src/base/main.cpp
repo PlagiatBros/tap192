@@ -53,7 +53,7 @@ bool global_nsm_opional_gui = false;
 nsm_client_t *nsm = 0;
 bool nsm_replied = false;
 string nsm_folder = "";
-string global_filename;
+string global_filename ="";
 
 tapeutape * tap_instance;
 
