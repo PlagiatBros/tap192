@@ -39,7 +39,11 @@ enum X_TYPES {
 	VOLUME = 0,
 	PAN,
 	MIDITUNE,
-	PLAYMODE
+	//OUTPUT,
+	PLAYMODE,
+	PLAYLOOP,
+	PLAYREVERSE,
+	PITCHOVERRANGE
 };
 
 enum P_TYPES {
@@ -365,6 +369,14 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			param_type = P_DOUBLE; get = 1;
 			break;
 
+/*		case INSTRUMENT_GET_OUTPUT_BYNAME:
+			by = "by_name";
+		case INSTRUMENT_GET_OUTPUT:
+		// Setup (s, i), Kit (s, i), Instrument (s, i)
+		// Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+			o_what = INSTRUMENT; x_what = OUTPUT;
+			param_type = P_INT; get = 1;
+			break;*/
 		case INSTRUMENT_GET_PLAYMODE_BYNAME:
 			by = "by_name";
 		case INSTRUMENT_GET_PLAYMODE:
@@ -373,7 +385,30 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			o_what = INSTRUMENT; x_what = PLAYMODE;
 			param_type = P_INT; get = 1;
 			break;
-
+		case INSTRUMENT_GET_PLAYLOOP_BYNAME:
+			by = "by_name";
+		case INSTRUMENT_GET_PLAYLOOP:
+		// Setup (s, i), Kit (s, i), Instrument (s, i)
+		// Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+			o_what = INSTRUMENT; x_what = PLAYLOOP;
+			param_type = P_INT; get = 1;
+			break;
+		case INSTRUMENT_GET_PLAYREVERSE_BYNAME:
+			by = "by_name";
+		case INSTRUMENT_GET_PLAYREVERSE:
+		// Setup (s, i), Kit (s, i), Instrument (s, i)
+		// Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+			o_what = INSTRUMENT; x_what = PLAYREVERSE;
+			param_type = P_INT; get = 1;
+			break;
+		case INSTRUMENT_GET_PITCHOVERRANGE_BYNAME:
+			by = "by_name";
+		case INSTRUMENT_GET_PITCHOVERRANGE:
+		// Setup (s, i), Kit (s, i), Instrument (s, i)
+		// Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+			o_what = INSTRUMENT; x_what = PITCHOVERRANGE;
+			param_type = P_INT; get = 1;
+			break;
     }
 
 // OSC Set Methods
@@ -950,6 +985,10 @@ void tapeutape::setInstrumentParameter(int sn, int kn, int in, int x_what, doubl
 	else if (x_what == PAN) setups[sn]->getKit(kn)->getInstrument(in)->setPan(x);
 	else if (x_what == MIDITUNE) setups[sn]->getKit(kn)->getInstrument(in)->setRootNoteFine(x);
 	else if (x_what == PLAYMODE) setups[sn]->getKit(kn)->getInstrument(in)->setPlayMode((int) x);
+	else if (x_what == PLAYLOOP) setups[sn]->getKit(kn)->getInstrument(in)->setPlayLoop((int) x);
+	else if (x_what == PLAYREVERSE) setups[sn]->getKit(kn)->getInstrument(in)->setPlayReverse((int) x);
+	else if (x_what == PITCHOVERRANGE) setups[sn]->getKit(kn)->getInstrument(in)->setPitchOverRange((bool) x);
+
 }
 
 double tapeutape::getInstrumentParameter(int sn, int kn, int in, int x_what){
@@ -958,6 +997,9 @@ double tapeutape::getInstrumentParameter(int sn, int kn, int in, int x_what){
 	else if (x_what == PAN) x = setups[sn]->getKit(kn)->getInstrument(in)->getPan();
 	else if (x_what == MIDITUNE) x = setups[sn]->getKit(kn)->getInstrument(in)->getRootNoteFine();
 	else if (x_what == PLAYMODE) x = (double) setups[sn]->getKit(kn)->getInstrument(in)->getPlayMode();
+	else if (x_what == PLAYLOOP) x = (double) setups[sn]->getKit(kn)->getInstrument(in)->getPlayLoop();
+	else if (x_what == PLAYREVERSE) x = (double) setups[sn]->getKit(kn)->getInstrument(in)->getPlayReverse();
+	else if (x_what == PITCHOVERRANGE) x = (double) setups[sn]->getKit(kn)->getInstrument(in)->getPitchOverRange();
 	return x;
 }
 

@@ -161,9 +161,9 @@ class tapeutape
 			INSTRUMENT_SET_MIDITUNE,
 			INSTRUMENT_GET_MIDITUNE,
 			INSTRUMENT_GET_MIDITUNE_BYNAME,
-			INSTRUMENT_SET_OUTPUT,
+/*			INSTRUMENT_SET_OUTPUT,
 			INSTRUMENT_GET_OUTPUT,
-			INSTRUMENT_GET_OUTPUT_BYNAME,
+			INSTRUMENT_GET_OUTPUT_BYNAME,*/
 			INSTRUMENT_SET_PLAYMODE,
 			INSTRUMENT_GET_PLAYMODE,
 			INSTRUMENT_GET_PLAYMODE_BYNAME,
@@ -214,9 +214,9 @@ class tapeutape
 			{"/instrument/set/miditune",		INSTRUMENT_SET_MIDITUNE},
 			{"/instrument/get/miditune",		INSTRUMENT_GET_MIDITUNE},
 			{"/instrument/get/miditune/by_name",		INSTRUMENT_GET_MIDITUNE_BYNAME},
-			{"/instrument/set/output",			INSTRUMENT_SET_OUTPUT},
+/*			{"/instrument/set/output",			INSTRUMENT_SET_OUTPUT},
 			{"/instrument/get/output",			INSTRUMENT_GET_OUTPUT},
-			{"/instrument/get/output/by_name",			INSTRUMENT_GET_OUTPUT_BYNAME},
+			{"/instrument/get/output/by_name",			INSTRUMENT_GET_OUTPUT_BYNAME},*/
 			{"/instrument/set/playmode",		INSTRUMENT_SET_PLAYMODE},
 			{"/instrument/get/playmode",		INSTRUMENT_GET_PLAYMODE},
 			{"/instrument/get/playmode/by_name",		INSTRUMENT_GET_PLAYMODE_BYNAME},
