@@ -151,11 +151,14 @@ execWindow::execWindow(const char* titre,tapeutape *t):
 	y = MENUBAR_HEIGHT+TAB_HEIGHT;
 
 
-
-	creaPack = new Flat_Group(10, y,w-20,h-CREAPANEL_HEIGHT-MENUBAR_HEIGHT*2-TAB_HEIGHT-BUTTON_HEIGHT - 20);
-
 	y += 30;
-	int _h = h - y - CREAPANEL_HEIGHT - BUTTON_HEIGHT - 20 - MENUBAR_HEIGHT;
+	execPack = new Flat_Group(0, y,w,h-MENUBAR_HEIGHT*2-TAB_HEIGHT-30);
+	execTab->insert(*execPack, 0);
+	execTab->resizable(*execPack);
+
+	creaPack = new Flat_Group(10, y,w-20,h-CREAPANEL_HEIGHT-MENUBAR_HEIGHT*2-TAB_HEIGHT-BUTTON_HEIGHT - 20 - 30);
+
+	int _h = h - y - CREAPANEL_HEIGHT - BUTTON_HEIGHT - 20 - MENUBAR_HEIGHT+30;
 	creaSetupList = new Flat_Hold_Browser(10,y,(w-50)/4,_h,"Setups");
 	creaSetupList->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 	creaSetupList->callback(statCreaSetupList,this);
@@ -2160,8 +2163,9 @@ void execWindow::updateExecTab()
 		int width = w() / tap->getNbSetups();
 		for(int i=0;i<tap->getNbSetups();++i)
 		{
-			std::string name=tap->getSetup(i)->getName();
-			setupLists[i] = new Flat_Hold_Browser(i*width,80,width,h()-104,name.c_str());
+			std::string name=tap->getSetup(i)->getName();//XXX
+			int y = MENUBAR_HEIGHT+TAB_HEIGHT+30;
+			setupLists[i] = new Flat_Hold_Browser(i*width,y,width,h()-y-MENUBAR_HEIGHT,name.c_str());
 			setupLists[i]->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 			setupLists[i]->callback(statExecSetupList,this);
 			for(int j=0;j<tap->getSetup(i)->getNbKits();++j)
@@ -2170,8 +2174,9 @@ void execWindow::updateExecTab()
 				setupLists[i]->add(kitName.c_str());
 			}
 			setupLists[i]->select(1);
-			execTab->insert(*setupLists[i],i+1);
+			execPack->insert(*setupLists[i],i+1);
 		}
+
 	}
 	Fl::check();
 }

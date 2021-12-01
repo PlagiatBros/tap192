@@ -216,6 +216,7 @@ class execWindow : public Flat_Double_Window
 
 
 			Flat_Group* execTab;
+            Flat_Group* execPack;
   			Flat_Hold_Browser **setupLists;
 
 
