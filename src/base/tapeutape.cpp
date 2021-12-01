@@ -39,6 +39,14 @@ enum X_TYPES {
 	VOLUME = 0,
 	PAN,
 	MIDITUNE,
+	PLAYMODE
+};
+
+enum P_TYPES {
+	P_DOUBLE = 0,
+	P_FLOAT,
+	P_INT,
+	P_STRING
 };
 
 using namespace std;
@@ -162,7 +170,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 
 
 	//int sn=-1, kn=-1, in=-1, whatset = 0;
-	int sn=-1, kn=-1, in=-1, o_what, x_what, get=0;
+	int sn=-1, kn=-1, in=-1, o_what, x_what, get=0, param_type=P_DOUBLE;
 	string snc="", knc="", inc="";
 	char *address;
 	//string spath, by, xwhat="miditune";
@@ -315,6 +323,12 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 		// Instrument (s,i), Miditune (d,f,i)
 			o_what = INSTRUMENT; x_what = MIDITUNE;
 			break;
+		case INSTRUMENT_SET_PLAYMODE:
+		// Setup (s,i), Kit (s,i), Instrument (s,i), Playmode (d,f,i)
+		// Kit (s,i), Instrument (s,i), Playmode (d,f,i)
+		// Instrument (s,i), Playmode (d,f,i)
+			o_what = INSTRUMENT; x_what = PLAYMODE;
+			break;
 
 // Trig OSC Get Parameters Methods
 		case KIT_GET_VOLUME_BYNAME:
@@ -323,7 +337,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 		// Setup (s, i), Kit (s, i)
 		// Setup (s, i), Kit (s, i), Address (s)
 			o_what = KIT; x_what = VOLUME;
-			get = 1;
+			param_type = P_DOUBLE; get = 1;
 			break;
 
 		case INSTRUMENT_GET_VOLUME_BYNAME:
@@ -332,7 +346,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 		// Setup (s, i), Kit (s, i), Instrument (s, i)
 		// Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
 			o_what = INSTRUMENT; x_what = VOLUME;
-			get = 1;
+			param_type = P_DOUBLE; get = 1;
 			break;
 		case INSTRUMENT_GET_PAN_BYNAME:
 			by = "by_name";
@@ -340,7 +354,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 		// Setup (s, i), Kit (s, i), Instrument (s, i)
 		// Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
 			o_what = INSTRUMENT; x_what = PAN;
-			get = 1;
+			param_type = P_DOUBLE; get = 1;
 			break;
 		case INSTRUMENT_GET_MIDITUNE_BYNAME:
 			by = "by_name";
@@ -348,8 +362,18 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 		// Setup (s, i), Kit (s, i), Instrument (s, i)
 		// Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
 			o_what = INSTRUMENT; x_what = MIDITUNE;
-			get = 1;
+			param_type = P_DOUBLE; get = 1;
 			break;
+
+		case INSTRUMENT_GET_PLAYMODE_BYNAME:
+			by = "by_name";
+		case INSTRUMENT_GET_PLAYMODE:
+		// Setup (s, i), Kit (s, i), Instrument (s, i)
+		// Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+			o_what = INSTRUMENT; x_what = PLAYMODE;
+			param_type = P_INT; get = 1;
+			break;
+
     }
 
 // OSC Set Methods
@@ -407,14 +431,14 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					for(int i=0; i<t->setups.size(); i++){
 						if (kn == -1) {
 							for (int j=0; j<t->setups[i]->getNbKits(); j++){
-								t->setInstrumentParameter(i, j, in, x_what, x);
+								t->setInstrumentParameter(i, j, in, x_what, (double) x);
 							}
 						} else {
-							t->setInstrumentParameter(i, kn, in, x_what, x);
+							t->setInstrumentParameter(i, kn, in, x_what, (double) x);
 						}
 					}
 				} else {
-					t->setInstrumentParameter(sn, kn, in, x_what, x);
+					t->setInstrumentParameter(sn, kn, in, x_what, (double) x);
 				}
 				break;
 			case KIT:
@@ -493,18 +517,15 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				lo_message_add_int32(lo_msg, kn);
 				if (o_what == INSTRUMENT) lo_message_add_int32(lo_msg, in);
 			}
-			switch (x_what) {
-				case VOLUME:
-					if (o_what == KIT) lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getVolume());
-					if (o_what == INSTRUMENT) lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getInstrument(in)->getVolume());
-					break;
-				case PAN:
-					lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getInstrument(in)->getPan());
-					break;
-				case MIDITUNE:
-					lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getInstrument(in)->getRootNoteFine());
-					break;
-			}
+
+			if (o_what == KIT) lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getVolume());
+			else if (o_what == INSTRUMENT)
+				if(param_type == P_DOUBLE)
+					lo_message_add_double(lo_msg, t->getInstrumentParameter(sn, kn, in, x_what));
+				else if(param_type == P_INT) {
+					lo_message_add_int32(lo_msg, (int) t->getInstrumentParameter(sn, kn, in, x_what));
+				}
+
 			lo_send_message(lo_add, spath.c_str(), lo_msg);
 			lo_address_free(lo_add);
 			lo_message_free(lo_msg);
@@ -928,6 +949,16 @@ void tapeutape::setInstrumentParameter(int sn, int kn, int in, int x_what, doubl
 	if (x_what == VOLUME) setups[sn]->getKit(kn)->getInstrument(in)->setVolume(x);
 	else if (x_what == PAN) setups[sn]->getKit(kn)->getInstrument(in)->setPan(x);
 	else if (x_what == MIDITUNE) setups[sn]->getKit(kn)->getInstrument(in)->setRootNoteFine(x);
+	else if (x_what == PLAYMODE) setups[sn]->getKit(kn)->getInstrument(in)->setPlayMode((int) x);
+}
+
+double tapeutape::getInstrumentParameter(int sn, int kn, int in, int x_what){
+	double x = -1;
+	if (x_what == VOLUME) x = setups[sn]->getKit(kn)->getInstrument(in)->getVolume();
+	else if (x_what == PAN) x = setups[sn]->getKit(kn)->getInstrument(in)->getPan();
+	else if (x_what == MIDITUNE) x = setups[sn]->getKit(kn)->getInstrument(in)->getRootNoteFine();
+	else if (x_what == PLAYMODE) x = (double) setups[sn]->getKit(kn)->getInstrument(in)->getPlayMode();
+	return x;
 }
 
 

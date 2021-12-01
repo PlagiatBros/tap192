@@ -89,6 +89,7 @@ class tapeutape
 		instrument *getInstrumentByName(string,string,int,string,int);
 		int getInstrumentIdByName(string,string,int,string,int);
 		void setInstrumentParameter(int,int,int,int,double);
+		double getInstrumentParameter(int,int,int,int);
 		void addSetup(setup*);
 		void removeSetup(int);
 		void setSetup(int ,setup* );
