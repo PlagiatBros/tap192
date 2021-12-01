@@ -43,7 +43,11 @@ enum X_TYPES {
 	PLAYMODE,
 	PLAYLOOP,
 	PLAYREVERSE,
-	PITCHOVERRANGE
+	PITCHOVERRANGE,
+
+	TRIG,
+	PLAY,
+	STOP
 };
 
 enum P_TYPES {
@@ -174,7 +178,9 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 
 
 	//int sn=-1, kn=-1, in=-1, whatset = 0;
-	int sn=-1, kn=-1, in=-1, o_what, x_what, get=0, param_type=P_DOUBLE;
+	int sn=-1, kn=-1, in=-1;
+	int o_what, x_what, param_type=P_DOUBLE;
+	int get=0, playstoptrig=0;
 	string snc="", knc="", inc="";
 	char *address;
 	//string spath, by, xwhat="miditune";
@@ -334,6 +340,30 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			o_what = INSTRUMENT; x_what = PLAYMODE;
 			break;
 
+		case INSTRUMENT_TRIG:
+		// Setup (s,i), Kit (s,i), Instrument (s,i)
+		// Kit (s,i), Instrument (s,i)
+		// Instrument (s,i)
+			o_what = INSTRUMENT; x_what = TRIG;
+			playstoptrig = 1;
+			break;
+		case INSTRUMENT_PLAY:
+		// Setup (s,i), Kit (s,i), Instrument (s,i)
+		// Kit (s,i), Instrument (s,i)
+		// Instrument (s,i)
+			o_what = INSTRUMENT; x_what = PLAY;
+			playstoptrig = 1;
+			break;
+		case INSTRUMENT_STOP:
+		// Setup (s,i), Kit (s,i), Instrument (s,i)
+		// Kit (s,i), Instrument (s,i)
+		// Instrument (s,i)
+			o_what = INSTRUMENT; x_what = STOP;
+			playstoptrig = 1;
+			break;
+
+
+
 // Trig OSC Get Parameters Methods
 		case KIT_GET_VOLUME_BYNAME:
 			by = "by_name";
@@ -411,7 +441,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			break;
     }
 
-// OSC Set Methods
+// OSC Set and Play/Stop/Trig Methods
 	if (argc > 0 && !get) {
 		double x;
 		int argind=0;
@@ -423,7 +453,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			argind++;
 		}
 		if (argc > 2) {
-			if (o_what == KIT) {
+			if (o_what == KIT || (o_what == INSTRUMENT && playstoptrig)) {
 				if (types[argind] == 's') snc = &argv[argind]->s;
 				else if (types[argind] == 'i') sn = argv[argind]->i;
 				else return -1;
@@ -439,7 +469,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 				if (types[argind] == 's') snc = &argv[argind]->s;
 				else if (types[argind] == 'i') sn = argv[argind]->i;
 				else return -1;
-			} else if(o_what == KIT) {
+			} else if(o_what == KIT || (o_what == INSTRUMENT && playstoptrig)) {
 				if (types[argind] == 's') knc = &argv[argind]->s;
 				else if (types[argind] == 'i') kn = argv[argind]->i;
 				else return -1;
@@ -451,14 +481,27 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 			argind++;
 		}
 
-		if (types[argind] == 'd') x = argv[argind]->d;
-		else if (types[argind] == 'f') x = (double) argv[argind]->f;
-		else if (types[argind] == 'i') x = (double) argv[argind]->i;
-		else return -1;
+		cout << 'A' << endl;
+
+		if(!playstoptrig){
+			if (types[argind] == 'd') x = argv[argind]->d;
+			else if (types[argind] == 'f') x = (double) argv[argind]->f;
+			else if (types[argind] == 'i') x = (double) argv[argind]->i;
+			else return -1;
+		}
+		else {
+			if (types[argind] == 's') inc = &argv[argind]->s;
+			else if (types[argind] == 'i') in = argv[argind]->i;
+			else return -1;
+		}
+
+		cout << 'B' << endl;
 
 		if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
 		if (knc != "" && sn < t->setups.size() && (o_what == KIT || o_what == INSTRUMENT)) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
 		if (inc != "" && kn < t->setups[sn]->getNbKits() && o_what == INSTRUMENT) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
+
+		cout << "sn: " << sn << ", kn: " << kn << ", in: " << in << ", x_what: " << x_what;
 
 		switch(o_what){
 			case INSTRUMENT:
@@ -466,14 +509,17 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 					for(int i=0; i<t->setups.size(); i++){
 						if (kn == -1) {
 							for (int j=0; j<t->setups[i]->getNbKits(); j++){
-								t->setInstrumentParameter(i, j, in, x_what, (double) x);
+								if(playstoptrig) t->playstoptrigInstrument(i, j, in, x_what, 127);
+								else t->setInstrumentParameter(i, j, in, x_what, (double) x);
 							}
 						} else {
-							t->setInstrumentParameter(i, kn, in, x_what, (double) x);
+							if(playstoptrig) t->playstoptrigInstrument(i, kn, in, x_what, 127);
+							else t->setInstrumentParameter(i, kn, in, x_what, (double) x);
 						}
 					}
 				} else {
-					t->setInstrumentParameter(sn, kn, in, x_what, (double) x);
+					if(playstoptrig) t->playstoptrigInstrument(sn, kn, in, x_what, 127);
+					else t->setInstrumentParameter(sn, kn, in, x_what, (double) x);
 				}
 				break;
 			case KIT:
@@ -1001,6 +1047,38 @@ double tapeutape::getInstrumentParameter(int sn, int kn, int in, int x_what){
 	else if (x_what == PLAYREVERSE) x = (double) setups[sn]->getKit(kn)->getInstrument(in)->getPlayReverse();
 	else if (x_what == PITCHOVERRANGE) x = (double) setups[sn]->getKit(kn)->getInstrument(in)->getPitchOverRange();
 	return x;
+}
+
+void tapeutape::playstoptrigInstrument(int sn, int kn, int in, int x_what, const unsigned short t_velocity){
+
+
+	const unsigned short t_channel = setups[sn]->getKit(kn)->getInstrument(in)->getMidiChannel()-1;
+	const unsigned short t_note = setups[sn]->getKit(kn)->getInstrument(in)->getRootNote();
+	const std::vector<tap*>& t = setups[sn]->getKit(kn)->getTap(t_channel, t_note, t_velocity);
+	int noteOn = 0;
+
+	for (int i=0; i<t.size(); i++) {
+		if (x_what == PLAY) noteOn = 1;
+		//setups[sn]->getKit(kn)->getInstrument(in)->addPlaying();
+		if (x_what == STOP) noteOn = 0;
+
+		float pitch = t[i]->getPitch();
+		if(t[i]->getInstrument()->getPlayReverse()) {
+			pitch*=-1.0;
+		}
+		unsigned long id = t_channel * 1000 + t_note;
+		audioEvent ae(
+			t[i]->getVariation(),
+			t[i]->getInstrument(),
+			id,
+			pitch,
+			t[i]->getJackStereoChannel(),
+			t[i]->getVolume(),
+			t[i]->getPanLeft(),
+			t[i]->getPanRight(),
+			noteOn);
+		addAudioEvent(ae);
+	}
 }
 
 
