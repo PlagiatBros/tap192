@@ -2161,13 +2161,15 @@ void execWindow::updateExecTab()
 	{
 		setupLists = new Flat_Hold_Browser*[tap->getNbSetups()];
 		int width = w() / tap->getNbSetups();
+		int y = MENUBAR_HEIGHT+TAB_HEIGHT+30;
+		std::string name;
 		for(int i=0;i<tap->getNbSetups();++i)
 		{
-			std::string name=tap->getSetup(i)->getName();//XXX
-			int y = MENUBAR_HEIGHT+TAB_HEIGHT+30;
-			setupLists[i] = new Flat_Hold_Browser(i*width,y,width,h()-y-MENUBAR_HEIGHT,name.c_str());
+			name=tap->getSetup(i)->getName();
+			setupLists[i] = new Flat_Hold_Browser(i*width,y,width,h()-y-MENUBAR_HEIGHT,"");
 			setupLists[i]->align(FL_ALIGN_TOP|FL_ALIGN_CENTER);
 			setupLists[i]->callback(statExecSetupList,this);
+			setupLists[i]->copy_label(name.c_str());
 			for(int j=0;j<tap->getSetup(i)->getNbKits();++j)
 			{
 				std::string kitName = tap->getSetup(i)->getKit(j)->getName();
