@@ -33,29 +33,29 @@
 
 class setup
 {
-	public:
-		setup();
-		setup(const setup&);
-		~setup();
-		void setName(std::string);
-		std::string getName();
-		const std::vector<tap*>& getTap(const unsigned short&, const unsigned short&, const unsigned short&);
-		int getNbKits();
-		kit *getKit(int);
-		int getCurrentKit();
-		void addKit(kit*);
-		void setKit(int,kit*);
-		void removeKit(int );
-		int changeKit(unsigned short);
-		void setCC(short,short);
-		short getChannel();
-		short getCC();
+    public:
+        setup();
+        setup(const setup&);
+        ~setup();
+        void setName(std::string);
+        std::string getName();
+        const std::vector<tap*>& getTap(const unsigned short&, const unsigned short&, const unsigned short&);
+        int getNbKits();
+        kit *getKit(int);
+        int getCurrentKit();
+        void addKit(kit*);
+        void setKit(int,kit*);
+        void removeKit(int );
+        int changeKit(unsigned short);
+        void setCC(short,short);
+        short getChannel();
+        short getCC();
 
-	private:
-		std::vector<kit*> kits;
-		unsigned short currentKit;
-		short channel,cc;
-		std::string name;
+    private:
+        std::vector<kit*> kits;
+        unsigned short currentKit;
+        short channel,cc;
+        std::string name;
 };
 
 

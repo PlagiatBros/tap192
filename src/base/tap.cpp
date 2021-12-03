@@ -35,13 +35,13 @@ tap::~tap()
 
 std::string tap::getSampleName()
 {
-	sample* s = var->getSample();
-	if(s)
-	{
-		return s->getName();
-	}
-	else
-	{
-		return "no sample yet";
-	}
+    sample* s = var->getSample();
+    if(s)
+    {
+        return s->getName();
+    }
+    else
+    {
+        return "no sample yet";
+    }
 }

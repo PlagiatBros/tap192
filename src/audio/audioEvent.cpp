@@ -37,7 +37,7 @@ m_playTrigger(instru->getPlayMode()),
 m_playLoop(instru->getPlayLoop()),
 m_playReverse(instru->getPlayReverse())
 {
-	if(instru->getPlayReverse()) {
-		offset=var->getSample()->getFramesCount()-1;
-	}
+    if(instru->getPlayReverse()) {
+        offset=var->getSample()->getFramesCount()-1;
+    }
 }

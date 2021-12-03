@@ -42,16 +42,16 @@
 
 class messageWindow : public Fl_Window
 {
-	public:
-			messageWindow(int ,int ,const char*);
-			~messageWindow();
+    public:
+            messageWindow(int ,int ,const char*);
+            ~messageWindow();
 
-			void addMessage(std::string);
-			void clear();
+            void addMessage(std::string);
+            void clear();
 
-	private:
-  			Fl_Text_Display *messages;
-			Fl_Text_Buffer *buf;
+    private:
+              Fl_Text_Display *messages;
+            Fl_Text_Buffer *buf;
 };
 
 #endif

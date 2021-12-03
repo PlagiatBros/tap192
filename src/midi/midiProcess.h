@@ -35,26 +35,26 @@ class tapeutape;
 
 class midiProcess
 {
-	public:
-			midiProcess(tapeutape*,jack_client_t*, int,jack_ringbuffer_t*);
-			~midiProcess();
-			static void* threadExec(void* );//midiThread method
-			int midiInit(); //midi init
-			void midiLoop(); //midi process loop
-			void stopThread(); //stops the midiThread
-			int startThread(); //starts the midiThread
-			void startMidiLearn();
-			void stopMidiLearn();
-			int getAlsaID();
-	private:
-			tapeutape* tapeu;
-			pthread_t midiThread; //midiThread ID
-			snd_seq_t *seqHandle;//sequencer handle
-			int midiInputPort;//midi input port
-			jack_client_t* jackClient;
-			int midiPriority;//realtime priority for the thread
-			jack_ringbuffer_t *EventsRingBuffer;
-			bool midiLearn;
+    public:
+            midiProcess(tapeutape*,jack_client_t*, int,jack_ringbuffer_t*);
+            ~midiProcess();
+            static void* threadExec(void* );//midiThread method
+            int midiInit(); //midi init
+            void midiLoop(); //midi process loop
+            void stopThread(); //stops the midiThread
+            int startThread(); //starts the midiThread
+            void startMidiLearn();
+            void stopMidiLearn();
+            int getAlsaID();
+    private:
+            tapeutape* tapeu;
+            pthread_t midiThread; //midiThread ID
+            snd_seq_t *seqHandle;//sequencer handle
+            int midiInputPort;//midi input port
+            jack_client_t* jackClient;
+            int midiPriority;//realtime priority for the thread
+            jack_ringbuffer_t *EventsRingBuffer;
+            bool midiLearn;
 };
 
 #endif

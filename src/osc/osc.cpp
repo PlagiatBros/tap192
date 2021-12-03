@@ -39,7 +39,7 @@ OSCServer::OSCServer( const char* port )
         exit(1);
     }
 
-	server = lo_server_thread_get_server( serverThread );
+    server = lo_server_thread_get_server( serverThread );
 }
 
 OSCServer::~OSCServer()

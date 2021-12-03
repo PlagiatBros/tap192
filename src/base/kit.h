@@ -34,31 +34,31 @@
 
 class kit
 {
-	public:
-		kit();
-		kit(const kit&);
-		~kit();
-		void setName(std::string);
-		std::string getName();
-		bool isFilled();
-		int getNbInstruments();
-		instrument* getInstrument(int);
-		void addInstrument(instrument*);
-		void removeInstrument(int);
-		const std::vector<tap*>& getTap(const unsigned short&, const unsigned short&, const unsigned short&);
-		void showTaps(int);
-		float compVolume(float,unsigned short,unsigned short,unsigned short);
-		void exec(double);
+    public:
+        kit();
+        kit(const kit&);
+        ~kit();
+        void setName(std::string);
+        std::string getName();
+        bool isFilled();
+        int getNbInstruments();
+        instrument* getInstrument(int);
+        void addInstrument(instrument*);
+        void removeInstrument(int);
+        const std::vector<tap*>& getTap(const unsigned short&, const unsigned short&, const unsigned short&);
+        void showTaps(int);
+        float compVolume(float,unsigned short,unsigned short,unsigned short);
+        void exec(double);
 
-		inline void setVolume(double vol){m_volume=vol;}
-		inline double getVolume(){return m_volume;}
+        inline void setVolume(double vol){m_volume=vol;}
+        inline double getVolume(){return m_volume;}
 
-	private:
-		std::vector<instrument*> instruments;
-		std::string name;
-		std::vector<tap*> taps[16][128][128];
-		double m_volume;
-		double m_globalVolume;
+    private:
+        std::vector<instrument*> instruments;
+        std::string name;
+        std::vector<tap*> taps[16][128][128];
+        double m_volume;
+        double m_globalVolume;
 
 };
 

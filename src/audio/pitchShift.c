@@ -40,99 +40,99 @@ static fftw_complex *out_inv =NULL;
 void fft_init()
 {
 
-  	in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
- 	out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
+      in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
+     out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
 
-      	plan = fftw_plan_dft_1d(N,in,out,FFTW_FORWARD, FFTW_ESTIMATE);
+          plan = fftw_plan_dft_1d(N,in,out,FFTW_FORWARD, FFTW_ESTIMATE);
 
 }
 
 void i_fft_init()
 {
 
-  	in_inv = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
- 	out_inv = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
+      in_inv = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
+     out_inv = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*N);
 
 
-      	plan_inv = fftw_plan_dft_1d(N,in_inv,out_inv,FFTW_BACKWARD, FFTW_ESTIMATE);
+          plan_inv = fftw_plan_dft_1d(N,in_inv,out_inv,FFTW_BACKWARD, FFTW_ESTIMATE);
 
 }
 
 void  fft(frame s)
 {
-	//on transforme le tableau de doubles en tab de fftw_complex
-	int i;
-	for(i=0;i<N;++i)
-		in[i]=s[i] + I*0.0;
+    //on transforme le tableau de doubles en tab de fftw_complex
+    int i;
+    for(i=0;i<N;++i)
+        in[i]=s[i] + I*0.0;
 
-	//on execute la transfo
-	fftw_execute(plan);
+    //on execute la transfo
+    fftw_execute(plan);
 
 }
 
 void  i_fft(double *amp,double *phs)
 {
-	//on transforme les tableaux de doubles en un tab de fftw_complex
-	int i;
-	for(i=0;i<N;++i)
-		in_inv[i]=amp[i]*cos(phs[i]) + I*(amp[i]*sin(phs[i]));
+    //on transforme les tableaux de doubles en un tab de fftw_complex
+    int i;
+    for(i=0;i<N;++i)
+        in_inv[i]=amp[i]*cos(phs[i]) + I*(amp[i]*sin(phs[i]));
 
-	//on execute la transfo
-	fftw_execute(plan_inv);
+    //on execute la transfo
+    fftw_execute(plan_inv);
 }
 
 
 void fft_exit()
 {
 
-	fftw_destroy_plan(plan);
-	free(out);
-	free(in);
-	fftw_destroy_plan(plan_inv);
-	free(out_inv);
-	free(in_inv);
+    fftw_destroy_plan(plan);
+    free(out);
+    free(in);
+    fftw_destroy_plan(plan_inv);
+    free(out_inv);
+    free(in_inv);
 
 }
 
 void cartesian_to_polar (complex *S,double *amp,double *phs,int n)
 {
-	int i;
-	for(i=0;i<n;++i)
-	{
-		amp[i]=(double)cabs(S[i]);
-		phs[i]=(double)carg(S[i]);
-	}
+    int i;
+    for(i=0;i<n;++i)
+    {
+        amp[i]=(double)cabs(S[i]);
+        phs[i]=(double)carg(S[i]);
+    }
 
 }
 
 
 void mul_fen_hann(frame s)
 {
-	double hann[N];
-	int i;
-	for(i=0;i<N;++i)
-		hann[i]=0.5*(1-cos(2*3.14*i/N));
-	for(i=0;i<N;++i)
-		s[i]=s[i]*hann[i];
+    double hann[N];
+    int i;
+    for(i=0;i<N;++i)
+        hann[i]=0.5*(1-cos(2*3.14*i/N));
+    for(i=0;i<N;++i)
+        s[i]=s[i]*hann[i];
 }
 
 
 void fen_zero_phase(frame s)
 {
-	int i;
-	for(i=0;i<N/2;++i)
-	{
-		float tmp = s[i];
-	        s[i]=s[i+N/2];
-		s[i+N/2]=tmp;
-	}
+    int i;
+    for(i=0;i<N/2;++i)
+    {
+        float tmp = s[i];
+            s[i]=s[i+N/2];
+        s[i+N/2]=tmp;
+    }
 }
 
 void robotisation(double *phs)
 {
-	int i;
-	for(i=0;i<N;++i)
-		phs[i]=0.0;
+    int i;
+    for(i=0;i<N;++i)
+        phs[i]=0.0;
 }
 
 
@@ -140,44 +140,44 @@ void robotisation(double *phs)
 //calcul du cepstre
 void calcul_cepstre(double *amp,double *phs,double *cepstre)
 {
-	double *tmp = (double*) malloc(N*sizeof(double));
+    double *tmp = (double*) malloc(N*sizeof(double));
 
 
-	int i;
-	for(i=0;i<N;++i)
-	{
-		tmp[i] = log(amp[i]);
-	}
+    int i;
+    for(i=0;i<N;++i)
+    {
+        tmp[i] = log(amp[i]);
+    }
 
 
-	//transform�e inverse
+    //transform�e inverse
 
-	//on transforme les tableaux de doubles en un tab de fftw_complex
-	for(i=0;i<N;++i)
-		in_inv[i]=(fftw_complex)tmp[i];
+    //on transforme les tableaux de doubles en un tab de fftw_complex
+    for(i=0;i<N;++i)
+        in_inv[i]=(fftw_complex)tmp[i];
 
-	//on execute la transfo
-	fftw_execute(plan_inv);
+    //on execute la transfo
+    fftw_execute(plan_inv);
 
-	//le resultat est dans out_inv
-  	//recupere le signal
-  	int l;
-	for(l=0;l<N;++l)
-		cepstre[l]=creal(out_inv[l]);
+    //le resultat est dans out_inv
+      //recupere le signal
+      int l;
+    for(l=0;l<N;++l)
+        cepstre[l]=creal(out_inv[l]);
 
-	free(tmp);
+    free(tmp);
 }
 
 //fenetre de filtrage passe bas du cepstre
 void calcul_fen_hpb(double* fen,int ordre)
 {
-	int i;
-	fen[0]=1;
-	for(i=1;i<ordre/2;++i)
-		fen[i]=2;
-	fen[ordre/2]=1;
-	for(i=ordre/2+1;i<N;++i)
-		fen[i]=0;
+    int i;
+    fen[0]=1;
+    for(i=1;i<ordre/2;++i)
+        fen[i]=2;
+    fen[ordre/2]=1;
+    for(i=ordre/2+1;i<N;++i)
+        fen[i]=0;
 }
 
 
@@ -186,32 +186,32 @@ void calcul_fen_hpb(double* fen,int ordre)
 //calcul_enveloppe_spectrale
 void calcul_env_spectr(double *env,double *amp,double* phs )
 {
-	int ordre = 50;
-	double *cepstre = (double*) malloc(N*sizeof(double));
-	double *fen = (double*) malloc(N*sizeof(double));
+    int ordre = 50;
+    double *cepstre = (double*) malloc(N*sizeof(double));
+    double *fen = (double*) malloc(N*sizeof(double));
 
 
-	//calcul du cesptre
-	calcul_cepstre(amp,phs,cepstre);
-	//calcul de la fenetre de filtrage passe bas
-	calcul_fen_hpb(fen,ordre);
+    //calcul du cesptre
+    calcul_cepstre(amp,phs,cepstre);
+    //calcul de la fenetre de filtrage passe bas
+    calcul_fen_hpb(fen,ordre);
 
-	int i;
+    int i;
 
 
-	//filtrage du cepstre
-	for(i=0;i<N;++i)
-		cepstre[i]*=fen[i];
+    //filtrage du cepstre
+    for(i=0;i<N;++i)
+        cepstre[i]*=fen[i];
 
-	//calcul de l'enveloppe spectrale
+    //calcul de l'enveloppe spectrale
 
-		//transformee de fourier
-		fft(cepstre);
+        //transformee de fourier
+        fft(cepstre);
 
-		//on recupere le resultat dans out
-		int l;
-		for(l=0;l<N;++l)
-			env[l]=cabs(cexp(out[l]/N));
+        //on recupere le resultat dans out
+        int l;
+        for(l=0;l<N;++l)
+            env[l]=cabs(cexp(out[l]/N));
 
 
 
@@ -221,65 +221,65 @@ void calcul_env_spectr(double *env,double *amp,double* phs )
 
 void decale_env_spect(double *env,int decalage)
 {
-	int i;
+    int i;
 
-	//on applique le decalage
-	if(decalage<0)
-	{
-		decalage*=(-1);
-		for(i=decalage;i<N/2;++i)
-		{
-			env[i-decalage]=env[i];
-		}
-		for(i=N/2-decalage;i<N/2;++i)
-		{
-			env[i]=0;
-		}
+    //on applique le decalage
+    if(decalage<0)
+    {
+        decalage*=(-1);
+        for(i=decalage;i<N/2;++i)
+        {
+            env[i-decalage]=env[i];
+        }
+        for(i=N/2-decalage;i<N/2;++i)
+        {
+            env[i]=0;
+        }
 
-	}
-	else
-	{
-		for(i=N/2;i>=decalage;--i)
-		{
-			env[i]=env[i-decalage];
-		}
-		for(i=decalage;i>=0;--i)
-		{
-			env[i]=0;
-		}
-	}
+    }
+    else
+    {
+        for(i=N/2;i>=decalage;--i)
+        {
+            env[i]=env[i-decalage];
+        }
+        for(i=decalage;i>=0;--i)
+        {
+            env[i]=0;
+        }
+    }
 
-	//symetrique
-	for(i=0;i<N/2;++i)
-	{
-		env[N-1-i]=env[i];
-	}
+    //symetrique
+    for(i=0;i<N/2;++i)
+    {
+        env[N-1-i]=env[i];
+    }
 }
 
 
 void passe_bas(double* env, int f)
 {
-	int i;
-	for(i=f;i<N/2;i++)
-		env[i]=0;
-	//symetrique
-	for(i=0;i<N/2;++i)
-	{
-		env[N-1-i]=env[i];
-	}
+    int i;
+    for(i=f;i<N/2;i++)
+        env[i]=0;
+    //symetrique
+    for(i=0;i<N/2;++i)
+    {
+        env[N-1-i]=env[i];
+    }
 
 }
 
 void passe_haut(double* env, int f)
 {
-	int i;
-	for(i=0;i<f;i++)
-		env[i]=0;
-	//symetrique
-	for(i=0;i<N/2;++i)
-	{
-		env[N-1-i]=env[i];
-	}
+    int i;
+    for(i=0;i<f;i++)
+        env[i]=0;
+    //symetrique
+    for(i=0;i<N/2;++i)
+    {
+        env[N-1-i]=env[i];
+    }
 
 }
 
@@ -295,9 +295,9 @@ sound_file_open_read (char *sound_file_name)
   assert (sound_file_name);
 
   snprintf (cmd, MAX_CMD,
-	    "sox %s -c %d -r %d -sw %s",
-	    sound_file_name,
-	    CHANNELS_NUMBER, (int)SAMPLING_RATE, SOUND_FILE_NAME_READ);
+        "sox %s -c %d -r %d -sw %s",
+        sound_file_name,
+        CHANNELS_NUMBER, (int)SAMPLING_RATE, SOUND_FILE_NAME_READ);
 
   system (cmd);
 
@@ -376,9 +376,9 @@ sound_file_close_write (FILE *fp)
   fclose (fp);
 
   snprintf (cmd, MAX_CMD,
-	    "sox -c %d -r %d -sw %s %s",
-	    CHANNELS_NUMBER, (int)SAMPLING_RATE, SOUND_FILE_NAME_WRITE,
-	    sound_file_name_write);
+        "sox -c %d -r %d -sw %s %s",
+        CHANNELS_NUMBER, (int)SAMPLING_RATE, SOUND_FILE_NAME_WRITE,
+        sound_file_name_write);
 
   system (cmd);
 
@@ -396,7 +396,7 @@ sound_file_write (frame s, FILE *fp)
 
   for (i=0; i<N/2; i++)
     {
-	   //on va ajouter la fin de la trame pr�c�dente a la trame courante
+       //on va ajouter la fin de la trame pr�c�dente a la trame courante
       real v = s[i] + cache_out[i];
       short _s = (v < -1) ? -32768 : (v > 1) ? 32767 : (short) (v * 32767);
 
@@ -406,9 +406,9 @@ sound_file_write (frame s, FILE *fp)
       int channel;
 
       for (channel=0; channel<CHANNELS_NUMBER; channel++)
-	{
-	  tmp[i*CHANNELS_NUMBER+channel] = _s;
-	}
+    {
+      tmp[i*CHANNELS_NUMBER+channel] = _s;
+    }
     }
 
   fwrite (tmp, sizeof(short), N/2*CHANNELS_NUMBER, fp);
@@ -460,70 +460,70 @@ main (int argc, char *argv[])
   while (sound_file_read (input, s))
     {
 
-	//on applique deja une fenetre de hann pour ameliorer l'analyse
-	mul_fen_hann(s);
+    //on applique deja une fenetre de hann pour ameliorer l'analyse
+    mul_fen_hann(s);
 
-	//on applique le fenetrage zero phase
-	fen_zero_phase(s);
+    //on applique le fenetrage zero phase
+    fen_zero_phase(s);
 
-      	// Fourier analysis
-	fft(s);
+          // Fourier analysis
+    fft(s);
 
-	//le resultat est dans out
-	//on recupere les spectres d'amplitude et de phase
-	cartesian_to_polar(out,amp,phs,N);
+    //le resultat est dans out
+    //on recupere les spectres d'amplitude et de phase
+    cartesian_to_polar(out,amp,phs,N);
 
-	//Calcul de l'enveloppe spectrale(filtre) et de la source
-	calcul_env_spectr(env,amp,phs);
+    //Calcul de l'enveloppe spectrale(filtre) et de la source
+    calcul_env_spectr(env,amp,phs);
 
-	int i;
-	for(i =0;i<N;++i)
-		source[i] = amp[i]/env[i];
-
-
-	//Decalage de l'enveloppe spectrale
-
-	//decale_env_spect(env,-50);
-
-	//Passe
-	passe_haut(env,300);
-
-	//PitchShifing : on bidouille la source puis on reapplique l'enveloppe
-	// spectrale
+    int i;
+    for(i =0;i<N;++i)
+        source[i] = amp[i]/env[i];
 
 
-	//on recalcule le signal
-	for(i =0;i<N;++i)
-		amp[i]= env[i]*source[i];
+    //Decalage de l'enveloppe spectrale
 
-	//Affichage du spectre et de l'enveloppe
-	/* nanosecondes*/
-	a.tv_nsec = (long)100000000;
-	/* secondes */
-	a.tv_sec=(time_t)0;
-	/*gnuplot_resetplot (temporal);
-	gnuplot_plot_x(temporal,env, N, "enveloppe");
-	gnuplot_plot_x(temporal,amp, N, "spectre d'amplitude");
-	*/
+    //decale_env_spect(env,-50);
 
-  	//sleep(1);
+    //Passe
+    passe_haut(env,300);
 
-      	// Fourier synthesis
+    //PitchShifing : on bidouille la source puis on reapplique l'enveloppe
+    // spectrale
 
-	i_fft(amp,phs);
 
-	//le resultat est dans out_inv
-  	//recupere le signal
-  	int l;
-	for(l=0;l<N;++l)
-		s[l]=creal(out_inv[l])/(N);
+    //on recalcule le signal
+    for(i =0;i<N;++i)
+        amp[i]= env[i]*source[i];
 
-	//on applique le fenetrage zero phase
-	fen_zero_phase(s);
+    //Affichage du spectre et de l'enveloppe
+    /* nanosecondes*/
+    a.tv_nsec = (long)100000000;
+    /* secondes */
+    a.tv_sec=(time_t)0;
+    /*gnuplot_resetplot (temporal);
+    gnuplot_plot_x(temporal,env, N, "enveloppe");
+    gnuplot_plot_x(temporal,amp, N, "spectre d'amplitude");
+    */
 
-	//on ecrit la frame dans le fichier de sortie
+      //sleep(1);
 
-	sound_file_write (s, output);
+          // Fourier synthesis
+
+    i_fft(amp,phs);
+
+    //le resultat est dans out_inv
+      //recupere le signal
+      int l;
+    for(l=0;l<N;++l)
+        s[l]=creal(out_inv[l])/(N);
+
+    //on applique le fenetrage zero phase
+    fen_zero_phase(s);
+
+    //on ecrit la frame dans le fichier de sortie
+
+    sound_file_write (s, output);
     }
 
 

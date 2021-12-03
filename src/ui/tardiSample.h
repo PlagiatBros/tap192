@@ -35,29 +35,29 @@ using namespace std;
 
 class tardiSample : public Fl_Widget
 {
-	public 	:
-			tardiSample(int , int , int , int , const char*);
-			~tardiSample();
-			void draw();
-			int handle(int);
-			void setBuffers(float**);
-			void setNbChannels(int);
-			void setFramesCount(long);
-			void handlePush(int,int);
-			void handleDrag(int,int);
-			void handleRelease(int,int);
-	private :
-			int nbChannels;
-			float zoom;
-			int step;
-			float** buffers;
-			long e1X,e2X,e3X,e4X;
-			float e1Y,e2Y,e3Y,e4Y;
-			long framesCount;
-			int pointSize;
+    public     :
+            tardiSample(int , int , int , int , const char*);
+            ~tardiSample();
+            void draw();
+            int handle(int);
+            void setBuffers(float**);
+            void setNbChannels(int);
+            void setFramesCount(long);
+            void handlePush(int,int);
+            void handleDrag(int,int);
+            void handleRelease(int,int);
+    private :
+            int nbChannels;
+            float zoom;
+            int step;
+            float** buffers;
+            long e1X,e2X,e3X,e4X;
+            float e1Y,e2Y,e3Y,e4Y;
+            long framesCount;
+            int pointSize;
 
-			int selectedWidget;
-			int prevMX,prevMY;
+            int selectedWidget;
+            int prevMX,prevMY;
 };
 
 

@@ -34,16 +34,16 @@ class Flat_Double_Window : public Fl_Double_Window
         Flat_Double_Window(int W, int H, const char *L = 0) : Fl_Double_Window(W,H,L)
         {
 
-        	Fl::set_color(COLOR_REAR,33,37,43);
-        	Fl::set_color(COLOR_FRONT,50,54,62);
+            Fl::set_color(COLOR_REAR,33,37,43);
+            Fl::set_color(COLOR_FRONT,50,54,62);
             Fl::set_color(COLOR_RAISED,70,74,82);
 
-        	Fl::set_color(FL_BACKGROUND_COLOR,33,37,43);
-        	Fl::set_color(FL_BACKGROUND2_COLOR,33,37,43);
+            Fl::set_color(FL_BACKGROUND_COLOR,33,37,43);
+            Fl::set_color(FL_BACKGROUND2_COLOR,33,37,43);
 
-        	Fl::set_color(FL_FOREGROUND_COLOR,220,220,220);
-        	Fl::set_color(FL_INACTIVE_COLOR,160,160,160);
-        	Fl::set_color(FL_SELECTION_COLOR,200,200,200);
+            Fl::set_color(FL_FOREGROUND_COLOR,220,220,220);
+            Fl::set_color(FL_INACTIVE_COLOR,160,160,160);
+            Fl::set_color(FL_SELECTION_COLOR,200,200,200);
 
             Fl::set_color(COLOR_BLACK,10,10,10);
             Fl::set_color(COLOR_WHITE,220,220,220);
@@ -60,7 +60,7 @@ class Flat_Window : public Fl_Window
         Flat_Window(int W, int H, const char *L = 0) : Fl_Window(W,H,L)
         {
 
-        	color(COLOR_FRONT);
+            color(COLOR_FRONT);
         }
 };
 

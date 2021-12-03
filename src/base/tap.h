@@ -29,24 +29,24 @@
 
 class tap
 {
-	public:
-		tap(variation*,instrument*,double,double,double,double);
-		~tap();
-		inline double getPitch(){return pitch;};
-		inline double getVolume(){return volume;};
-		inline double getPanLeft(){return panLeft;};
-		inline double getPanRight(){return panRight;};
-		std::string getSampleName();
-		inline variation* getVariation(){return var;};
-		inline instrument* getInstrument(){return instru;};
-		inline int getJackStereoChannel(){return instru->getJackStereoChannel();};
-	private:
-		variation* var;
-		instrument* instru;
-		double volume;
-		double panLeft;
-		double panRight;
-		double pitch;
+    public:
+        tap(variation*,instrument*,double,double,double,double);
+        ~tap();
+        inline double getPitch(){return pitch;};
+        inline double getVolume(){return volume;};
+        inline double getPanLeft(){return panLeft;};
+        inline double getPanRight(){return panRight;};
+        std::string getSampleName();
+        inline variation* getVariation(){return var;};
+        inline instrument* getInstrument(){return instru;};
+        inline int getJackStereoChannel(){return instru->getJackStereoChannel();};
+    private:
+        variation* var;
+        instrument* instru;
+        double volume;
+        double panLeft;
+        double panRight;
+        double pitch;
 };
 
 #endif /* _TAP_H */

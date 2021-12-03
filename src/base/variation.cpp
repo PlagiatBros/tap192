@@ -34,7 +34,7 @@ variation::variation():minVeloc(0),maxVeloc(127),sound(NULL)
 
 variation::variation(const variation &var):sound(var.sound),minVeloc(var.minVeloc),maxVeloc(var.maxVeloc)
 {
-	if (sound != NULL) sound->addUser();
+    if (sound != NULL) sound->addUser();
 }
 
 variation::~variation()
@@ -44,59 +44,59 @@ variation::~variation()
 
 void variation::setMidi(short com,short chan,short min,short max)
 {
-	switch(com)
-	{
-		case 0://velocity range
-		{
-			minVeloc=min;
-			maxVeloc=max;
-		}
-		break;
-		default:break;
-	}
+    switch(com)
+    {
+        case 0://velocity range
+        {
+            minVeloc=min;
+            maxVeloc=max;
+        }
+        break;
+        default:break;
+    }
 }
 
 void variation::setMaxVeloc(unsigned short vmax)
 {
-	 maxVeloc=vmax;
+     maxVeloc=vmax;
 }
 
 void variation::setMinVeloc(unsigned short vmin)
 {
-	 minVeloc=vmin;
+     minVeloc=vmin;
 }
 
 unsigned short variation::getMaxVeloc()
 {
-	 return maxVeloc;
+     return maxVeloc;
 }
 
 unsigned short variation::getMinVeloc()
 {
-	 return minVeloc;
+     return minVeloc;
 }
 
 int variation::setSample(sample* s)
 {
-	sound = s;
-	if(!s)
-	{
-		return -1;
-	}
-	return 0;
+    sound = s;
+    if(!s)
+    {
+        return -1;
+    }
+    return 0;
 }
 
 sample* variation::getSample()
 {
-	return sound;
+    return sound;
 }
 
 void variation::getFrame(const int& channel, const double& offset, jack_default_audio_sample_t& frame)
 {
-	if(sound) {
-		return sound->getFrame(channel,offset, frame);
-	}
-	else {
-		frame=0;
-	}
+    if(sound) {
+        return sound->getFrame(channel,offset, frame);
+    }
+    else {
+        frame=0;
+    }
 }

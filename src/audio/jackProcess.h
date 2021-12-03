@@ -36,37 +36,37 @@ class tapeutape;
 
 class jackProcess
 {
-	public:
-		jackProcess(tapeutape*, jack_ringbuffer_t*,int);
-		~jackProcess();
-		int init();
-		int start();
-		void addPort(std::string);
-		void removePort(int);
-		void renamePort(int,std::string);
-		jack_client_t* getClient();
-		int getSampleRate();
-		friend int process(jack_nframes_t , void *);
-		friend int sRate(jack_nframes_t , void *);
-		friend void shutdown(void*);
+    public:
+        jackProcess(tapeutape*, jack_ringbuffer_t*,int);
+        ~jackProcess();
+        int init();
+        int start();
+        void addPort(std::string);
+        void removePort(int);
+        void renamePort(int,std::string);
+        jack_client_t* getClient();
+        int getSampleRate();
+        friend int process(jack_nframes_t , void *);
+        friend int sRate(jack_nframes_t , void *);
+        friend void shutdown(void*);
 
-		void addAudioEvent(const audioEvent&);
+        void addAudioEvent(const audioEvent&);
 
-	protected:
-		tapeutape* tap;
-		jack_ringbuffer_t* EventsRingBuffer;
-		jack_client_t *jackClient;
-		int sampleRate;
-		std::vector<audioEvent> audioEvents;
-		int polyphonie;
-		int nbJackStereoChannels;
-		std::vector<jack_port_t*> outputPorts[2];
+    protected:
+        tapeutape* tap;
+        jack_ringbuffer_t* EventsRingBuffer;
+        jack_client_t *jackClient;
+        int sampleRate;
+        std::vector<audioEvent> audioEvents;
+        int polyphonie;
+        int nbJackStereoChannels;
+        std::vector<jack_port_t*> outputPorts[2];
 
-		std::vector<audioEvent> m_processRingBuffer;
-		int m_processRingBufferReadPosition;
-		int m_processRingBufferFilledCount;
-		int m_processRingBufferWritePosition;
-		int m_processRingBufferEmptyCount;
+        std::vector<audioEvent> m_processRingBuffer;
+        int m_processRingBufferReadPosition;
+        int m_processRingBufferFilledCount;
+        int m_processRingBufferWritePosition;
+        int m_processRingBufferEmptyCount;
 };
 
 

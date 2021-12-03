@@ -36,24 +36,24 @@ using namespace std;
 
 class tardiPiano : public Fl_Widget
 {
-	public 	:
-			tardiPiano(int , int , int , int , const char*);
-			~tardiPiano();
-			void draw();
-			int handle(int);
-			int trouve_note(int,int);
-			int getLSelect();
-			int getRSelect();
-			int getMSelect();
-			void maj();
-			void setLSelect(int);
-			void setRSelect(int);
-			void setMSelect(int);
+    public     :
+            tardiPiano(int , int , int , int , const char*);
+            ~tardiPiano();
+            void draw();
+            int handle(int);
+            int trouve_note(int,int);
+            int getLSelect();
+            int getRSelect();
+            int getMSelect();
+            void maj();
+            void setLSelect(int);
+            void setRSelect(int);
+            void setMSelect(int);
 
-	private :
-		 	float touches[128][2];//0:posX,1:type
-			int lSelect,rSelect,mSelect;
-			int mouse;
+    private :
+             float touches[128][2];//0:posX,1:type
+            int lSelect,rSelect,mSelect;
+            int mouse;
 };
 
 

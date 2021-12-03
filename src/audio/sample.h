@@ -35,40 +35,40 @@
 
 class sample
 {
-	public:
-		sample();
-		~sample();
+    public:
+        sample();
+        ~sample();
 
-		std::string getName();
-		std::string getAbsoluteName();
-		std::string getRelativeName();
+        std::string getName();
+        std::string getAbsoluteName();
+        std::string getRelativeName();
 
-		int tryLoad(char*,char*,std::string);
-		int load(char*);
-		void unload();
-		void processFileName(std::string,std::string);
+        int tryLoad(char*,char*,std::string);
+        int load(char*);
+        void unload();
+        void processFileName(std::string,std::string);
 
-		void addUser();
-		int getNbUsers();
-		void removeUser();
+        void addUser();
+        int getNbUsers();
+        void removeUser();
 
-		void getFrame(const int&, const double&, jack_default_audio_sample_t&);
-		inline int getChannelsCount(){return channelsCount;};
-		inline long getFramesCount(){return framesCount;};
-		inline bool isLoaded(){return loaded;};
-		jack_default_audio_sample_t** getBuffers();
-		void setSampleRate(int);
+        void getFrame(const int&, const double&, jack_default_audio_sample_t&);
+        inline int getChannelsCount(){return channelsCount;};
+        inline long getFramesCount(){return framesCount;};
+        inline bool isLoaded(){return loaded;};
+        jack_default_audio_sample_t** getBuffers();
+        void setSampleRate(int);
 
-	private:
-		std::string name;
-		std::string absoluteName;
-		std::string relativeName;
-		jack_default_audio_sample_t** buffers;
-		int channelsCount;
-		int sampleRate;
-		long framesCount;
-		bool loaded;
-		int nbUsers;
+    private:
+        std::string name;
+        std::string absoluteName;
+        std::string relativeName;
+        jack_default_audio_sample_t** buffers;
+        int channelsCount;
+        int sampleRate;
+        long framesCount;
+        bool loaded;
+        int nbUsers;
 };
 
 enum { TABSIZE = 256 };

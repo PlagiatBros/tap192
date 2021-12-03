@@ -28,81 +28,81 @@
 #include <math.h>
 #include <iostream>
 
-class audioEvent			//audio event triggered by midi
+class audioEvent            //audio event triggered by midi
 {
-	public:
-			audioEvent();
-			audioEvent(variation*,instrument*,unsigned long,double,int,double,double,double,bool);
-			inline variation* getVariation(){return var;}
-			inline instrument* getInstrument(){return instru;}
-			inline double getPitch(){return pitch;}
-			inline double getPanLeft(){return panLeft;}
-			inline double getPanRight(){return panRight;}
-			inline unsigned long getID(){return id;}
-			inline bool getEvent(){return event;}
-			inline double getOffset(){return offset;}
-			inline int getJackStereoChannel(){return jackStereoChannel;}
-			//we add the pitch to the offset, if the play mode is repeat, we go back to the beginning of the sample
-			inline void addOffset()
-			{
-				offset+=pitch;
-				if(m_playLoop) {
-					if(!m_playReverse && offset>=var->getSample()->getFramesCount()) {
-						//offset-=var->getSample()->getFramesCount();
-						offset=0;
-					}
-					else if(m_playReverse && offset<=0) {
-						offset=var->getSample()->getFramesCount()-1;
-					}
-				}
-			}
-			//we start fading out
-			inline void fadeOut(int nframes)
-			{
-				fade=volume/1000.0;
-			}
+    public:
+            audioEvent();
+            audioEvent(variation*,instrument*,unsigned long,double,int,double,double,double,bool);
+            inline variation* getVariation(){return var;}
+            inline instrument* getInstrument(){return instru;}
+            inline double getPitch(){return pitch;}
+            inline double getPanLeft(){return panLeft;}
+            inline double getPanRight(){return panRight;}
+            inline unsigned long getID(){return id;}
+            inline bool getEvent(){return event;}
+            inline double getOffset(){return offset;}
+            inline int getJackStereoChannel(){return jackStereoChannel;}
+            //we add the pitch to the offset, if the play mode is repeat, we go back to the beginning of the sample
+            inline void addOffset()
+            {
+                offset+=pitch;
+                if(m_playLoop) {
+                    if(!m_playReverse && offset>=var->getSample()->getFramesCount()) {
+                        //offset-=var->getSample()->getFramesCount();
+                        offset=0;
+                    }
+                    else if(m_playReverse && offset<=0) {
+                        offset=var->getSample()->getFramesCount()-1;
+                    }
+                }
+            }
+            //we start fading out
+            inline void fadeOut(int nframes)
+            {
+                fade=volume/1000.0;
+            }
 
-			inline int getPlayingLength(int nframes)
-			{
-				int length= (int)nframes;
-				//if looping, always return the max nb of frames
-				//if not looping
-				if(!m_playLoop)
-				{
-					if(m_playReverse) {
-						length = (floor(((double)offset)/fabs(pitch)) < nframes) ? (int)floor(((double)offset)/fabs(pitch)) : (int)nframes;
-					}
-					else {
-						length = (floor( ((double)(var->getSample()->getFramesCount()) - offset)/fabs(pitch)) < nframes )? (int)floor( ((double)(var->getSample()->getFramesCount()) - offset)/fabs(pitch)) : (int)nframes;
+            inline int getPlayingLength(int nframes)
+            {
+                int length= (int)nframes;
+                //if looping, always return the max nb of frames
+                //if not looping
+                if(!m_playLoop)
+                {
+                    if(m_playReverse) {
+                        length = (floor(((double)offset)/fabs(pitch)) < nframes) ? (int)floor(((double)offset)/fabs(pitch)) : (int)nframes;
+                    }
+                    else {
+                        length = (floor( ((double)(var->getSample()->getFramesCount()) - offset)/fabs(pitch)) < nframes )? (int)floor( ((double)(var->getSample()->getFramesCount()) - offset)/fabs(pitch)) : (int)nframes;
 
-					}
-				}
-				return length;
-			}
+                    }
+                }
+                return length;
+            }
 
-			inline double getVolume()
-			{
-				//if we are fading out, we decrease the volume
-				if(fade!=1.0)
-					volume-=fade;
-				return volume;
-			}
+            inline double getVolume()
+            {
+                //if we are fading out, we decrease the volume
+                if(fade!=1.0)
+                    volume-=fade;
+                return volume;
+            }
 
-	private:
-			variation* var;
-			instrument* instru;
-			double pitch;
-			unsigned long id;
-			bool event;
-			double volume;
-			double panLeft;
-			double panRight;
-			double fade;
-			int jackStereoChannel;
-			double offset;
-			bool m_playTrigger;
-			bool m_playLoop;
-			bool m_playReverse;
+    private:
+            variation* var;
+            instrument* instru;
+            double pitch;
+            unsigned long id;
+            bool event;
+            double volume;
+            double panLeft;
+            double panRight;
+            double fade;
+            int jackStereoChannel;
+            double offset;
+            bool m_playTrigger;
+            bool m_playLoop;
+            bool m_playReverse;
 };
 
 #endif

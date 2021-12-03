@@ -34,37 +34,37 @@ class tapeutape;
 
 class tapParser
 {
-	public:
-		tapParser(tapeutape*);
-		~tapParser();
-		int createTree(char*);
-		int parseTree();
-		int recParseTree(xmlNode*);
+    public:
+        tapParser(tapeutape*);
+        ~tapParser();
+        int createTree(char*);
+        int parseTree();
+        int recParseTree(xmlNode*);
 
-		int parse005(xmlNodePtr);
-		int parseCurrent(xmlNodePtr);
+        int parse005(xmlNodePtr);
+        int parseCurrent(xmlNodePtr);
 
-		int parseOptions(xmlNodePtr);
-		int parseCreation(xmlNodePtr);
-		int parseSetup(xmlNodePtr);
-		int parseKit(xmlNodePtr,setup*);
-		int parseInstrument(xmlNodePtr,kit*);
-		int parseVariation(xmlNodePtr,instrument*);
+        int parseOptions(xmlNodePtr);
+        int parseCreation(xmlNodePtr);
+        int parseSetup(xmlNodePtr);
+        int parseKit(xmlNodePtr,setup*);
+        int parseInstrument(xmlNodePtr,kit*);
+        int parseVariation(xmlNodePtr,instrument*);
 
-		int saveToFile(char*);
+        int saveToFile(char*);
 
-	private:
+    private:
 
-		char* fileName;
-		xmlDocPtr doc;
-		xmlNode *root_element;
-		tapeutape *tap;
-		bool creationMode;
-		bool optionsMode;
-		kit* currentKit;
-		instrument* currentInstru;
-		variation* currentVar;
-		setup* currentSetup;
+        char* fileName;
+        xmlDocPtr doc;
+        xmlNode *root_element;
+        tapeutape *tap;
+        bool creationMode;
+        bool optionsMode;
+        kit* currentKit;
+        instrument* currentInstru;
+        variation* currentVar;
+        setup* currentSetup;
 };
 
 

@@ -143,7 +143,7 @@ int main(int argc, char** argv)
         global_filename = nsm_folder + "/sampler.tap";
         std::ifstream infile(global_filename);
         if(!infile.good())
-		    tap_instance->save((char *)global_filename.c_str());
+            tap_instance->save((char *)global_filename.c_str());
         else {
             tap_instance->load((char *)global_filename.c_str());
             tap_instance->start();
@@ -152,11 +152,11 @@ int main(int argc, char** argv)
         // register callbacks
         nsm_set_save_callback(nsm, nsm_save_cb, 0);
     }
-	else
-		tap_instance = new tapeutape((char *)global_filename.c_str());
+    else
+        tap_instance = new tapeutape((char *)global_filename.c_str());
 
     int r;
-	Fl::lock();
+    Fl::lock();
     if (nsm) {
         if (!global_nsm_opional_gui) tap_instance->setVisible(true);
         while (true) {

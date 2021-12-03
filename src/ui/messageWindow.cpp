@@ -29,13 +29,13 @@ using namespace std;
 
 messageWindow::messageWindow(int w,int h,const char* titre):Fl_Window(w,h,titre)
 {
-	//better look
-	Fl::scheme("gtk+");
+    //better look
+    Fl::scheme("gtk+");
 
-	messages = new Fl_Text_Display(0,0,w,h,"Messages");
-	buf = new Fl_Text_Buffer();
-	messages->buffer(buf);
-	messages->insert_position(0);
+    messages = new Fl_Text_Display(0,0,w,h,"Messages");
+    buf = new Fl_Text_Buffer();
+    messages->buffer(buf);
+    messages->insert_position(0);
 
 
 }
@@ -47,16 +47,16 @@ messageWindow::~messageWindow()
 
 void messageWindow::addMessage(std::string m)
 {
-	std::string mess = m+"\n";
-	messages->insert(mess.c_str());
-	messages->show_insert_position();
-	messages->redraw();
-	Fl::check();
+    std::string mess = m+"\n";
+    messages->insert(mess.c_str());
+    messages->show_insert_position();
+    messages->redraw();
+    Fl::check();
 }
 
 void messageWindow::clear()
 {
-	buf->remove(0,buf->length());
-	messages->redraw();
-	Fl::check();
+    buf->remove(0,buf->length());
+    messages->redraw();
+    Fl::check();
 }

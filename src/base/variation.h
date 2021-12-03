@@ -32,21 +32,21 @@
 class variation
 {
 
-	public:
-		variation();
-		variation(const variation &);
-		~variation();
-		void setMidi(short,short,short,short);
-		void setMaxVeloc(unsigned short);
-		void setMinVeloc(unsigned short);
-		unsigned short getMaxVeloc();
-		unsigned short getMinVeloc();
-		int setSample(sample*);
-		sample* getSample();
-		void getFrame(const int&, const double&, jack_default_audio_sample_t&);
+    public:
+        variation();
+        variation(const variation &);
+        ~variation();
+        void setMidi(short,short,short,short);
+        void setMaxVeloc(unsigned short);
+        void setMinVeloc(unsigned short);
+        unsigned short getMaxVeloc();
+        unsigned short getMinVeloc();
+        int setSample(sample*);
+        sample* getSample();
+        void getFrame(const int&, const double&, jack_default_audio_sample_t&);
 
-	private:
-		unsigned short maxVeloc,minVeloc;
-		sample *sound;
+    private:
+        unsigned short maxVeloc,minVeloc;
+        sample *sound;
 };
 #endif
