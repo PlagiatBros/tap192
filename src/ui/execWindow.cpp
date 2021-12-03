@@ -1845,7 +1845,7 @@ void execWindow::cbCreaVolume(Fl_Widget*)
 	switch(creaActiveList)
 	{
 		case 1:
-			{
+			if (creaSelectedKit != -1) {
 				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->setVolume(creaVolume->value());
 				//recreate the tap list
 				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
@@ -1853,7 +1853,7 @@ void execWindow::cbCreaVolume(Fl_Widget*)
 			}
 			break;
 		case 2:
-			{
+			if (creaSelectedInst != -1) {
 				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->getInstrument(creaSelectedInst)->setVolume(creaVolume->value());
 				//recreate the tap list
 				tap->getSetup(creaSelectedSetup)->getKit(creaSelectedKit)->exec(tap->getGlobalVolume());
