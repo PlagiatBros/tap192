@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tapeutape version="0.1.2">
+  <options globalvolume="1.000000" max_polyphony="100">
+    <jack-output name=""/>
+  </options>
+  <creation/>
+</tapeutape>

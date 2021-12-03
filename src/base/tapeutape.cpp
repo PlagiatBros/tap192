@@ -63,10 +63,8 @@ tapeutape::tapeutape(char *fn):polyphony(100),globalVolume(1.0),fileName(""),jac
 {
 	fileName="";
 
-	#ifdef WITH_GUI
-		//start the ui
-		execWin = new execWindow("Tapeutape",this);
-	#endif
+	//start the ui
+	execWin = new execWindow("Tapeutape",this);
 
 	//ring buffer
 	eventsRingBuffer = jack_ringbuffer_create(RING_BUFFER_SIZE);
@@ -108,56 +106,6 @@ tapeutape::tapeutape(char *fn):polyphony(100),globalVolume(1.0),fileName(""),jac
 	//if everything's ok
 	showMessage(false,"Let's play !! ");
 
-	#ifndef WITH_GUI
-	while(loop)
-	{
-		showMessage(false,"Menu :");
-		showMessage(false,"1 : Open File");
-		showMessage(false,"2 : Reset/Reload File");
-		showMessage(false,"3 : Quit");
-		int choice;
-		while(!(cin>>choice) || choice<1 || choice>3)
-		{
-			if ( cin.fail() )
-			{
-			    cin.clear();
-			    cin.ignore( numeric_limits<streamsize>::max(), '\n' );
-			}
-			showMessage(false,"Incorrect Choice");
-			showMessage(false,"Menu :");
-			showMessage(false,"1 : Open File");
-			showMessage(false,"2 : Reset/Reload File");
-			showMessage(false,"3 : Quit");
-		}
-		if(choice==1)
-		{
-			std::string f;
-			showMessage(false,"Enter the file name:");
-			cin>>f;
-			size_t size = f.size() + 1;
-			char * cf = new char[ size ];
-			strncpy( cf, f.c_str(), size );
-			load(cf);
-			delete [] cf;
-			start();
-		}
-		else if(choice==2)
-		{
-			std::string f = getCompleteFileName();
-			size_t size = f.size() + 1;
-			char * cf = new char[ size ];
-			strncpy( cf, f.c_str(), size );
-			load(cf);
-			start();
-			delete [] cf;
-		}
-		else if(choice==3)
-		{
-			stop();
-			loop=false;
-		}
-	}
-	#endif
 }
 
 
@@ -628,13 +576,9 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 
 void tapeutape::showMessage(bool t,std::string mess)
 {
-	#ifdef WITH_GUI
-		Fl::lock();
-		execWin->showMessage(t,mess);
-		Fl::unlock();
-	#else
-		cout<<"<Tapeutape> "<<mess<<endl;
-	#endif
+	Fl::lock();
+	execWin->showMessage(t,mess);
+	Fl::unlock();
 }
 
 std::string tapeutape::getFileName()
@@ -742,20 +686,11 @@ int tapeutape::start()
 	//create the array of taps for each setup
 	createTaps();
 
-	//(re)init lash
-	#ifdef WITH_LASH
-		sleep(2);
-		lashC->setAlsa(midi->getAlsaID());
-		lashC->setJack();
-	#endif
-
 	//(re)init the gui
-	#ifdef WITH_GUI
-		Fl::lock();
-		execWin->init();
-		execWin->setTitle("Tapeutape : "+getFileName());
-		Fl::unlock();
-	#endif
+	Fl::lock();
+	execWin->init();
+	execWin->setTitle("Tapeutape : "+getFileName());
+	Fl::unlock();
 
 	return 0;
 }
@@ -767,11 +702,10 @@ void tapeutape::save(char* f)
 	tapParser tap(this);
 	if(!tap.saveToFile(f))
 	{
-		#ifdef WITH_GUI
-			Fl::lock();
-			execWin->setTitle("Tapeutape : "+getFileName());
-			Fl::unlock();
-		#endif
+
+		Fl::lock();
+		execWin->setTitle("Tapeutape : "+getFileName());
+		Fl::unlock();
 		for(unsigned int s=0;s<samples.size();++s)
 		{
 			samples[s]->processFileName(samples[s]->getAbsoluteName(),fileName);
@@ -816,11 +750,9 @@ void tapeutape::saveWithSamples(char* f,const char* cpath)
 	if(!tap.saveToFile(f))
 	{
 		//set the new name
-		#ifdef WITH_GUI
-			Fl::lock();
-			execWin->setTitle("Tapeutape : "+getFileName());
-			Fl::unlock();
-		#endif
+		Fl::lock();
+		execWin->setTitle("Tapeutape : "+getFileName());
+		Fl::unlock();
 	}
 }
 
@@ -1255,16 +1187,14 @@ int tapeutape::getJackStereoChannel(std::string n)
 
 void tapeutape::changeKit(int sn, int kn)
 {
-			int kit = setups[sn]->changeKit(kn);
+	int kit = setups[sn]->changeKit(kn);
 
-			#ifdef WITH_GUI
-				Fl::lock();
-				execWin->changeKit(sn,kit+1);
-				Fl::unlock();
+	Fl::lock();
+	execWin->changeKit(sn,kit+1);
+	Fl::unlock();
 
-				string mes = "Kit changed to " + to_string(kn) + ":'"  + setups[sn]->getKit(kn)->getName() + "' in Setup " + to_string(sn) + ":'" + setups[sn]->getName() + "'";
-				showMessage(false, mes);
-			#endif
+	string mes = "Kit changed to " + to_string(kn) + ":'"  + setups[sn]->getKit(kn)->getName() + "' in Setup " + to_string(sn) + ":'" + setups[sn]->getName() + "'";
+	showMessage(false, mes);
 }
 
 void tapeutape::startMidiLearn()
@@ -1279,11 +1209,9 @@ void tapeutape::stopMidiLearn()
 
 void tapeutape::processMidiLearn(int ch,int ccn,int vel)
 {
-	#ifdef WITH_GUI
-		Fl::lock();
-		execWin->learnMidi(ch,ccn,vel);
-		Fl::unlock();
-	#endif
+	Fl::lock();
+	execWin->learnMidi(ch,ccn,vel);
+	Fl::unlock();
 }
 
 void tapeutape::setSetupCC(short chan,short cc)

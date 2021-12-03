@@ -48,13 +48,7 @@
 
 #include "../osc/osc.h"
 
-#ifdef WITH_GUI
-	#include "../ui/execWindow.h"
-#endif
-
-#ifdef WITH_LASH
-	#include "../lash/lashClient.h"
-#endif
+#include "../ui/execWindow.h"
 
 
 #define RING_BUFFER_SIZE 1024
@@ -62,12 +56,14 @@
 
 #define TAPEUTAPE_VERSION "0.1.2"
 
+using namespace std;
+
 class tapeutape
 {
 	public:
 		tapeutape(char*);
 		~tapeutape();
-		void showMessage(bool,std::string);
+		void showMessage(bool,string);
 
 		int load(char*);
 		int start();
@@ -105,20 +101,20 @@ class tapeutape
 		double getGlobalVolume();
 		void setPolyphony(int);
 		int getPolyphony();
-		std::string getFileName();
-		std::string getCompleteFileName();
+		string getFileName();
+		string getCompleteFileName();
 		void createTaps();
 		void changeKit(int, int);
 
 
 		//Jack Part
 		int getNbJackStereoChannels();
-		void addJackStereoChannel(std::string);
-		void addCreateJackStereoChannel(std::string);
+		void addJackStereoChannel(string);
+		void addCreateJackStereoChannel(string);
 		void removeJackStereoChannel(int );
-		std::string getJackStereoChannelName(int);
-		void setJackStereoChannelName(int,std::string);
-		int getJackStereoChannel(std::string);
+		string getJackStereoChannelName(int);
+		void setJackStereoChannelName(int,string);
+		int getJackStereoChannel(string);
 		jackProcess* getJackProcess();
 		void setSampleRate(int);
 
@@ -180,7 +176,7 @@ class tapeutape
 			INSTRUMENT_PLAY,
 			INSTRUMENT_STOP,
 	    };
-	    std::map<std::string, int> oscCommands = {
+	    std::map<string, int> oscCommands = {
 	        {"/set/global_volume",  SET_GLOBAL_VOLUME},
 			{"/get/global_volume",  GET_GLOBAL_VOLUME},
 			{"/get/setups_list", GET_SETUPS_LIST},
@@ -234,19 +230,17 @@ class tapeutape
 		bool loop;
 
 		//Tap File
-		std::string fileName;
+		string fileName;
 
-		#ifdef WITH_GUI
-			//Gui
-			execWindow *execWin;
-		#endif
+		//Gui
+		execWindow *execWin;
 
 		//Stuctures
 		std::vector<sample*> samples;
 		std::vector<setup*> setups;
 
 		//Audio
-		std::vector<std::string> jackStereoChannelsNames;
+		std::vector<string> jackStereoChannelsNames;
 		jackProcess *jack;
 		double globalVolume;
 
@@ -259,10 +253,6 @@ class tapeutape
 		//Events
 		jack_ringbuffer_t* eventsRingBuffer;
 
-		#ifdef WITH_LASH
-			//Lash
-			lashClient *lashC;
-		#endif
 };
 
 #endif

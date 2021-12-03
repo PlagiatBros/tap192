@@ -27,9 +27,9 @@
 #include <math.h>
 #include <iostream>
 #include <getopt.h>
-#include "tapeutape.h"
 
-#include "../nsm/nsm.h"
+#include "base/tapeutape.h"
+#include "nsm/nsm.h"
 
 using namespace std;
 
@@ -156,31 +156,27 @@ int main(int argc, char** argv)
 		tap_instance = new tapeutape((char *)global_filename.c_str());
 
     int r;
-	#ifdef WITH_GUI
-		Fl::lock();
-        if (nsm) {
-            if (!global_nsm_opional_gui) tap_instance->setVisible(true);
-            while (true) {
-                Fl::wait(0.1);
-                if (tap_instance->isDirty() != global_nsm_dirty) {
-                    global_nsm_dirty = tap_instance->isDirty();
-                    if (global_nsm_dirty) nsm_send_is_dirty(nsm);
-                    else nsm_send_is_clean(nsm);
-                }
-                if (global_nsm_opional_gui && tap_instance->isVisible() != global_nsm_visible) {
-                    tap_instance->setVisible(global_nsm_visible);
-                    if (global_nsm_visible)nsm_send_is_shown(nsm);
-                    else nsm_send_is_hidden(nsm);
-                }
+	Fl::lock();
+    if (nsm) {
+        if (!global_nsm_opional_gui) tap_instance->setVisible(true);
+        while (true) {
+            Fl::wait(0.1);
+            if (tap_instance->isDirty() != global_nsm_dirty) {
+                global_nsm_dirty = tap_instance->isDirty();
+                if (global_nsm_dirty) nsm_send_is_dirty(nsm);
+                else nsm_send_is_clean(nsm);
             }
-            r = EXIT_SUCCESS;
-        } else {
-            tap_instance->setVisible(true);
-            r = Fl::run();
+            if (global_nsm_opional_gui && tap_instance->isVisible() != global_nsm_visible) {
+                tap_instance->setVisible(global_nsm_visible);
+                if (global_nsm_visible)nsm_send_is_shown(nsm);
+                else nsm_send_is_hidden(nsm);
+            }
         }
-	#else
-		r = EXIT_SUCCESS;
-	#endif
+        r = EXIT_SUCCESS;
+    } else {
+        tap_instance->setVisible(true);
+        r = Fl::run();
+    }
 
     if (nsm) nsm_free(nsm);
     delete tap_instance;
