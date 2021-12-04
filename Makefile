@@ -33,7 +33,7 @@ $(BIN): $(OBJ)
 clean:
 	@rm -f $(OBJ) $(DEPENDS) $(BIN)
 
-install: src/$(BIN)
+install: $(BIN)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	mkdir -p $(DESTDIR)$(PREFIX)/share/pixmaps
 	mkdir -p $(DESTDIR)$(PREFIX)/share/applications
