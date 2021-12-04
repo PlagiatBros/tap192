@@ -26,16 +26,30 @@
 using namespace std;
 
 char *global_oscport;
+bool global_no_gui = false;
 
 // struct for command parsing
+const char* optstring = "p:nhv";
 static struct
 option long_options[] = {
     {"help",     0, 0, 'h'},
     {"osc-port", 1, 0, 'p'},
+    {"no-gui",   0, 0, 'n'},
     {"version",  0, 0, 'v'},
     {0, 0, 0, 0}
-
 };
+static void usage(char *argv0)
+{
+    fprintf(stderr, PACKAGE_NAME);
+    fprintf(stderr, "\nMidi & OSC controlable Sample Player\n\n");
+    fprintf(stderr, "Usage: %s [options...]\n", argv0);
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "  -p <int> , --osc-port=<int>                          udp in port number for OSC server\n");
+    fprintf(stderr, "  -n , --no-gui                                        headless mode\n");
+    fprintf(stderr, "  -h , --help                                          this usage output\n");
+    fprintf(stderr, "  -v , --version                                       show version only\n");
+}
+
 
 // nsm
 bool global_nsm_visible = false;
@@ -88,7 +102,7 @@ int main(int argc, char** argv)
     while (1)
     {
         int c, option_index=0;
-        c = getopt_long(argc, argv, "p:h", long_options, &option_index);
+        c = getopt_long(argc, argv, optstring, long_options, &option_index);
 
         if (c == -1) break;
 
@@ -97,22 +111,19 @@ int main(int argc, char** argv)
             case 'p':
                 global_oscport = optarg;
                 break;
+            case 'n':
+                global_no_gui = true;
+                break;
+            case 'v':
+                fprintf(stdout, "%s version %s\n", PACKAGE_NAME, VERSION);
+                return 0;
             case '?':
             case 'h':
-                cout << "" << endl;
-                cout << "tapeutape - Midi & OSC controlable Sample Player" << endl;
-                cout << endl;
-                cout << "Usage: tapeutape [options] [file]" << endl;
-                cout << endl;
-                cout << "Options:" << endl;
-                cout << "  -h, --help              show available options" << endl;
-                cout << "  -p, --osc-port <port>   osc input port (udp port number or unix socket path) // default: 12345" << endl;
+                usage(argv[0]);
                 return 0;
-                break;
-          }
-      }
-      if (optind < argc)
-          global_filename = argv[optind++];
+        }
+    }
+    if (optind < argc) global_filename = argv[optind++];
 
     // nsm
     const char *nsm_url = getenv("NSM_URL" );
@@ -121,7 +132,7 @@ int main(int argc, char** argv)
         nsm_set_open_callback(nsm, nsm_open_cb, 0);
 
         if (nsm_init_thread(nsm, nsm_url) == 0) {
-            nsm_send_announce(nsm, "Tapeutape", ":optional-gui:dirty:", argv[0]);
+            nsm_send_announce(nsm, PACKAGE_NAME, ":optional-gui:dirty:", argv[0]);
         }
         nsm_thread_start(nsm);
         usleep(500000);
@@ -167,8 +178,13 @@ int main(int argc, char** argv)
         }
         r = EXIT_SUCCESS;
     } else {
-        tap_instance->setVisible(true);
-        r = Fl::run();
+        if (global_no_gui) {
+            while (true) Fl::wait(0.1);
+            r = EXIT_SUCCESS;
+        } else {
+            tap_instance->setVisible(true);
+            r = Fl::run();
+        }
     }
 
     if (nsm) nsm_free(nsm);
