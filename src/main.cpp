@@ -114,6 +114,9 @@ int main(int argc, char** argv)
             case 'n':
                 global_no_gui = true;
                 break;
+            case 'v':
+                fprintf(stdout, "%s version %s\n", PACKAGE_NAME, VERSION);
+                return 0;
             case '?':
             case 'h':
                 usage(argv[0]);
