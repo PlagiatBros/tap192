@@ -51,6 +51,10 @@ enum P_TYPES
     P_STRING
 };
 
+int sn=-1, kn=-1, in=-1;
+string snc="", knc="", inc="";
+
+
 using namespace std;
 
 tapeutape::tapeutape(char *fn):
@@ -65,7 +69,7 @@ tapeutape::tapeutape(char *fn):
     fileName="";
 
     //start the ui
-    execWin = new execWindow(CLIENT_NAME,this);
+    execWin = new execWindow(PACKAGE_NAME,this);
 
     //ring buffer
     eventsRingBuffer = jack_ringbuffer_create(RING_BUFFER_SIZE);
@@ -118,16 +122,16 @@ int argc, void *data, void *user_data)
     int command = t->oscCommands[(std::string) path];
     if (!command) return 0;
 
-    //int sn=-1, kn=-1, in=-1, whatset = 0;
-    int sn=-1, kn=-1, in=-1;
+
     int o_what, x_what, param_type=P_DOUBLE;
     int get=0, playstop=0;
-    string snc="", knc="", inc="";
     char *address = NULL;
-    //string spath, by, xwhat="miditune";
     string spath, by;
     lo_address lo_add;
     lo_message lo_msg;
+
+    sn=-1; kn=-1; in=-1;
+    snc=""; knc=""; inc="";
 
     switch (command) {
         // General OSC methods
@@ -154,7 +158,7 @@ int argc, void *data, void *user_data)
             lo_add = lo_address_new_from_url(address);
             if (lo_add != NULL) {
                 spath = path;
-                spath.replace(spath.find("get"), 3, PACKAGE_NAME);
+                spath.replace(spath.find("get"), 3, BINARY_NAME);
                 lo_msg = lo_message_new();
                 lo_message_add_double(lo_msg, t->getGlobalVolume());
                 lo_send_message(lo_add, spath.c_str(), lo_msg);
@@ -381,94 +385,55 @@ int argc, void *data, void *user_data)
     if (argc > 0 && !get) {
         double x;
         float p=1;
-        int argind=0;
+        int argind=1;
+
+        t->parseOscSKI(&argv[0]->s, o_what);
 
         cout << argind << endl;
-        if ((argc > 3 && o_what == INSTRUMENT) || x_what == STOP) {
-            if (types[argind] == 's') snc = &argv[argind]->s;
-            else if (types[argind] == 'i') sn = argv[argind]->i;
-            else return -1;
-            argind++;
-        }
-        cout << argind << endl;
-        if (argc > 2) {
-            if (o_what == KIT) {
-                if (types[argind] == 's') snc = &argv[argind]->s;
-                else if (types[argind] == 'i') sn = argv[argind]->i;
-                else return -1;
-            }
-            else if (o_what == INSTRUMENT) {
-                if (types[argind] == 's') knc = &argv[argind]->s;
-                else if (types[argind] == 'i') kn = argv[argind]->i;
-                else return -1;
-            }
-            argind++;
-        }
-        cout << argind << endl;
         if (argc > 1) {
-            if (o_what == SETUP) {
-                if (types[argind] == 's') snc = &argv[argind]->s;
-                else if (types[argind] == 'i') sn = argv[argind]->i;
-                else return -1;
-            }
-            else if (o_what == KIT) {
-                if (types[argind] == 's') knc = &argv[argind]->s;
-                else if (types[argind] == 'i') kn = argv[argind]->i;
-                else return -1;
-            }
-            else if (o_what == INSTRUMENT) {
-                if (types[argind] == 's') inc = &argv[argind]->s;
-                else if (types[argind] == 'i') in = argv[argind]->i;
-                else return -1;
-            }
-            argind++;
-        }
-        cout << argind << endl;
-        if (argc > argind) {
-            if (types[argind] == 'd') x = argv[argind]->d;
-            else if (types[argind] == 'f') x = (double) argv[argind]->f;
-            else if (types[argind] == 'i') x = (double) argv[argind]->i;
+            if (types[1] == 'd') x = argv[1]->d;
+            else if (types[1] == 'f') x = (double) argv[1]->f;
+            else if (types[1] == 'i') x = (double) argv[1]->i;
             else return -1;
         }
         cout << "avant playstop" << endl;
         if (playstop) {
-            if (argc < 4) x = 127; // if no velocity defined
+            if (argc < 2) x = 127; // if no velocity defined
             if (x < 0) x = 127;  // if velocity below 0
-            if (argc > 4) {
-                if (types[argind+1] == 'd') p = (float) argv[argind+1]->d;
-                else if (types[argind+1] == 'f') p = argv[argind+1]->f;
-                else if (types[argind+1] == 'i') p = (float) argv[argind+1]->i;
+            if (argc > 2) {
+                if (types[2] == 'd') p = (float) argv[2]->d;
+                else if (types[2] == 'f') p = argv[2]->f;
+                else if (types[2] == 'i') p = (float) argv[2]->i;
                 else return -1;
             }
             if (p < 0) p = 1;    // if pitch below 0
         }
-        cout << "avant d\303\251termination" << endl;
+
         // Setup by name
         if (snc != "") sn = t->getSetupIdByName(snc);
-        cout << "SN OK: " << sn << endl;
-        // Kit by name
-        if (knc != "" && (o_what == KIT || o_what == INSTRUMENT)) kn = t->getKitIdByName(knc, snc="", sn);
-        cout << "KN OK: knc: " << knc << ", kn: " << kn << endl;
-        // Instrument by name
-        if (inc != "" && o_what == INSTRUMENT) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn);
-
-        cout << "MSG" << endl;
-        cout << "snc :" << snc << ", knc: " << knc << ", inc: " << inc << ", x: " << x << endl;
-        cout << "sn :" << sn << ", kn: " << kn << ", in: " << in << ", x: " << x << endl;
 
         switch(o_what) {
             case INSTRUMENT:
+                if (knc != "") kn = t->getKitIdByName(knc, snc="", sn);
                 if (sn == -1) {
                     for(int i=0; i<(int)t->setups.size(); i++) {
                         if (kn == -1) {
                             for (int j=0; j<t->setups[i]->getNbKits(); j++) {
+                                if (inc != "") {
+                                    for (int k=0; k<t->setups[i]->getKit(j)->getNbInstruments(); k++){
+                                        if (!inc.compare(t->setups[i]->getKit(j)->getInstrument(k)->getName())) {
+                                            in = k;
+                                        } else in = -1;
+                                    }
+                                }
                                 if (in != -1 && in < t->setups[i]->getKit(j)->getNbInstruments()) {
                                     if (playstop) t->playstopInstrument(i, j, in, x_what, (unsigned short) x, p);
                                     else t->setInstrumentParameter(i, j, in, x_what, (double) x);
-                                } else return -1;
+                                }
                             }
                         }
                         else {
+                            if (inc != "") in = t->getInstrumentIdByName(inc, snc="", i, knc="", kn);
                             if (in != -1 && in < t->setups[i]->getKit(kn)->getNbInstruments()) {
                                 if (playstop) t->playstopInstrument(i, kn, in, x_what, (unsigned short) x, p);
                                 else t->setInstrumentParameter(i, kn, in, x_what, (double) x);
@@ -477,6 +442,7 @@ int argc, void *data, void *user_data)
                     }
                 }
                 else {
+                    if (inc != "") in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn);
                     if (in != -1 && in < t->setups[sn]->getKit(kn)->getNbInstruments()) {
                         if (playstop) t->playstopInstrument(sn, kn, in, x_what, (unsigned short) x, p);
                         else t->setInstrumentParameter(sn, kn, in, x_what, (double) x);
@@ -486,11 +452,14 @@ int argc, void *data, void *user_data)
             case KIT:
                 if (sn == -1) {
                     for(int i=0; i<(int)t->setups.size(); i++) {
-                        t->setups[i]->getKit(kn)->setVolume(x);
+                        if (knc != "") kn = t->getKitIdByName(knc, snc="", i);
+                        if(kn != -1 && kn < t->setups[i]->getNbKits())
+                            t->setups[i]->getKit(kn)->setVolume(x);
                     }
                 }
                 else {
-                    t->setups[sn]->getKit(kn)->setVolume(x);
+                    if(kn != -1 && kn < t->setups[sn]->getNbKits())
+                        t->setups[sn]->getKit(kn)->setVolume(x);
                 }
                 break;
             case SETUP:
@@ -1280,6 +1249,47 @@ void tapeutape::setGlobalVolume(double gv)
 double tapeutape::getGlobalVolume()
 {
     return globalVolume;
+}
+
+void tapeutape::parseOscSKI(string a, int ow)
+{
+    int pos = -1, nb_args=1;
+    bool t;
+    char sep = '/';
+    if(a.find(':',pos+1) == 1) {
+        t = a.substr(0,1).compare("s");
+        pos = 2;
+    }
+
+    while (a.find(sep, pos+1) != -1) {
+        pos = a.find(sep, pos+1);
+        nb_args ++;
+    }
+    pos = 2;
+
+    if (nb_args > 2) {
+        snc = a.substr(pos,a.find(sep)-pos);
+        pos = a.find(sep) + 1;
+    }
+    if (nb_args > 1) {
+        if (ow == KIT) snc = a.substr(pos,a.find(sep, pos)-pos);
+        else knc = a.substr(pos,a.find(sep, pos)-pos);
+        pos = a.find(sep, pos) + 1;
+    }
+    if (nb_args > 0) {
+        if (ow == KIT) knc = a.substr(pos,a.size()-pos);
+        else inc = a.substr(pos,a.size()-pos);
+    }
+
+    if (t) {
+        try { sn = stoi(snc); }
+        catch (std::exception& e) { sn = -1; }
+        try { kn = stoi(knc); }
+        catch (std::exception& e) { kn = -1; }
+        try { in = stoi(inc); }
+        catch (std::exception& e) { in = -1; }
+        snc = ""; knc = ""; inc = "";
+    }
 }
 
 bool tapeutape::isDirty()
