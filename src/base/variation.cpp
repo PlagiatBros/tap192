@@ -20,7 +20,10 @@
 
 using namespace std;
 
-variation::variation():minVeloc(0),maxVeloc(127),sound(NULL)
+variation::variation():
+    minVeloc(0),
+    maxVeloc(127),
+    sound(NULL)
 {
 }
 

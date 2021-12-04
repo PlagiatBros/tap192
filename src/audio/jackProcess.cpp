@@ -263,7 +263,7 @@ int jackProcess::start()
     //if ports already created
     if (outputPorts[0].size()>0) {
         //delete everything
-        for(int i=0;i<outputPorts[0].size();++i) {
+        for(int i=0;i<(int)outputPorts[0].size();++i) {
             jack_port_unregister (jackClient,outputPorts[0][i]);
             jack_port_unregister (jackClient,outputPorts[1][i]);
         }

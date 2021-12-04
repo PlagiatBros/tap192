@@ -17,11 +17,19 @@
 
 using namespace std;
 
-setup::setup():name(""),currentKit(0),channel(-1),cc(-1)
+setup::setup():
+    currentKit(0),
+    channel(-1),
+    cc(-1),
+    name("")
 {
 }
 
-setup::setup(const setup& s):name(s.name),currentKit(0),channel(s.channel),cc(s.cc)
+setup::setup(const setup& s):
+    currentKit(0),
+    channel(s.channel),
+    cc(s.cc),
+    name(s.name)
 {
     for(unsigned int k=0;k<s.kits.size();++k) {
         kits.push_back(new kit(*(s.kits[k])));
@@ -53,7 +61,7 @@ int setup::getNbKits()
 
 kit* setup::getKit(int ind)
 {
-    if (ind>=0 && ind<kits.size())
+    if (ind >= 0 && ind < (int)kits.size())
         return kits[ind];
     else
         return NULL;

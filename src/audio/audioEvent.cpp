@@ -21,8 +21,18 @@ audioEvent::audioEvent()
 
 }
 
-audioEvent::audioEvent(variation* va,instrument* i,unsigned long d,double ps,int j,double v,double pl,double pr,bool ev)
-    :var(va),instru(i),id(d),pitch(ps),event(ev),offset(0),jackStereoChannel(j),volume(v),panLeft(pl),panRight(pr),fade(1.0),
+audioEvent::audioEvent(variation* va,instrument* i,unsigned long d,double ps,int j,double v,double pl,double pr,bool ev):
+    var(va),
+    instru(i),
+    pitch(ps),
+    id(d),
+    event(ev),
+    volume(v),
+    panLeft(pl),
+    panRight(pr),
+    fade(1.0),
+    jackStereoChannel(j),
+    offset(0),
     m_playTrigger(instru->getPlayMode()),
     m_playLoop(instru->getPlayLoop()),
     m_playReverse(instru->getPlayReverse())

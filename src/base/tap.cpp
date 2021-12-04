@@ -15,7 +15,13 @@
 
 #include "tap.h"
 
-tap::tap(variation* va,instrument* i,double ps,double v,double pl,double pr):var(va),instru(i),pitch(ps),volume(v),panLeft(pl),panRight(pr)
+tap::tap(variation* va,instrument* i,double ps,double v,double pl,double pr):
+    var(va),
+    instru(i),
+    volume(v),
+    panLeft(pl),
+    panRight(pr),
+    pitch(ps)
 {
 }
 

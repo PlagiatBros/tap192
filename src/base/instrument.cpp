@@ -17,11 +17,44 @@
 
 using namespace std;
 
-instrument::instrument():playingCount(0),count(0),volume(1.0),pan(0),pitchOverRange(true), m_playMode(0), m_playLoop(0), m_playReverse(0), cut(-1),polyphony(0),minNote(60),rootNote(60),maxNote(60),midiChannel(0),jackStereoChannel(0),rootNoteFine(0)
+instrument::instrument():
+    minNote(60),
+    maxNote(60),
+    rootNote(60),
+    midiChannel(0),
+    rootNoteFine(0),
+    jackStereoChannel(0),
+    volume(1.0),
+    pan(0),
+    pitchOverRange(true),
+    m_playMode(0),
+    m_playLoop(0),
+    m_playReverse(0),
+    playingCount(0),
+    count(0),
+    polyphony(0),
+    cut(-1)
 {
 }
 
-instrument::instrument(const instrument &inst):playingCount(0),count(0),name(inst.name),volume(inst.volume),pan(inst.pan),pitchOverRange(inst.pitchOverRange),m_playMode(inst.m_playMode), m_playLoop(inst.m_playLoop), m_playReverse(inst.m_playReverse), cut(inst.cut),polyphony(inst.polyphony),minNote(inst.minNote),rootNote(inst.rootNote),rootNoteFine(inst.rootNoteFine),maxNote(inst.maxNote),midiChannel(inst.midiChannel),jackStereoChannel(inst.jackStereoChannel)
+instrument::instrument(const instrument &inst):
+    name(inst.name),
+    minNote(inst.minNote),
+    maxNote(inst.maxNote),
+    rootNote(inst.rootNote),
+    midiChannel(inst.midiChannel),
+    rootNoteFine(inst.rootNoteFine),
+    jackStereoChannel(inst.jackStereoChannel),
+    volume(inst.volume),
+    pan(inst.pan),
+    pitchOverRange(inst.pitchOverRange),
+    m_playMode(inst.m_playMode),
+    m_playLoop(inst.m_playLoop),
+    m_playReverse(inst.m_playReverse),
+    playingCount(0),
+    count(0),
+    polyphony(inst.polyphony),
+    cut(inst.cut)
 {
     for(unsigned int v=0;v<inst.variations.size();++v) {
         variations.push_back(new variation(*(inst.variations[v])));
@@ -37,7 +70,7 @@ instrument::~instrument()
 
 variation* instrument::getVariation(int ind)
 {
-    if (ind<variations.size() && ind>=0)
+    if (ind<(int)variations.size() && ind>=0)
         return variations[ind];
     else
         return NULL;
@@ -61,9 +94,9 @@ void instrument::moveVariation(bool down, int var)
     variation* swapVar;
     unsigned short swapVal;
 
-    if (down) {                   //moving towards the end (->127)
-                                 //if not the last var
-        if (var<variations.size()-1) {
+    if (down) { //moving towards the end (->127)
+        //if not the last var
+        if (var<(int)variations.size()-1) {
             swapVal = variations[var+1]->getMaxVeloc();
             variations[var+1]->setMaxVeloc(variations[var]->getMaxVeloc());
             variations[var]->setMaxVeloc(swapVal);
@@ -76,8 +109,9 @@ void instrument::moveVariation(bool down, int var)
             variations[var] = swapVar;
         }
     }
-    else {                       //moving towards the beginning (->0)
-        if (var>0) {              //if not the first var
+    else { //moving towards the beginning (->0)
+        if (var>0) {
+            //if not the first var
             swapVal = variations[var-1]->getMaxVeloc();
             variations[var-1]->setMaxVeloc(variations[var]->getMaxVeloc());
             variations[var]->setMaxVeloc(swapVal);
@@ -94,20 +128,20 @@ void instrument::moveVariation(bool down, int var)
 
 void instrument::updateVariations(int var)
 {
-                                 //arrange according to one var
-    if (var>-1 && var < variations.size()) {
+    //arrange according to one var
+    if (var>-1 && var < (int)variations.size()) {
         //remap the min and max veloc according to the variation given
         if (var==0)
             variations[0]->setMinVeloc(0);
         else
             variations[var-1]->setMaxVeloc(variations[var]->getMinVeloc()+1);
 
-        if (var==variations.size()-1)
+        if (var==(int)variations.size()-1)
             variations[var]->setMaxVeloc(127);
         else
             variations[var+1]->setMinVeloc(variations[var]->getMaxVeloc());
     }
-    else {                       //rearrange all the vars
+    else { //rearrange all the vars
         int step = (int)(ceil(127.0/(double)(variations.size())));
         for(unsigned int v=0;v<variations.size();++v) {
             int min = (v==0)?0:v*step+1;

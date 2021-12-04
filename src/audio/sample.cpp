@@ -17,7 +17,13 @@
 
 using namespace std;
 
-sample::sample():name("no sample yet"),buffers(NULL),loaded(false),absoluteName(""),relativeName(""),nbUsers(0)
+sample::sample():
+    name("no sample yet"),
+    absoluteName(""),
+    relativeName(""),
+    buffers(NULL),
+    loaded(false),
+    nbUsers(0)
 {
 }
 

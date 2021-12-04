@@ -53,7 +53,14 @@ enum P_TYPES
 
 using namespace std;
 
-tapeutape::tapeutape(char *fn):polyphony(100),globalVolume(1.0),fileName(""),jack(NULL),midi(NULL),eventsRingBuffer(NULL),loop(true)
+tapeutape::tapeutape(char *fn):
+    loop(true),
+    fileName(""),
+    jack(NULL),
+    globalVolume(1.0),
+    midi(NULL),
+    polyphony(100),
+    eventsRingBuffer(NULL)
 {
     fileName="";
 
@@ -116,7 +123,7 @@ int argc, void *data, void *user_data)
     int o_what, x_what, param_type=P_DOUBLE;
     int get=0, playstop=0;
     string snc="", knc="", inc="";
-    char *address;
+    char *address = NULL;
     //string spath, by, xwhat="miditune";
     string spath, by;
     lo_address lo_add;
@@ -233,7 +240,7 @@ int argc, void *data, void *user_data)
                 spath = path;
                 spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
                 lo_msg = lo_message_new();
-                for (int i=0;i<t->setups.size();i++) {
+                for (int i=0;i<(int)t->setups.size();i++) {
                     if (!by.compare("by_name")) {
                         lo_message_add_string(lo_msg, t->setups[i]->getName().c_str());
                         lo_message_add_string(lo_msg, t->setups[i]->getKit(t->setups[i]->getCurrentKit())->getName().c_str());
@@ -452,7 +459,7 @@ int argc, void *data, void *user_data)
         switch(o_what) {
             case INSTRUMENT:
                 if (sn == -1) {
-                    for(int i=0; i<t->setups.size(); i++) {
+                    for(int i=0; i<(int)t->setups.size(); i++) {
                         if (kn == -1) {
                             for (int j=0; j<t->setups[i]->getNbKits(); j++) {
                                 if (in != -1 && in < t->setups[i]->getKit(j)->getNbInstruments()) {
@@ -478,7 +485,7 @@ int argc, void *data, void *user_data)
                 break;
             case KIT:
                 if (sn == -1) {
-                    for(int i=0; i<t->setups.size(); i++) {
+                    for(int i=0; i<(int)t->setups.size(); i++) {
                         t->setups[i]->getKit(kn)->setVolume(x);
                     }
                 }
@@ -514,7 +521,7 @@ int argc, void *data, void *user_data)
             address = &argv[3]->s;
         }
 
-        if (address == "") {
+        if (address == NULL) {
             address = lo_address_get_url(lo_message_get_source(data));
         }
 
@@ -528,7 +535,7 @@ int argc, void *data, void *user_data)
             // setup by name
             sn = t->getSetupIdByName(snc);
         }
-        if (sn < t->setups.size() && sn != -1) {
+        if (sn < (int)t->setups.size() && sn != -1) {
             snc = "";
             if (knc != "") {
                 // kit by name
@@ -560,11 +567,12 @@ int argc, void *data, void *user_data)
             }
 
             if (o_what == KIT) lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getVolume());
-            else if (o_what == INSTRUMENT)
-            if (param_type == P_DOUBLE)
+            else if (o_what == INSTRUMENT) {
+                if (param_type == P_DOUBLE)
                 lo_message_add_double(lo_msg, t->getInstrumentParameter(sn, kn, in, x_what));
-            else if (param_type == P_INT) {
-                lo_message_add_int32(lo_msg, (int) t->getInstrumentParameter(sn, kn, in, x_what));
+                else if (param_type == P_INT) {
+                    lo_message_add_int32(lo_msg, (int) t->getInstrumentParameter(sn, kn, in, x_what));
+                }
             }
 
             lo_send_message(lo_add, spath.c_str(), lo_msg);
@@ -787,7 +795,7 @@ void tapeutape::createTaps()
 {
     //create the array of taps for each setup
     for(unsigned int i=0;i<setups.size();++i) {
-        for(unsigned int j=0;j<setups[i]->getNbKits();++j) {
+        for(int j=0;j<setups[i]->getNbKits();++j) {
             setups[i]->getKit(j)->exec(globalVolume);
         }
     }
@@ -818,7 +826,7 @@ setup* tapeutape::getSetup(int ind)
 
 setup* tapeutape::getSetupByName(string name)
 {
-    for (int i=0;i<setups.size();i++) {
+    for (int i=0;i<(int)setups.size();i++) {
         if (!name.compare(setups[i]->getName())) {
             return setups[i];
         }
@@ -828,7 +836,7 @@ setup* tapeutape::getSetupByName(string name)
 
 int tapeutape::getSetupIdByName(string name)
 {
-    for (int i=0;i<setups.size();i++) {
+    for (int i=0;i<(int)setups.size();i++) {
         if (!name.compare(setups[i]->getName())) {
             return i;
         }
@@ -857,13 +865,13 @@ kit* tapeutape::getKit(int ind, string snc="", int sn=-1)
     if (ind>=0 && ind<(int)(setups.size())) {
                                  // kit number ind in setup by name
         if (snc != "" && sn == -1) {
-            for (int i;i<setups.size();i++) {
+            for (int i;i<(int)setups.size();i++) {
                 if (!snc.compare(setups[i]->getName())) {
                     return setups[i]->getKit(ind);
                 }
             }
         }                        // kit number ind in setup by id
-        else if (snc =="" && sn != -1 && sn < setups.size()) {
+        else if (snc =="" && sn != -1 && sn < (int)setups.size()) {
             return setups[sn]->getKit(ind);
         } else return NULL;
     }
@@ -873,7 +881,7 @@ kit* tapeutape::getKit(int ind, string snc="", int sn=-1)
 kit* tapeutape::getKitByName(string name, string snc, int sn)
 {
     if (snc != "" && sn == -1) { // kit name in setup by name
-        for (int i=0;i<setups.size();i++) {
+        for (int i=0;i<(int)setups.size();i++) {
             if (!snc.compare(setups[i]->getName())) {
                 for (int j;j<setups[i]->getNbKits();j++) {
                     if (!name.compare(setups[i]->getKit(j)->getName())) {
@@ -884,7 +892,7 @@ kit* tapeutape::getKitByName(string name, string snc, int sn)
         }
     }                            // kit name in setup by id
     else if (snc == "" && sn != -1) {
-        if (sn < setups.size()) {
+        if (sn < (int)setups.size()) {
             for (int j=0;j<setups[sn]->getNbKits();j++) {
                 if (!name.compare(setups[sn]->getKit(j)->getName())) {
                     return setups[sn]->getKit(j);
@@ -898,7 +906,7 @@ kit* tapeutape::getKitByName(string name, string snc, int sn)
 int tapeutape::getKitIdByName(string name, string snc, int sn)
 {
     if (snc != "" && sn == -1) { // kit id in setup by name
-        for (int i=0;i<setups.size();i++) {
+        for (int i=0;i<(int)setups.size();i++) {
             if (!snc.compare(setups[i]->getName())) {
                 for (int j=0;j<setups[i]->getNbKits();j++) {
                     if (!name.compare(setups[i]->getKit(j)->getName())) {
@@ -909,7 +917,7 @@ int tapeutape::getKitIdByName(string name, string snc, int sn)
         }
     }                            // kit name in setup by id
     else if (snc == "" && sn != -1) {
-        if (sn < setups.size()) {
+        if (sn < (int)setups.size()) {
             for (int j=0;j<setups[sn]->getNbKits();j++) {
                 if (!name.compare(setups[sn]->getKit(j)->getName())) {
                     return j;
@@ -928,7 +936,7 @@ instrument* tapeutape::getInstrumentByName(string name, string snc, int sn, stri
 int tapeutape::getInstrumentIdByName(string name, string snc, int sn, string knc, int kn)
 {
     if (snc != "" && sn == -1) { // if setup by name
-        for (int i=0;i<setups.size();i++) {
+        for (int i=0;i<(int)setups.size();i++) {
             if (!snc.compare(setups[i]->getName())) {
                 sn = i;
             }
@@ -943,7 +951,7 @@ int tapeutape::getInstrumentIdByName(string name, string snc, int sn, string knc
         }
     }
 
-    if (sn < setups.size() && sn != -1) {
+    if (sn < (int)setups.size() && sn != -1) {
         if (kn < setups[sn]->getNbKits() && kn != -1) {
             for (int i=0;i<setups[sn]->getKit(kn)->getNbInstruments(); i++) {
                 if (!name.compare(setups[sn]->getKit(kn)->getInstrument(i)->getName())) {
@@ -1083,7 +1091,7 @@ void tapeutape::removeSample(sample* s)
 void tapeutape::setSampleRate(int sr)
 {
     /*
-        for(unsigned int i=0;i<setups.size();++i)
+        for(unsigned int i=0;i<(int)setups.size();++i)
             for(unsigned int j=0;j<setups[i]->getNbKits();++j)
                 for(unsigned int k=0;k<setups[i]->getKit(j)->getNbInstruments();++k)
                     for(unsigned int l=0;l<setups[i]->getKit(j)->getInstrument(k)->getNbVariations();++l)
@@ -1123,8 +1131,8 @@ void tapeutape::removeJackStereoChannel(int ind)
         //for each instrument, check if the number of the output is still available
         //if it isn't , give it the last output
         for(unsigned int i=0;i<setups.size();++i) {
-            for(unsigned int j=0;j<setups[i]->getNbKits();++j) {
-                for(unsigned int k=0;k<setups[i]->getKit(j)->getNbInstruments();++k) {
+            for(int j=0;j<setups[i]->getNbKits();++j) {
+                for(int k=0;k<setups[i]->getKit(j)->getNbInstruments();++k) {
                     int outNum = setups[i]->getKit(j)->getInstrument(k)->getJackStereoChannel();
                     if (outNum>ind) {
                         setups[i]->getKit(j)->getInstrument(k)->setJackStereoChannel(outNum-1);
@@ -1214,7 +1222,7 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
         if (cc > 125) {
             // CC 126 set the instrument(s) bound to note "val" in Reverse mode
             // CC 127 set the instrument(s) bound to note "val" in Forward mode
-            for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++) {
+            for(int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++) {
                 int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
                 int iMaxN = setups[i]->getKit(cK)->getInstrument(j)->getMaxNote();
                 int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();
@@ -1228,7 +1236,7 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
             // CC 125 set the instrument(s) bound to note "val" in Loop mode
             // CC 124 set the instrument(s) bound to note "val" in SingleShot mode
 
-            for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++) {
+            for(int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++) {
                 int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
                 int iMaxN = setups[i]->getKit(cK)->getInstrument(j)->getMaxNote();
                 int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();
@@ -1242,7 +1250,7 @@ void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short 
             // CC 123 set the instrument(s) bound to note "val" in Normal mode
             // CC 122 set the instrument(s) bound to note "val" in Trigger mode
 
-            for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++) {
+            for(int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++) {
                 int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
                 int iMaxN = setups[i]->getKit(cK)->getInstrument(j)->getMaxNote();
                 int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();

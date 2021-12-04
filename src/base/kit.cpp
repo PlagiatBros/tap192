@@ -57,7 +57,7 @@ int kit::getNbInstruments()
 
 instrument* kit::getInstrument(int ind)
 {
-    if (ind<instruments.size() && ind>=0)
+    if (ind < (int)instruments.size() && ind>=0)
         return instruments[ind];
     else
         return NULL;
@@ -83,13 +83,13 @@ void kit::exec(double globalVolume)
     for(int c=0;c<16;++c)
         for(int n=0;n<128;++n)
         for(int v=0;v<128;++v) {
-            for(int t=0;t<taps[c][n][v].size();++t)
+            for(int t=0;t<(int)taps[c][n][v].size();++t)
                 delete taps[c][n][v][t];
         taps[c][n][v].clear();
     }
 
-                                 //for each instrument in the kit
-    for(int j=0;j<instruments.size();++j) {
+    //for each instrument in the kit
+    for(int j=0;j<(int)instruments.size();++j) {
         //compute the panning (Thanks Vincent Verfaille)
         double panLeft = sqrt(2)/2.0*(cos(instruments[j]->getPan()*(M_PI/4.0)) - sin(instruments[j]->getPan()*(M_PI/4.0)));
         double panRight = sqrt(2)/2.0*(cos(instruments[j]->getPan()*(M_PI/4.0)) + sin(instruments[j]->getPan()*(M_PI/4.0)));
@@ -97,7 +97,7 @@ void kit::exec(double globalVolume)
         panLeft=(panLeft<0.0001)? 0 : panLeft;
 
         for(unsigned short n=instruments[j]->getMinNote();
-                                 //for each note of the instrument
+        //for each note of the instrument
         n<=instruments[j]->getMaxNote();n++) {
             //compute the offset to pitchShift (Thanks pete bessman) (temporary solution)
             double pitch = 1;
@@ -105,9 +105,9 @@ void kit::exec(double globalVolume)
                 pitch=pow(2.0, ((double)(n - instruments[j]->getRootNote()) + instruments[j]->getRootNoteFine())/12.0);
             //FIXME TESTER FINE , voir dans SPECIMEN patch.c pour la fonction interpolate.
 
-                                 //for each variation of the instrument
+            //for each variation of the instrument
             for(int k=0;k<instruments[j]->getNbVariations();++k) {
-                                 //for each velocity of the variation
+                //for each velocity of the variation
                 for(unsigned short v=instruments[j]->getVariation(k)->getMinVeloc();
                 v<=instruments[j]->getVariation(k)->getMaxVeloc();v++) {
                     //we compute the volume (with the velocity, the instrument's volume and the global volume)
@@ -127,7 +127,7 @@ void kit::showTaps(int c)
         cout<<"note "<<n<<endl;
         for(int v=0;v<128;++v) {
             cout<<"veloc "<<v;
-            for(int t=0;t<taps[c-1][n][v].size();++t)
+            for(int t=0;t<(int)taps[c-1][n][v].size();++t)
                 cout<<((vector<tap*>)taps[c-1][n][v])[t]->getVariation()->getSample()->getName()<<",";
             cout<<"|";
         }
