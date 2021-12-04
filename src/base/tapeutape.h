@@ -115,6 +115,7 @@ class tapeutape
         inline void addAudioEvent(const audioEvent& newEvent){jack->addAudioEvent(newEvent);}
 
         //OSC server
+        void parseOscSKI(string a, int ow);
         OSCServer *oscServer;
         static int oscCallback(const char *path, const char *types, lo_arg ** argv,
             int argc, void *data, void *user_data);
