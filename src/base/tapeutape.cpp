@@ -1077,7 +1077,8 @@ void tapeutape::removeSample(sample* s)
     if (s->getNbUsers()>1) {
         s->removeUser();
     }
-    else {                       //else look for the sample in the vector and remove it completely
+    else {
+        //else look for the sample in the vector and remove it completely
         for(unsigned int i=0;i<samples.size();++i) {
             if (samples[i]->getAbsoluteName()==s->getAbsoluteName()) {
                 delete(samples[i]);
@@ -1091,7 +1092,7 @@ void tapeutape::removeSample(sample* s)
 void tapeutape::setSampleRate(int sr)
 {
     /*
-        for(unsigned int i=0;i<(int)setups.size();++i)
+        for(unsigned int i=0;i<setups.size();++i)
             for(unsigned int j=0;j<setups[i]->getNbKits();++j)
                 for(unsigned int k=0;k<setups[i]->getKit(j)->getNbInstruments();++k)
                     for(unsigned int l=0;l<setups[i]->getKit(j)->getInstrument(k)->getNbVariations();++l)
