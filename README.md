@@ -1,6 +1,6 @@
 # Tapeutape
 
-This is fork of the legacy Tapeutape with some bug fixes and additional features.
+This is a fork of the legacy Tapeutape with some bug fixes and additional features.
 
 ## Build
 
