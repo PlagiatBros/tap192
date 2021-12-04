@@ -65,7 +65,7 @@ tapeutape::tapeutape(char *fn):
     fileName="";
 
     //start the ui
-    execWin = new execWindow(CLIENT_NAME,this);
+    execWin = new execWindow(PACKAGE_NAME,this);
 
     //ring buffer
     eventsRingBuffer = jack_ringbuffer_create(RING_BUFFER_SIZE);
@@ -154,7 +154,7 @@ int argc, void *data, void *user_data)
             lo_add = lo_address_new_from_url(address);
             if (lo_add != NULL) {
                 spath = path;
-                spath.replace(spath.find("get"), 3, PACKAGE_NAME);
+                spath.replace(spath.find("get"), 3, BINARY_NAME);
                 lo_msg = lo_message_new();
                 lo_message_add_double(lo_msg, t->getGlobalVolume());
                 lo_send_message(lo_add, spath.c_str(), lo_msg);

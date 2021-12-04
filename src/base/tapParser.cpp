@@ -47,7 +47,7 @@ int tapParser::createTree(char* f)
         return -1;
     }
 
-    if (xmlStrcmp(root_element->name, (const xmlChar *) "tapeutape")) {
+    if (xmlStrcmp(root_element->name, (const xmlChar *) XML_NAMESPACE)) {
         tap->showMessage(true,"Document of the wrong type, root node != tapeutape");
         xmlFreeDoc(doc);
         return -1;
@@ -457,7 +457,7 @@ int tapParser::saveToFile(char* filename)
     xmlNodePtr rootNode = NULL, node1 = NULL, node2 = NULL,node3 = NULL,node4 = NULL,node5 = NULL;
 
     doc = xmlNewDoc(BAD_CAST "1.0");
-    rootNode = xmlNewNode(NULL, BAD_CAST "tapeutape");
+    rootNode = xmlNewNode(NULL, BAD_CAST XML_NAMESPACE);
     xmlNewProp(rootNode, BAD_CAST "version", BAD_CAST VERSION );
     xmlDocSetRootElement(doc, rootNode);
 
