@@ -40,7 +40,7 @@ option long_options[] = {
 };
 static void usage(char *argv0)
 {
-    fprintf(stderr, BINARY_NAME);
+    fprintf(stderr, PACKAGE_NAME);
     fprintf(stderr, "\nMidi & OSC controlable Sample Player\n\n");
     fprintf(stderr, "Usage: %s [options...]\n", argv0);
     fprintf(stderr, "Options:\n");
