@@ -1,26 +1,17 @@
-/***************************************************************************
- *            tapeutape.h
- *
- *  Copyright  2006 - 2013 Florent Berthaut, 2019 Jean-Emmanuel Doucet & Aurélien Roux
- *  florentberthaut@no-log.org jean-emmanuel.doucet@groolot.net orl@ammd.net
- ****************************************************************************/
-
-/*
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
-
+// This file is part of tapeutape
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef tapeutape_h
 #define tapeutape_h
@@ -50,11 +41,8 @@
 
 #include "../ui/execWindow.h"
 
-
 #define RING_BUFFER_SIZE 1024
 #define MIDI_PRIORITY 60
-
-#define TAPEUTAPE_VERSION "0.1.2"
 
 using namespace std;
 
@@ -106,7 +94,6 @@ class tapeutape
         void createTaps();
         void changeKit(int, int);
 
-
         //Jack Part
         int getNbJackStereoChannels();
         void addJackStereoChannel(string);
@@ -117,7 +104,6 @@ class tapeutape
         int getJackStereoChannel(string);
         jackProcess* getJackProcess();
         void setSampleRate(int);
-
 
         //Midi Part
         midiProcess* getMidiProcess();
@@ -131,8 +117,9 @@ class tapeutape
         //OSC server
         OSCServer *oscServer;
         static int oscCallback(const char *path, const char *types, lo_arg ** argv,
-                        int argc, void *data, void *user_data);
-        enum OSC_COMMANDS {
+            int argc, void *data, void *user_data);
+        enum OSC_COMMANDS
+        {
             OSC_ZERO = 0,
             SET_GLOBAL_VOLUME,
             GET_GLOBAL_VOLUME,
@@ -158,9 +145,9 @@ class tapeutape
             INSTRUMENT_SET_MIDITUNE,
             INSTRUMENT_GET_MIDITUNE,
             INSTRUMENT_GET_MIDITUNE_BYNAME,
-/*            INSTRUMENT_SET_OUTPUT,
-            INSTRUMENT_GET_OUTPUT,
-            INSTRUMENT_GET_OUTPUT_BYNAME,*/
+            /*            INSTRUMENT_SET_OUTPUT,
+                        INSTRUMENT_GET_OUTPUT,
+                        INSTRUMENT_GET_OUTPUT_BYNAME,*/
             INSTRUMENT_SET_PLAYMODE,
             INSTRUMENT_GET_PLAYMODE,
             INSTRUMENT_GET_PLAYMODE_BYNAME,
@@ -201,9 +188,9 @@ class tapeutape
             {"/instrument/set/miditune",        INSTRUMENT_SET_MIDITUNE},
             {"/instrument/get/miditune",        INSTRUMENT_GET_MIDITUNE},
             {"/instrument/get/miditune/by_name",        INSTRUMENT_GET_MIDITUNE_BYNAME},
-/*            {"/instrument/set/output",            INSTRUMENT_SET_OUTPUT},
-            {"/instrument/get/output",            INSTRUMENT_GET_OUTPUT},
-            {"/instrument/get/output/by_name",            INSTRUMENT_GET_OUTPUT_BYNAME},*/
+            /*            {"/instrument/set/output",            INSTRUMENT_SET_OUTPUT},
+                        {"/instrument/get/output",            INSTRUMENT_GET_OUTPUT},
+                        {"/instrument/get/output/by_name",            INSTRUMENT_GET_OUTPUT_BYNAME},*/
             {"/instrument/set/playmode",        INSTRUMENT_SET_PLAYMODE},
             {"/instrument/get/playmode",        INSTRUMENT_GET_PLAYMODE},
             {"/instrument/get/playmode/by_name",        INSTRUMENT_GET_PLAYMODE_BYNAME},
@@ -219,7 +206,6 @@ class tapeutape
             {"/instrument/play",                INSTRUMENT_PLAY},
             {"/instrument/stop",                INSTRUMENT_STOP},
         };
-
 
         // nsm
         bool isDirty();
@@ -254,5 +240,4 @@ class tapeutape
         jack_ringbuffer_t* eventsRingBuffer;
 
 };
-
 #endif

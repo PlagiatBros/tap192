@@ -1,25 +1,17 @@
-/***************************************************************************
- *            sample.h
- *
- *  Copyright  2006 - 2013 Florent Berthaut, 2019 Jean-Emmanuel Doucet & Aurélien Roux
- *  florentberthaut@no-log.org jean-emmanuel.doucet@groolot.net orl@ammd.net
- ****************************************************************************/
-
-/*
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
+// This file is part of tapeutape
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef _SAMPLE_H
 #define _SAMPLE_H
@@ -74,7 +66,8 @@ class sample
 enum { TABSIZE = 256 };
 
 /* cubic interpolation coefficient table for first tap */
-static float ct0[TABSIZE] = {
+static float ct0[TABSIZE] =
+{
     0.000000, -0.001938, -0.003845, -0.005723,
     -0.007570, -0.009388, -0.011176, -0.012934,
     -0.014664, -0.016364, -0.018035, -0.019678,
@@ -141,9 +134,9 @@ static float ct0[TABSIZE] = {
     -0.000120, -0.000068, -0.000030, -0.000008
 };
 
-
 /* cubic interpolation coefficient table for second tap */
-static float ct1[TABSIZE] = {
+static float ct1[TABSIZE] =
+{
     1.000000, 0.999962, 0.999848, 0.999659,
     0.999395, 0.999058, 0.998646, 0.998161,
     0.997604, 0.996975, 0.996275, 0.995503,
@@ -210,9 +203,9 @@ static float ct1[TABSIZE] = {
     0.008295, 0.006132, 0.004028, 0.001984
 };
 
-
 /* cubic interpolation coefficient table for third tap */
-static float ct2[TABSIZE] = {
+static float ct2[TABSIZE] =
+{
     0.000000, 0.001984, 0.004028, 0.006132,
     0.008295, 0.010517, 0.012798, 0.015137,
     0.017532, 0.019985, 0.022494, 0.025058,
@@ -279,9 +272,9 @@ static float ct2[TABSIZE] = {
     0.999395, 0.999659, 0.999848, 0.999962
 };
 
-
 /* cubic interpolation coefficient table for fourth tap */
-static float ct3[TABSIZE] = {
+static float ct3[TABSIZE] =
+{
     0.000000, -0.000008, -0.000030, -0.000068,
     -0.000120, -0.000187, -0.000268, -0.000364,
     -0.000473, -0.000596, -0.000733, -0.000883,
@@ -348,7 +341,8 @@ static float ct3[TABSIZE] = {
     -0.007570, -0.005723, -0.003845, -0.001938
 };
 
-static float logvolct[TABSIZE] = {
+static float logvolct[TABSIZE] =
+{
     0.000000, 0.000000, 0.000000, 0.000000,
     0.000001, 0.000002, 0.000004, 0.000007,
     0.000010, 0.000015, 0.000021, 0.000029,
@@ -414,6 +408,4 @@ static float logvolct[TABSIZE] = {
     0.911681, 0.923950, 0.936334, 0.948834,
     0.961450, 0.974182, 0.987032, 1.000000,
 };
-
-
-#endif /* _SAMPLE_H */
+#endif

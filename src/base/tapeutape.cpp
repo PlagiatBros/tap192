@@ -1,41 +1,34 @@
-/***************************************************************************
- *            tapeutape.cpp
- *
- *  Copyright  2005 - 2013 Florent Berthaut, 2019 Jean-Emmanuel Doucet & Aurélien Roux
- *  florentberthaut@no-log.org jean-emmanuel.doucet@groolot.net orl@ammd.net
- ****************************************************************************/
+// This file is part of tapeutape
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Library General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
-
-
+#include "../package.h"
 #include "tapeutape.h"
 #include "../nsm/nsm.h"
 extern nsm_client_t *nsm;
 
-
 extern char *global_oscport;
 
-enum O_TYPES {
+enum O_TYPES
+{
     SETUP = 0,
     KIT,
     INSTRUMENT
 };
 
-enum X_TYPES {
+enum X_TYPES
+{
     VOLUME = 0,
     PAN,
     MIDITUNE,
@@ -50,7 +43,8 @@ enum X_TYPES {
     STOP
 };
 
-enum P_TYPES {
+enum P_TYPES
+{
     P_DOUBLE = 0,
     P_FLOAT,
     P_INT,
@@ -64,38 +58,33 @@ tapeutape::tapeutape(char *fn):polyphony(100),globalVolume(1.0),fileName(""),jac
     fileName="";
 
     //start the ui
-    execWin = new execWindow("Tapeutape",this);
+    execWin = new execWindow(CLIENT_NAME,this);
 
     //ring buffer
     eventsRingBuffer = jack_ringbuffer_create(RING_BUFFER_SIZE);
 
     //jackProcess , initialised here to get the samplerate to load the files
     jack = new jackProcess(this,eventsRingBuffer,polyphony);
-    if(jack->init())
-    {
+    if (jack->init()) {
         showMessage(true,"Error Initialiasing Jack Client");
     }
-
 
     //midiProcess init
     midi = new midiProcess(this,jack->getClient(),MIDI_PRIORITY,eventsRingBuffer);
     showMessage(false,"Starting MIDI");
-    if(midi->midiInit())
-    {
+    if (midi->midiInit()) {
         showMessage(true,"Error Starting Midi ");
     }
 
     //OSCServer init and start
-  if (global_oscport != 0) {
+    if (global_oscport != 0) {
         oscServer = new OSCServer(global_oscport);
         oscServer->start();
         oscServer->add_method(NULL, NULL, &tapeutape::oscCallback, this);
-  }
-
-
+    }
 
     //if a file name was specified
-    if(((string) fn).compare("")){
+    if (((string) fn).compare("")) {
         load(fn);
     }
 
@@ -108,23 +97,19 @@ tapeutape::tapeutape(char *fn):polyphony(100),globalVolume(1.0),fileName(""),jac
 
 }
 
-
 tapeutape::~tapeutape()
 {
     jack_ringbuffer_free(eventsRingBuffer);
 }
 
-
 int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data, void *user_data)
+int argc, void *data, void *user_data)
 {
 
     tapeutape *t = (tapeutape *)user_data;
 
     int command = t->oscCommands[(std::string) path];
     if (!command) return 0;
-
-
 
     //int sn=-1, kn=-1, in=-1, whatset = 0;
     int sn=-1, kn=-1, in=-1;
@@ -138,31 +123,31 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
     lo_message lo_msg;
 
     switch (command) {
-// General OSC methods
+        // General OSC methods
         case SET_GLOBAL_VOLUME:
-        // 'd' : global_volume
-            if (argc > 0)
-            {
-                    double gv;
-                    if (types[0] == 'i')    gv = (double)(argv[0]->i);
-                    else if (types[0] == 'f') gv = argv[0]->f;
-                    else break;
-                    t->setGlobalVolume(gv);
+            // 'd' : global_volume
+            if (argc > 0) {
+                double gv;
+                if (types[0] == 'i')    gv = (double)(argv[0]->i);
+                else if (types[0] == 'f') gv = argv[0]->f;
+                else break;
+                t->setGlobalVolume(gv);
             }
             break;
         case GET_GLOBAL_VOLUME:
-        // noargs : message will be sent to sender's address
-        // 's' : address
+            // noargs : message will be sent to sender's address
+            // 's' : address
             if (argc == 1) {
                 address = &argv[0]->s;
-            } else {
+            }
+            else {
                 address = lo_address_get_url(lo_message_get_source(data));
             }
 
             lo_add = lo_address_new_from_url(address);
             if (lo_add != NULL) {
                 spath = path;
-                spath.replace(spath.find("get"), 3, "tapeutape");
+                spath.replace(spath.find("get"), 3, PACKAGE_NAME);
                 lo_msg = lo_message_new();
                 lo_message_add_double(lo_msg, t->getGlobalVolume());
                 lo_send_message(lo_add, spath.c_str(), lo_msg);
@@ -170,57 +155,63 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
             }
             break;
 
-
-// Kit OSC methods
+            // Kit OSC methods
         case KIT_SET_SELECTED:
         case KIT_SELECT:
-        // 'ii', 'is', 'si', 'ss' : Setup, Kit
+            // 'ii', 'is', 'si', 'ss' : Setup, Kit
             sn=-1; kn=-1;
             snc=""; knc="";
             if (argc > 1) {
-                if (types[0] == 'i')
-                {
+                if (types[0] == 'i') {
                     sn = argv[0]->i;
-                     if (types[1] == 'i') kn = argv[1]->i;
-                    else if(types[1] == 's') knc = &argv[1]->s;
+                    if (types[1] == 'i') kn = argv[1]->i;
+                    else if (types[1] == 's') knc = &argv[1]->s;
                 }
-                else if (types[0] == 's')
-                {
+                else if (types[0] == 's') {
                     snc = &argv[0]->s;
-                     if (types[1] == 'i') kn = argv[1]->i;
-                    else if(types[1] == 's') knc = &argv[1]->s;
+                    if (types[1] == 'i') kn = argv[1]->i;
+                    else if (types[1] == 's') knc = &argv[1]->s;
                 }
                 else break;
-            } else if (argc > 0) {
-                    if (types[0] == 'i') kn = argv[0]->i;
-                    else if (types[0] == 's')    knc = &argv[0]->s;
-                    else break;
+            }
+            else if (argc > 0) {
+                if (types[0] == 'i') kn = argv[0]->i;
+                else if (types[0] == 's')    knc = &argv[0]->s;
+                else break;
             }
 
-            if (snc != "") // setup(s) defined by name
-            {
+            if (snc != "") {
+                // setup(s) defined by name
                 sn = t->getSetupIdByName(snc);
-                if (kn !=-1 ) t->changeKit(sn, kn); // kit defined by number
-                else if (knc !="") { // kit(s) defined by name
+                // kit defined by number
+                if (kn !=-1) t->changeKit(sn, kn);
+                // kit(s) defined by name
+                else if (knc !="") {
                     kn = t->getKitIdByName(knc, snc);
-                    if( kn != -1) t->changeKit(sn, kn);
+                    if (kn != -1) t->changeKit(sn, kn);
                 }
-            } else if (sn !=-1) { // setup defined by number
-                if (kn != -1) t->changeKit(sn,kn); // kit(s) defined by number
-                else if (knc != "") { // kit defined by name
+            }
+            // setup defined by number
+            else if (sn !=-1) {
+                // kit(s) defined by number
+                if (kn != -1) t->changeKit(sn,kn);
+                // kit defined by name
+                else if (knc != "") {
                     kn = t->getKitIdByName(knc,snc,sn);
                     if (kn != -1) t->changeKit(sn, kn);
                 }
             }
-            else if (sn == -1 && argc == 1) // setup not defined (one arg only)
-            {
-                for (unsigned int i=0;i<t->setups.size();++i)
-                {
+            // setup not defined (one arg only)
+            else if (sn == -1 && argc == 1) {
+                for (unsigned int i=0;i<t->setups.size();++i) {
                     if (kn != -1 && kn < t->setups[i]->getNbKits()) {
-                        t->changeKit(i,kn); // kit(s) defined by number
-                    } else if (knc != "") { // kit defined by name
+                        // kit(s) defined by number
+                        t->changeKit(i,kn);
+                    }
+                    // kit defined by name
+                    else if (knc != "") {
                         kn = t->getKitIdByName(knc, snc, i);
-                        if(kn != -1) t->changeKit(i,kn);
+                        if (kn != -1) t->changeKit(i,kn);
                     }
                 }
             }
@@ -228,11 +219,12 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
         case KIT_GET_SELECTED_BYNAME:
             by = "by_name";
         case KIT_GET_SELECTED:
-        // noargs : message will be sent to the sender's address
-        // 's' : address
+            // noargs : message will be sent to the sender's address
+            // 's' : address
             if (argc == 1) {
                 address = &argv[0]->s;
-            } else {
+            }
+            else {
                 address = lo_address_get_url(lo_message_get_source(data));
             }
 
@@ -241,13 +233,12 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
                 spath = path;
                 spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
                 lo_msg = lo_message_new();
-                for (int i=0;i<t->setups.size();i++)
-                {
-                    if (!by.compare("by_name"))
-                    {
+                for (int i=0;i<t->setups.size();i++) {
+                    if (!by.compare("by_name")) {
                         lo_message_add_string(lo_msg, t->setups[i]->getName().c_str());
                         lo_message_add_string(lo_msg, t->setups[i]->getKit(t->setups[i]->getCurrentKit())->getName().c_str());
-                    } else {
+                    }
+                    else {
                         lo_message_add_int32(lo_msg, i);
                         lo_message_add_int32(lo_msg, t->setups[i]->getCurrentKit());
                     }
@@ -258,57 +249,54 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
             }
             break;
 
-// Trig OSC Set Parameters Methods
+        // Trig OSC Set Parameters Methods
         case KIT_SET_VOLUME:
-        // Setup (s,i), Kit (s,i), Volume (d,f,i)
-        // Kit (s,i), Volume (d,f,i)
+            // Setup (s,i), Kit (s,i), Volume (d,f,i)
+            // Kit (s,i), Volume (d,f,i)
             o_what = KIT; x_what = VOLUME;
             break;
         case INSTRUMENT_SET_VOLUME:
-        // Setup (s,i), Kit (s,i), Instrument (s,i), Volume (d,f,i)
-        // Kit (s,i), Instrument (s,i), Volume (d,f,i)
-        // Instrument (s,i), Volume (d,f,i)
+            // Setup (s,i), Kit (s,i), Instrument (s,i), Volume (d,f,i)
+            // Kit (s,i), Instrument (s,i), Volume (d,f,i)
+            // Instrument (s,i), Volume (d,f,i)
             o_what = INSTRUMENT; x_what = VOLUME;
             break;
         case INSTRUMENT_SET_PAN:
-        // Setup (s,i), Kit (s,i), Instrument (s,i), Pan (d,f,i)
-        // Kit (s,i), Instrument (s,i), Pan (d,f,i)
-        // Instrument (s,i), Pan (d,f,i)
+            // Setup (s,i), Kit (s,i), Instrument (s,i), Pan (d,f,i)
+            // Kit (s,i), Instrument (s,i), Pan (d,f,i)
+            // Instrument (s,i), Pan (d,f,i)
             o_what = INSTRUMENT; x_what = PAN;
             break;
         case INSTRUMENT_SET_MIDITUNE:
-        // Setup (s,i), Kit (s,i), Instrument (s,i), Miditune (d,f,i)
-        // Kit (s,i), Instrument (s,i), Miditune (d,f,i)
-        // Instrument (s,i), Miditune (d,f,i)
+            // Setup (s,i), Kit (s,i), Instrument (s,i), Miditune (d,f,i)
+            // Kit (s,i), Instrument (s,i), Miditune (d,f,i)
+            // Instrument (s,i), Miditune (d,f,i)
             o_what = INSTRUMENT; x_what = MIDITUNE;
             break;
         case INSTRUMENT_SET_PLAYMODE:
-        // Setup (s,i), Kit (s,i), Instrument (s,i), Playmode (d,f,i)
-        // Kit (s,i), Instrument (s,i), Playmode (d,f,i)
-        // Instrument (s,i), Playmode (d,f,i)
+            // Setup (s,i), Kit (s,i), Instrument (s,i), Playmode (d,f,i)
+            // Kit (s,i), Instrument (s,i), Playmode (d,f,i)
+            // Instrument (s,i), Playmode (d,f,i)
             o_what = INSTRUMENT; x_what = PLAYMODE;
             break;
 
-
         case INSTRUMENT_PLAY:
-        // Setup (s,i), Kit (s,i), Instrument (s,i), Velocity (i), (Pitch (f))
+            // Setup (s,i), Kit (s,i), Instrument (s,i), Velocity (i), (Pitch (f))
             o_what = INSTRUMENT; x_what = PLAY;
             playstop = 1;
             break;
         case INSTRUMENT_STOP:
-        // Setup (s,i), Kit (s,i), Instrument (s,i)
+            // Setup (s,i), Kit (s,i), Instrument (s,i)
             o_what = INSTRUMENT; x_what = STOP;
             playstop = 1;
             break;
 
-
-
-// Trig OSC Get Parameters Methods
+        // Trig OSC Get Parameters Methods
         case KIT_GET_VOLUME_BYNAME:
             by = "by_name";
         case KIT_GET_VOLUME:
-        // Setup (s, i), Kit (s, i)
-        // Setup (s, i), Kit (s, i), Address (s)
+            // Setup (s, i), Kit (s, i)
+            // Setup (s, i), Kit (s, i), Address (s)
             o_what = KIT; x_what = VOLUME;
             param_type = P_DOUBLE; get = 1;
             break;
@@ -316,71 +304,73 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
         case INSTRUMENT_GET_VOLUME_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_VOLUME:
-        // Setup (s, i), Kit (s, i), Instrument (s, i)
-        // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+            // Setup (s, i), Kit (s, i), Instrument (s, i)
+            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
             o_what = INSTRUMENT; x_what = VOLUME;
             param_type = P_DOUBLE; get = 1;
             break;
         case INSTRUMENT_GET_PAN_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PAN:
-        // Setup (s, i), Kit (s, i), Instrument (s, i)
-        // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+            // Setup (s, i), Kit (s, i), Instrument (s, i)
+            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
             o_what = INSTRUMENT; x_what = PAN;
             param_type = P_DOUBLE; get = 1;
             break;
         case INSTRUMENT_GET_MIDITUNE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_MIDITUNE:
-        // Setup (s, i), Kit (s, i), Instrument (s, i)
-        // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+            // Setup (s, i), Kit (s, i), Instrument (s, i)
+            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
             o_what = INSTRUMENT; x_what = MIDITUNE;
             param_type = P_DOUBLE; get = 1;
             break;
 
-/*        case INSTRUMENT_GET_OUTPUT_BYNAME:
+        /*
+        case INSTRUMENT_GET_OUTPUT_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_OUTPUT:
-        // Setup (s, i), Kit (s, i), Instrument (s, i)
-        // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+            // Setup (s, i), Kit (s, i), Instrument (s, i)
+            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
             o_what = INSTRUMENT; x_what = OUTPUT;
             param_type = P_INT; get = 1;
-            break;*/
+            break;
+        */
         case INSTRUMENT_GET_PLAYMODE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PLAYMODE:
-        // Setup (s, i), Kit (s, i), Instrument (s, i)
-        // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+            // Setup (s, i), Kit (s, i), Instrument (s, i)
+            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
             o_what = INSTRUMENT; x_what = PLAYMODE;
             param_type = P_INT; get = 1;
             break;
         case INSTRUMENT_GET_PLAYLOOP_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PLAYLOOP:
-        // Setup (s, i), Kit (s, i), Instrument (s, i)
-        // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+            // Setup (s, i), Kit (s, i), Instrument (s, i)
+            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
             o_what = INSTRUMENT; x_what = PLAYLOOP;
             param_type = P_INT; get = 1;
             break;
         case INSTRUMENT_GET_PLAYREVERSE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PLAYREVERSE:
-        // Setup (s, i), Kit (s, i), Instrument (s, i)
-        // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+            // Setup (s, i), Kit (s, i), Instrument (s, i)
+            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
             o_what = INSTRUMENT; x_what = PLAYREVERSE;
             param_type = P_INT; get = 1;
             break;
         case INSTRUMENT_GET_PITCHOVERRANGE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PITCHOVERRANGE:
-        // Setup (s, i), Kit (s, i), Instrument (s, i)
-        // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
+            // Setup (s, i), Kit (s, i), Instrument (s, i)
+            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
             o_what = INSTRUMENT; x_what = PITCHOVERRANGE;
             param_type = P_INT; get = 1;
             break;
     }
 
-// OSC Set and Play/Stop Methods
+    // OSC Set and Play/Stop Methods
     if (argc > 0 && !get) {
         double x;
         float p=1;
@@ -399,7 +389,8 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
                 if (types[argind] == 's') snc = &argv[argind]->s;
                 else if (types[argind] == 'i') sn = argv[argind]->i;
                 else return -1;
-            } else if (o_what == INSTRUMENT) {
+            }
+            else if (o_what == INSTRUMENT) {
                 if (types[argind] == 's') knc = &argv[argind]->s;
                 else if (types[argind] == 'i') kn = argv[argind]->i;
                 else return -1;
@@ -408,15 +399,17 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
         }
         cout << argind << endl;
         if (argc > 1) {
-            if(o_what == SETUP) {
+            if (o_what == SETUP) {
                 if (types[argind] == 's') snc = &argv[argind]->s;
                 else if (types[argind] == 'i') sn = argv[argind]->i;
                 else return -1;
-            } else if(o_what == KIT) {
+            }
+            else if (o_what == KIT) {
                 if (types[argind] == 's') knc = &argv[argind]->s;
                 else if (types[argind] == 'i') kn = argv[argind]->i;
                 else return -1;
-            } else if(o_what == INSTRUMENT) {
+            }
+            else if (o_what == INSTRUMENT) {
                 if (types[argind] == 's') inc = &argv[argind]->s;
                 else if (types[argind] == 'i') in = argv[argind]->i;
                 else return -1;
@@ -433,66 +426,72 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
         cout << "avant playstop" << endl;
         if (playstop) {
             if (argc < 4) x = 127; // if no velocity defined
-            if (x < 0) x = 127; // if velocity below 0
+            if (x < 0) x = 127;  // if velocity below 0
             if (argc > 4) {
                 if (types[argind+1] == 'd') p = (float) argv[argind+1]->d;
                 else if (types[argind+1] == 'f') p = argv[argind+1]->f;
                 else if (types[argind+1] == 'i') p = (float) argv[argind+1]->i;
                 else return -1;
             }
-            if (p < 0) p = 1; // if pitch below 0
+            if (p < 0) p = 1;    // if pitch below 0
         }
-        cout << "avant détermination" << endl;
-        if (snc != "") sn = t->getSetupIdByName(snc); // Setup by name
+        cout << "avant d\303\251termination" << endl;
+        // Setup by name
+        if (snc != "") sn = t->getSetupIdByName(snc);
         cout << "SN OK: " << sn << endl;
-        if (knc != "" && (o_what == KIT || o_what == INSTRUMENT)) kn = t->getKitIdByName(knc, snc="", sn); // Kit by name
+        // Kit by name
+        if (knc != "" && (o_what == KIT || o_what == INSTRUMENT)) kn = t->getKitIdByName(knc, snc="", sn);
         cout << "KN OK: knc: " << knc << ", kn: " << kn << endl;
-        if (inc != "" && o_what == INSTRUMENT) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn); // Instrument by name
+        // Instrument by name
+        if (inc != "" && o_what == INSTRUMENT) in = t->getInstrumentIdByName(inc, snc="", sn, knc="", kn);
 
         cout << "MSG" << endl;
         cout << "snc :" << snc << ", knc: " << knc << ", inc: " << inc << ", x: " << x << endl;
         cout << "sn :" << sn << ", kn: " << kn << ", in: " << in << ", x: " << x << endl;
 
-        switch(o_what){
+        switch(o_what) {
             case INSTRUMENT:
-                if(sn == -1) {
-                    for(int i=0; i<t->setups.size(); i++){
+                if (sn == -1) {
+                    for(int i=0; i<t->setups.size(); i++) {
                         if (kn == -1) {
-                            for (int j=0; j<t->setups[i]->getNbKits(); j++){
-                                if(in != -1 && in < t->setups[i]->getKit(j)->getNbInstruments()){
-                                    if(playstop) t->playstopInstrument(i, j, in, x_what, (unsigned short) x, p);
+                            for (int j=0; j<t->setups[i]->getNbKits(); j++) {
+                                if (in != -1 && in < t->setups[i]->getKit(j)->getNbInstruments()) {
+                                    if (playstop) t->playstopInstrument(i, j, in, x_what, (unsigned short) x, p);
                                     else t->setInstrumentParameter(i, j, in, x_what, (double) x);
                                 } else return -1;
                             }
-                        } else {
-                            if(in != -1 && in < t->setups[i]->getKit(kn)->getNbInstruments()){
-                                if(playstop) t->playstopInstrument(i, kn, in, x_what, (unsigned short) x, p);
+                        }
+                        else {
+                            if (in != -1 && in < t->setups[i]->getKit(kn)->getNbInstruments()) {
+                                if (playstop) t->playstopInstrument(i, kn, in, x_what, (unsigned short) x, p);
                                 else t->setInstrumentParameter(i, kn, in, x_what, (double) x);
                             } else return -1;
                         }
                     }
-                } else {
-                    if(in != -1 && in < t->setups[sn]->getKit(kn)->getNbInstruments()){
-                        if(playstop) t->playstopInstrument(sn, kn, in, x_what, (unsigned short) x, p);
+                }
+                else {
+                    if (in != -1 && in < t->setups[sn]->getKit(kn)->getNbInstruments()) {
+                        if (playstop) t->playstopInstrument(sn, kn, in, x_what, (unsigned short) x, p);
                         else t->setInstrumentParameter(sn, kn, in, x_what, (double) x);
                     } else return -1;
                 }
                 break;
             case KIT:
-                if(sn == -1) {
-                    for(int i=0; i<t->setups.size(); i++){
+                if (sn == -1) {
+                    for(int i=0; i<t->setups.size(); i++) {
                         t->setups[i]->getKit(kn)->setVolume(x);
                     }
-                } else {
+                }
+                else {
                     t->setups[sn]->getKit(kn)->setVolume(x);
                 }
                 break;
             case SETUP:
                 break;
         }
-
-// OSC Get Methods
-    } else if(get) {
+    }
+    // OSC Get Methods
+    else if (get) {
         // Setup
         if (types[0] == 's') snc = &argv[0]->s;
         else if (types[0] == 'i') sn = argv[0]->i;
@@ -506,7 +505,8 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
             if (o_what == INSTRUMENT) {
                 if (types[2] == 's') inc = &argv[2]->s;
                 else if (types[2] == 'i') in = argv[2]->i;
-            } else {
+            }
+            else {
                 address = &argv[2]->s;
             }
         }
@@ -515,7 +515,7 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
         }
 
         if (address == "") {
-               address = lo_address_get_url(lo_message_get_source(data));
+            address = lo_address_get_url(lo_message_get_source(data));
         }
 
         lo_add = lo_address_new_from_url(address);
@@ -524,18 +524,21 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
         else if (o_what == INSTRUMENT) spath.replace(spath.find("instrument/get"), 14, "tapeutape/instrument");
         lo_msg = lo_message_new();
 
-        if (snc != "") { // setup by name
+        if (snc != "") {
+            // setup by name
             sn = t->getSetupIdByName(snc);
         }
         if (sn < t->setups.size() && sn != -1) {
             snc = "";
-            if (knc != "") { // kit by name
+            if (knc != "") {
+                // kit by name
                 kn = t->getKitIdByName(knc, snc, sn);
             }
             if (o_what == INSTRUMENT) {
                 if (kn < t->setups[sn]->getNbKits() && kn != -1) {
                     knc = "";
-                    if (inc !="") { // instrument by name
+                    // instrument by name
+                    if (inc !="") {
                         in = t->getInstrumentIdByName(inc, snc, sn, knc, kn);
                     }
                 } else return -1;
@@ -545,11 +548,12 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
         if (o_what == INSTRUMENT && sn == -1) return -1;
 
         if (lo_add != NULL) {
-            if (!by.compare("by_name")){
+            if (!by.compare("by_name")) {
                 lo_message_add_string(lo_msg, t->setups[sn]->getName().c_str());
                 lo_message_add_string(lo_msg, t->setups[sn]->getKit(kn)->getName().c_str());
                 if (o_what == INSTRUMENT) lo_message_add_string(lo_msg, t->setups[sn]->getKit(kn)->getInstrument(in)->getName().c_str());
-            } else {
+            }
+            else {
                 lo_message_add_int32(lo_msg, sn);
                 lo_message_add_int32(lo_msg, kn);
                 if (o_what == INSTRUMENT) lo_message_add_int32(lo_msg, in);
@@ -557,11 +561,11 @@ int tapeutape::oscCallback(const char *path, const char *types, lo_arg ** argv,
 
             if (o_what == KIT) lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getVolume());
             else if (o_what == INSTRUMENT)
-                if(param_type == P_DOUBLE)
-                    lo_message_add_double(lo_msg, t->getInstrumentParameter(sn, kn, in, x_what));
-                else if(param_type == P_INT) {
-                    lo_message_add_int32(lo_msg, (int) t->getInstrumentParameter(sn, kn, in, x_what));
-                }
+            if (param_type == P_DOUBLE)
+                lo_message_add_double(lo_msg, t->getInstrumentParameter(sn, kn, in, x_what));
+            else if (param_type == P_INT) {
+                lo_message_add_int32(lo_msg, (int) t->getInstrumentParameter(sn, kn, in, x_what));
+            }
 
             lo_send_message(lo_add, spath.c_str(), lo_msg);
             lo_address_free(lo_add);
@@ -597,15 +601,13 @@ int tapeutape::load(char * nomfic)
     execWin->reset();
 
     //delete the setups/kits/instruments/variations
-    for(unsigned int i=0;i<setups.size();++i)
-    {
+    for(unsigned int i=0;i<setups.size();++i) {
         delete setups[i];
     }
     setups.clear();
 
     //delete the samples
-    for(unsigned int i=0;i<samples.size();++i)
-    {
+    for(unsigned int i=0;i<samples.size();++i) {
         delete samples[i];
     }
     samples.clear();
@@ -617,11 +619,10 @@ int tapeutape::load(char * nomfic)
 
     // File Open
     tapParser parse(this);
-    if(parse.createTree(nomfic))
+    if (parse.createTree(nomfic))
         return -1;
     showMessage(false,"Loading "+getFileName());
-    if(parse.parseTree())
-    {
+    if (parse.parseTree()) {
         showMessage(true,"Error Parsing "+getFileName());
         return -1;
     }
@@ -635,7 +636,7 @@ void tapeutape::import(char* dir)
     std::string dirStr(dir);
 
     //test if it is a directory
-    if(fl_filename_isdir(dirStr.c_str())) {
+    if (fl_filename_isdir(dirStr.c_str())) {
         //create a default setup/kit/instru ...
         setup* setup1 = new setup();
         addSetup(setup1);
@@ -645,10 +646,10 @@ void tapeutape::import(char* dir)
         ostringstream oss,oss2;
         DIR *dp2;
         struct dirent *dirp2;
-        if((dp2  = opendir((dirStr).c_str())) != NULL) {
+        if ((dp2  = opendir((dirStr).c_str())) != NULL) {
             while ((dirp2 = readdir(dp2)) != NULL) {
-                if(dirp2->d_name[0]!='.') { //if not a hidden file
-                    if(!fl_filename_isdir(dirp2->d_name)) { //if it's a file, try to add it as an instrument
+                if (dirp2->d_name[0]!='.') { //if not a hidden file
+                    if (!fl_filename_isdir(dirp2->d_name)) { //if it's a file, try to add it as an instrument
                         sample* newsample = addSample(dirp2->d_name);
                         kit* kit1 = new kit();
                         setup1->addKit(kit1);
@@ -658,28 +659,25 @@ void tapeutape::import(char* dir)
                     }
                     else { //if it is a directory, create a new kit
 
-
                     }
                 }
             }
         }
 
     }
-*/
+    */
 }
 
 int tapeutape::start()
 {
 
     //test if we created at least one jack-output
-    if(jackStereoChannelsNames.size()==0)
-    {
+    if (jackStereoChannelsNames.size()==0) {
         jackStereoChannelsNames.push_back("output");
     }
 
     //jackProcess , real start
-    if(jack->start())
-    {
+    if (jack->start()) {
         showMessage(true,"Error starting jack client");
     }
 
@@ -700,14 +698,12 @@ void tapeutape::save(char* f)
     showMessage(false,"Now saving...");
     fileName=f;
     tapParser tap(this);
-    if(!tap.saveToFile(f))
-    {
+    if (!tap.saveToFile(f)) {
 
         Fl::lock();
         execWin->setTitle("Tapeutape : "+getFileName());
         Fl::unlock();
-        for(unsigned int s=0;s<samples.size();++s)
-        {
+        for(unsigned int s=0;s<samples.size();++s) {
             samples[s]->processFileName(samples[s]->getAbsoluteName(),fileName);
         }
     }
@@ -720,8 +716,7 @@ void tapeutape::saveWithSamples(char* f,const char* cpath)
     std::string path = cpath;
 
     //save the samples
-    for(unsigned int s=0;s<samples.size();++s)
-    {
+    for(unsigned int s=0;s<samples.size();++s) {
         //get the new filename, according to the tap path
         std::string sampleName;
         std::ostringstream oss;
@@ -731,8 +726,7 @@ void tapeutape::saveWithSamples(char* f,const char* cpath)
         std::string sampleExt = samples[s]->getAbsoluteName().substr(found+1);
         std::string sampleCompleteName = path+"/"+sampleName+"."+sampleExt;
         //if the sample wasn't already saved with the tap
-        if(samples[s]->getAbsoluteName()!=sampleCompleteName)
-        {
+        if (samples[s]->getAbsoluteName()!=sampleCompleteName) {
             //copy and rename the sample
             std::string cmd = "cp ";
             cmd += samples[s]->getAbsoluteName();
@@ -747,8 +741,7 @@ void tapeutape::saveWithSamples(char* f,const char* cpath)
 
     //save the tap file
     tapParser tap(this);
-    if(!tap.saveToFile(f))
-    {
+    if (!tap.saveToFile(f)) {
         //set the new name
         Fl::lock();
         execWin->setTitle("Tapeutape : "+getFileName());
@@ -759,22 +752,19 @@ void tapeutape::saveWithSamples(char* f,const char* cpath)
 void tapeutape::stop()
 {
     //stops the midi thread
-    if(midi)
-    {
+    if (midi) {
         midi->stopThread();
         delete midi;
         midi=NULL;
     }
 
     //stops the jack client
-    if(jack)
-    {
+    if (jack) {
         delete jack;
         jack=NULL;
     }
 
-    if(eventsRingBuffer)
-    {
+    if (eventsRingBuffer) {
         delete eventsRingBuffer;
         eventsRingBuffer=NULL;
     }
@@ -796,10 +786,8 @@ void tapeutape::stop()
 void tapeutape::createTaps()
 {
     //create the array of taps for each setup
-    for(unsigned int i=0;i<setups.size();++i)
-    {
-        for(unsigned int j=0;j<setups[i]->getNbKits();++j)
-        {
+    for(unsigned int i=0;i<setups.size();++i) {
+        for(unsigned int j=0;j<setups[i]->getNbKits();++j) {
             setups[i]->getKit(j)->exec(globalVolume);
         }
     }
@@ -822,7 +810,7 @@ int tapeutape::getNbSetups()
 
 setup* tapeutape::getSetup(int ind)
 {
-    if(ind>=0 && ind<(int)(setups.size()))
+    if (ind>=0 && ind<(int)(setups.size()))
         return setups[ind];
     else
         return NULL;
@@ -830,8 +818,7 @@ setup* tapeutape::getSetup(int ind)
 
 setup* tapeutape::getSetupByName(string name)
 {
-    for (int i=0;i<setups.size();i++)
-    {
+    for (int i=0;i<setups.size();i++) {
         if (!name.compare(setups[i]->getName())) {
             return setups[i];
         }
@@ -841,8 +828,7 @@ setup* tapeutape::getSetupByName(string name)
 
 int tapeutape::getSetupIdByName(string name)
 {
-    for (int i=0;i<setups.size();i++)
-    {
+    for (int i=0;i<setups.size();i++) {
         if (!name.compare(setups[i]->getName())) {
             return i;
         }
@@ -868,14 +854,16 @@ void tapeutape::removeSetup(int i)
 
 kit* tapeutape::getKit(int ind, string snc="", int sn=-1)
 {
-    if(ind>=0 && ind<(int)(setups.size())) {
-        if (snc != "" && sn == -1) { // kit number ind in setup by name
-            for (int i;i<setups.size();i++){
+    if (ind>=0 && ind<(int)(setups.size())) {
+                                 // kit number ind in setup by name
+        if (snc != "" && sn == -1) {
+            for (int i;i<setups.size();i++) {
                 if (!snc.compare(setups[i]->getName())) {
                     return setups[i]->getKit(ind);
                 }
             }
-        } else if (snc =="" && sn != -1 && sn < setups.size()) { // kit number ind in setup by id
+        }                        // kit number ind in setup by id
+        else if (snc =="" && sn != -1 && sn < setups.size()) {
             return setups[sn]->getKit(ind);
         } else return NULL;
     }
@@ -885,7 +873,7 @@ kit* tapeutape::getKit(int ind, string snc="", int sn=-1)
 kit* tapeutape::getKitByName(string name, string snc, int sn)
 {
     if (snc != "" && sn == -1) { // kit name in setup by name
-        for (int i=0;i<setups.size();i++){
+        for (int i=0;i<setups.size();i++) {
             if (!snc.compare(setups[i]->getName())) {
                 for (int j;j<setups[i]->getNbKits();j++) {
                     if (!name.compare(setups[i]->getKit(j)->getName())) {
@@ -894,8 +882,9 @@ kit* tapeutape::getKitByName(string name, string snc, int sn)
                 }
             }
         }
-    } else if (snc == "" && sn != -1) { // kit name in setup by id
-        if (sn < setups.size()){
+    }                            // kit name in setup by id
+    else if (snc == "" && sn != -1) {
+        if (sn < setups.size()) {
             for (int j=0;j<setups[sn]->getNbKits();j++) {
                 if (!name.compare(setups[sn]->getKit(j)->getName())) {
                     return setups[sn]->getKit(j);
@@ -909,7 +898,7 @@ kit* tapeutape::getKitByName(string name, string snc, int sn)
 int tapeutape::getKitIdByName(string name, string snc, int sn)
 {
     if (snc != "" && sn == -1) { // kit id in setup by name
-        for (int i=0;i<setups.size();i++){
+        for (int i=0;i<setups.size();i++) {
             if (!snc.compare(setups[i]->getName())) {
                 for (int j=0;j<setups[i]->getNbKits();j++) {
                     if (!name.compare(setups[i]->getKit(j)->getName())) {
@@ -918,8 +907,9 @@ int tapeutape::getKitIdByName(string name, string snc, int sn)
                 }
             }
         }
-    } else if (snc == "" && sn != -1) { // kit name in setup by id
-        if (sn < setups.size()){
+    }                            // kit name in setup by id
+    else if (snc == "" && sn != -1) {
+        if (sn < setups.size()) {
             for (int j=0;j<setups[sn]->getNbKits();j++) {
                 if (!name.compare(setups[sn]->getKit(j)->getName())) {
                     return j;
@@ -930,13 +920,15 @@ int tapeutape::getKitIdByName(string name, string snc, int sn)
     return -1;
 }
 
-instrument* tapeutape::getInstrumentByName(string name, string snc, int sn, string knc, int kn){
+instrument* tapeutape::getInstrumentByName(string name, string snc, int sn, string knc, int kn)
+{
     return NULL;
 }
 
-int tapeutape::getInstrumentIdByName(string name, string snc, int sn, string knc, int kn){
+int tapeutape::getInstrumentIdByName(string name, string snc, int sn, string knc, int kn)
+{
     if (snc != "" && sn == -1) { // if setup by name
-        for (int i=0;i<setups.size();i++){
+        for (int i=0;i<setups.size();i++) {
             if (!snc.compare(setups[i]->getName())) {
                 sn = i;
             }
@@ -951,11 +943,10 @@ int tapeutape::getInstrumentIdByName(string name, string snc, int sn, string knc
         }
     }
 
-
     if (sn < setups.size() && sn != -1) {
-        if (kn < setups[sn]->getNbKits() && kn != -1){
-            for (int i=0;i<setups[sn]->getKit(kn)->getNbInstruments(); i++){
-                if (!name.compare(setups[sn]->getKit(kn)->getInstrument(i)->getName())){
+        if (kn < setups[sn]->getNbKits() && kn != -1) {
+            for (int i=0;i<setups[sn]->getKit(kn)->getNbInstruments(); i++) {
+                if (!name.compare(setups[sn]->getKit(kn)->getInstrument(i)->getName())) {
                     return i;
                 }
             }
@@ -965,7 +956,8 @@ int tapeutape::getInstrumentIdByName(string name, string snc, int sn, string knc
     return -1;
 }
 
-void tapeutape::setInstrumentParameter(int sn, int kn, int in, int x_what, double x){
+void tapeutape::setInstrumentParameter(int sn, int kn, int in, int x_what, double x)
+{
     if (x_what == VOLUME) setups[sn]->getKit(kn)->getInstrument(in)->setVolume(x);
     else if (x_what == PAN) setups[sn]->getKit(kn)->getInstrument(in)->setPan(x);
     else if (x_what == MIDITUNE) setups[sn]->getKit(kn)->getInstrument(in)->setRootNoteFine(x);
@@ -976,7 +968,8 @@ void tapeutape::setInstrumentParameter(int sn, int kn, int in, int x_what, doubl
 
 }
 
-double tapeutape::getInstrumentParameter(int sn, int kn, int in, int x_what){
+double tapeutape::getInstrumentParameter(int sn, int kn, int in, int x_what)
+{
     double x = -1;
     if (x_what == VOLUME) x = setups[sn]->getKit(kn)->getInstrument(in)->getVolume();
     else if (x_what == PAN) x = setups[sn]->getKit(kn)->getInstrument(in)->getPan();
@@ -988,14 +981,15 @@ double tapeutape::getInstrumentParameter(int sn, int kn, int in, int x_what){
     return x;
 }
 
-void tapeutape::playstopInstrument(int sn, int kn, int in, int x_what, const unsigned short t_velocity, float pitch){
+void tapeutape::playstopInstrument(int sn, int kn, int in, int x_what, const unsigned short t_velocity, float pitch)
+{
 
     instrument* ins = setups[sn]->getKit(kn)->getInstrument(in);
     int noteOn = 0, vn;
 
-    for (int i=0; i<ins->getNbVariations(); i++){
-        if((ins->getVariation(i)->getMinVeloc() <= t_velocity)
-             && (ins->getVariation(i)->getMaxVeloc() >= t_velocity)) {
+    for (int i=0; i<ins->getNbVariations(); i++) {
+        if ((ins->getVariation(i)->getMinVeloc() <= t_velocity)
+        && (ins->getVariation(i)->getMaxVeloc() >= t_velocity)) {
             vn = i;
         }
     }
@@ -1003,7 +997,7 @@ void tapeutape::playstopInstrument(int sn, int kn, int in, int x_what, const uns
     if (x_what == PLAY) noteOn = 1;
     if (x_what == STOP) noteOn = 0;
 
-    if(ins->getPlayReverse()) {
+    if (ins->getPlayReverse()) {
         pitch*=-1.0;
     }
 
@@ -1023,7 +1017,6 @@ void tapeutape::playstopInstrument(int sn, int kn, int in, int x_what, const uns
     addAudioEvent(ae);
 }
 
-
 int tapeutape::getNbSamples()
 {
     return samples.size();
@@ -1031,7 +1024,7 @@ int tapeutape::getNbSamples()
 
 sample* tapeutape::getSample(int ind)
 {
-    if(ind>=0 && ind<(int)(samples.size()))
+    if (ind>=0 && ind<(int)(samples.size()))
         return samples[ind];
     else
         return NULL;
@@ -1042,29 +1035,23 @@ sample* tapeutape::addSample(char* n,char *rn)
     std::string sampleName(n);
     sample *addedSample=NULL;
     //if there is a sample
-    if(sampleName!="")
-    {
+    if (sampleName!="") {
         //test if the sample has already been added
-        for(unsigned int i=0;i<samples.size();++i)
-        {
-            if(samples[i]->getAbsoluteName()==sampleName)
-            {
+        for(unsigned int i=0;i<samples.size();++i) {
+            if (samples[i]->getAbsoluteName()==sampleName) {
                 addedSample=samples[i];
                 samples[i]->addUser();
             }
         }
         //if no, add it
-        if(addedSample==NULL)
-        {
+        if (addedSample==NULL) {
             addedSample = new sample();
-            if(addedSample->tryLoad(n,rn,fileName))
-            {
+            if (addedSample->tryLoad(n,rn,fileName)) {
                 delete addedSample;
                 addedSample=NULL;
                 showMessage(true,"Problem loading sample "+sampleName);
             }
-            else
-            {
+            else {
                 //resample if needed
                 addedSample->setSampleRate(jack->getSampleRate());
                 //add user to current sample
@@ -1079,16 +1066,12 @@ sample* tapeutape::addSample(char* n,char *rn)
 void tapeutape::removeSample(sample* s)
 {
     //if more than one user left, just remove the user
-    if(s->getNbUsers()>1)
-    {
+    if (s->getNbUsers()>1) {
         s->removeUser();
     }
-    else //else look for the sample in the vector and remove it completely
-    {
-        for(unsigned int i=0;i<samples.size();++i)
-        {
-            if(samples[i]->getAbsoluteName()==s->getAbsoluteName())
-            {
+    else {                       //else look for the sample in the vector and remove it completely
+        for(unsigned int i=0;i<samples.size();++i) {
+            if (samples[i]->getAbsoluteName()==s->getAbsoluteName()) {
                 delete(samples[i]);
                 samples.erase(samples.begin()+i);
                 break;
@@ -1099,16 +1082,15 @@ void tapeutape::removeSample(sample* s)
 
 void tapeutape::setSampleRate(int sr)
 {
-/*
-    for(unsigned int i=0;i<setups.size();++i)
-        for(unsigned int j=0;j<setups[i]->getNbKits();++j)
-            for(unsigned int k=0;k<setups[i]->getKit(j)->getNbInstruments();++k)
-                for(unsigned int l=0;l<setups[i]->getKit(j)->getInstrument(k)->getNbVariations();++l)
-                    setups[i]->getKit(j)->getInstrument(k)->getVariation(l)->getSample()->setSampleRate(sr);
-*/
+    /*
+        for(unsigned int i=0;i<setups.size();++i)
+            for(unsigned int j=0;j<setups[i]->getNbKits();++j)
+                for(unsigned int k=0;k<setups[i]->getKit(j)->getNbInstruments();++k)
+                    for(unsigned int l=0;l<setups[i]->getKit(j)->getInstrument(k)->getNbVariations();++l)
+                        setups[i]->getKit(j)->getInstrument(k)->getVariation(l)->getSample()->setSampleRate(sr);
+    */
 
-    for(unsigned int s=0;s<samples.size();++s)
-    {
+    for(unsigned int s=0;s<samples.size();++s) {
         samples[s]->setSampleRate(sr);
     }
 }
@@ -1136,20 +1118,15 @@ void tapeutape::addCreateJackStereoChannel(std::string n)
 
 void tapeutape::removeJackStereoChannel(int ind)
 {
-    if(jackStereoChannelsNames.size()>1)
-    {
+    if (jackStereoChannelsNames.size()>1) {
         jackStereoChannelsNames.erase(jackStereoChannelsNames.begin()+ind);
         //for each instrument, check if the number of the output is still available
         //if it isn't , give it the last output
-        for(unsigned int i=0;i<setups.size();++i)
-        {
-            for(unsigned int j=0;j<setups[i]->getNbKits();++j)
-            {
-                for(unsigned int k=0;k<setups[i]->getKit(j)->getNbInstruments();++k)
-                {
+        for(unsigned int i=0;i<setups.size();++i) {
+            for(unsigned int j=0;j<setups[i]->getNbKits();++j) {
+                for(unsigned int k=0;k<setups[i]->getKit(j)->getNbInstruments();++k) {
                     int outNum = setups[i]->getKit(j)->getInstrument(k)->getJackStereoChannel();
-                    if(outNum>ind)
-                    {
+                    if (outNum>ind) {
                         setups[i]->getKit(j)->getInstrument(k)->setJackStereoChannel(outNum-1);
                     }
                 }
@@ -1177,9 +1154,8 @@ void tapeutape::setJackStereoChannelName(int ind,std::string n)
 
 int tapeutape::getJackStereoChannel(std::string n)
 {
-    for(unsigned int i=0;i<jackStereoChannelsNames.size();++i)
-    {
-        if(n == getJackStereoChannelName(i))
+    for(unsigned int i=0;i<jackStereoChannelsNames.size();++i) {
+        if (n == getJackStereoChannelName(i))
             return i;
     }
     return -1;
@@ -1232,55 +1208,45 @@ short tapeutape::getSetupCC()
 
 void tapeutape::processCC(unsigned short chan, unsigned short cc,unsigned short val)
 {
-    for(unsigned int i=0;i<setups.size();++i)
-    {
+    for(unsigned int i=0;i<setups.size();++i) {
         int cK = setups[i]->getCurrentKit();
 
-        if(cc > 125)
-        {
+        if (cc > 125) {
             // CC 126 set the instrument(s) bound to note "val" in Reverse mode
             // CC 127 set the instrument(s) bound to note "val" in Forward mode
-            for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++)
-            {
+            for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++) {
                 int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
                 int iMaxN = setups[i]->getKit(cK)->getInstrument(j)->getMaxNote();
                 int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();
-                if(iChan-1 == chan && val <= iMaxN && val >= iMinN)
-                {
+                if (iChan-1 == chan && val <= iMaxN && val >= iMinN) {
                     setups[i]->getKit(cK)->getInstrument(j)->setPlayReverse(127-cc);
                 }
             }
         }
         else
-        if(cc > 123)
-        {
+        if (cc > 123) {
             // CC 125 set the instrument(s) bound to note "val" in Loop mode
             // CC 124 set the instrument(s) bound to note "val" in SingleShot mode
 
-            for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++)
-            {
+            for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++) {
                 int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
                 int iMaxN = setups[i]->getKit(cK)->getInstrument(j)->getMaxNote();
                 int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();
-                if(iChan-1 == chan && val <= iMaxN && val >= iMinN)
-                {
+                if (iChan-1 == chan && val <= iMaxN && val >= iMinN) {
                     setups[i]->getKit(cK)->getInstrument(j)->setPlayLoop(125-cc);
                 }
             }
         }
         else
-        if(cc > 121)
-        {
+        if (cc > 121) {
             // CC 123 set the instrument(s) bound to note "val" in Normal mode
             // CC 122 set the instrument(s) bound to note "val" in Trigger mode
 
-            for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++)
-            {
+            for(unsigned int j=0;j<setups[i]->getKit(cK)->getNbInstruments();j++) {
                 int iChan = setups[i]->getKit(cK)->getInstrument(j)->getMidiChannel();
                 int iMaxN = setups[i]->getKit(cK)->getInstrument(j)->getMaxNote();
                 int iMinN = setups[i]->getKit(cK)->getInstrument(j)->getMinNote();
-                if(iChan-1 == chan && val <= iMaxN && val >= iMinN)
-                {
+                if (iChan-1 == chan && val <= iMaxN && val >= iMinN) {
                     setups[i]->getKit(cK)->getInstrument(j)->setPlayMode(123-cc);
                 }
             }
@@ -1293,11 +1259,8 @@ void tapeutape::processPC(unsigned short chan, unsigned short pc)
     //test if it changes one of the setups
     int ipc = static_cast <int>(pc);
     for(unsigned int i=0;i<setups.size();++i)
-        if(setups[i]->getChannel()-1 == chan && ipc < setups[i]->getNbKits()+1) changeKit(i, pc);
+        if (setups[i]->getChannel()-1 == chan && ipc < setups[i]->getNbKits()+1) changeKit(i, pc);
 }
-
-
-
 
 void tapeutape::setGlobalVolume(double gv)
 {

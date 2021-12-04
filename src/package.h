@@ -13,21 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "audioEvent.h"
-using namespace std;
-
-audioEvent::audioEvent()
-{
-
-}
-
-audioEvent::audioEvent(variation* va,instrument* i,unsigned long d,double ps,int j,double v,double pl,double pr,bool ev)
-    :var(va),instru(i),id(d),pitch(ps),event(ev),offset(0),jackStereoChannel(j),volume(v),panLeft(pl),panRight(pr),fade(1.0),
-    m_playTrigger(instru->getPlayMode()),
-    m_playLoop(instru->getPlayLoop()),
-    m_playReverse(instru->getPlayReverse())
-{
-    if (instru->getPlayReverse()) {
-        offset=var->getSample()->getFramesCount()-1;
-    }
-}
+#define PACKAGE_NAME "tapeutape"
+#define CLIENT_NAME "Tapeutape"
+#define VERSION "1.0.0-alpha"

@@ -18,7 +18,6 @@
 /* PERFORMANCE OF THIS SOFTWARE.                                         */
 /*************************************************************************/
 
-
 /*************************************************************************/
 /* A simple, callback based C API for NSM clients.                        */
 /*                                                                        */
@@ -218,7 +217,7 @@ NSM_EXPORT
 const char *
 nsm_get_client_id( nsm_client_t *nsm )
 {
-  return _NSM()->nsm_client_id;
+    return _NSM()->nsm_client_id;
 }
 
 NSM_EXPORT
@@ -311,8 +310,8 @@ NSM_EXPORT
 void
 nsm_send_message ( nsm_client_t *nsm, int priority, const char *msg )
 {
-   if ( _NSM()->nsm_is_active )
-       lo_send_from( _NSM()->nsm_addr, _NSM()->_server, LO_TT_IMMEDIATE, "/nsm/client/message", "is", priority, msg );
+    if ( _NSM()->nsm_is_active )
+        lo_send_from( _NSM()->nsm_addr, _NSM()->_server, LO_TT_IMMEDIATE, "/nsm/client/message", "is", priority, msg );
 }
 
 NSM_EXPORT void
@@ -320,8 +319,7 @@ nsm_send_announce ( nsm_client_t *nsm, const char *app_name, const char *capabil
 {
     lo_address to = lo_address_new_from_url( _NSM()->nsm_url );
 
-    if ( ! to )
-    {
+    if ( ! to ) {
         fprintf( stderr, "NSM: Bad address!" );
         return;
     }
@@ -329,12 +327,12 @@ nsm_send_announce ( nsm_client_t *nsm, const char *app_name, const char *capabil
     int pid = (int)getpid();
 
     lo_send_from( to, _NSM()->_server, LO_TT_IMMEDIATE, "/nsm/server/announce", "sssiii",
-                  app_name,
-                  capabilities,
-                  process_name,
-                  NSM_API_VERSION_MAJOR,
-                  NSM_API_VERSION_MINOR,
-                  pid );
+        app_name,
+        capabilities,
+        process_name,
+        NSM_API_VERSION_MAJOR,
+        NSM_API_VERSION_MINOR,
+        pid );
 
     lo_address_free( to );
 }
@@ -342,11 +340,9 @@ nsm_send_announce ( nsm_client_t *nsm, const char *app_name, const char *capabil
 NSM_EXPORT void
 nsm_send_broadcast ( nsm_client_t *nsm, lo_message msg )
 {
-   if ( _NSM()->nsm_is_active )
-       lo_send_message_from( _NSM()->nsm_addr, _NSM()->_server, "/nsm/server/broadcast", msg );
+    if ( _NSM()->nsm_is_active )
+        lo_send_message_from( _NSM()->nsm_addr, _NSM()->_server, "/nsm/server/broadcast", msg );
 }
-
-
 
 NSM_EXPORT
 void
@@ -363,7 +359,6 @@ nsm_check_nowait (nsm_client_t *nsm )
     nsm_check_wait( nsm, 0 );
 }
 
-
 NSM_EXPORT
 void
 nsm_thread_start ( nsm_client_t *nsm )
@@ -371,15 +366,12 @@ nsm_thread_start ( nsm_client_t *nsm )
     lo_server_thread_start( _NSM()->_st );
 }
 
-
 NSM_EXPORT
 void
 nsm_thread_stop ( nsm_client_t *nsm )
 {
     lo_server_thread_stop( _NSM()->_st );
 }
-
-
 
 NSM_EXPORT void
 nsm_free ( nsm_client_t *nsm )
@@ -453,7 +445,6 @@ nsm_set_session_is_loaded_callback( nsm_client_t *nsm, nsm_session_is_loaded_cal
     _NSM()->session_is_loaded_userdata = userdata;
 }
 
-
 NSM_EXPORT
 void
 nsm_set_broadcast_callback( nsm_client_t *nsm, nsm_broadcast_callback *broadcast_callback, void *userdata )
@@ -461,8 +452,6 @@ nsm_set_broadcast_callback( nsm_client_t *nsm, nsm_broadcast_callback *broadcast
     _NSM()->broadcast = broadcast_callback;
     _NSM()->broadcast_userdata = userdata;
 }
-
-
 
 /****************/
 /* OSC HANDLERS */
@@ -474,7 +463,6 @@ nsm_set_broadcast_callback( nsm_client_t *nsm, nsm_broadcast_callback *broadcast
 #define OSC_REPLY( value ) lo_send_from( ((struct _nsm_client_t*)user_data)->nsm_addr, ((struct _nsm_client_t*)user_data)->_server, LO_TT_IMMEDIATE, "/reply", "ss", path, value )
 
 #define OSC_REPLY_ERR( errcode, value ) lo_send_from( ((struct _nsm_client_t*)user_data)->nsm_addr, ((struct _nsm_client_t*)user_data)->_server, LO_TT_IMMEDIATE, "/error", "sis", path, errcode, value )
-
 
 NSM_EXPORT int _nsm_osc_open ( const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data )
 {
@@ -635,8 +623,6 @@ NSM_EXPORT int _nsm_osc_broadcast ( const char *path, const char *types, lo_arg 
     return nsm->broadcast( path, msg, nsm->broadcast_userdata );
 }
 
-
-
 NSM_EXPORT
 int
 nsm_init ( nsm_client_t *nsm, const char *nsm_url )
@@ -663,7 +649,6 @@ nsm_init ( nsm_client_t *nsm, const char *nsm_url )
 
     return 0;
 }
-
 
 NSM_EXPORT
 int
@@ -692,5 +677,4 @@ nsm_init_thread ( nsm_client_t *nsm, const char *nsm_url )
 
     return 0;
 }
-
-#endif /* NSM_H */
+#endif                           /* NSM_H */

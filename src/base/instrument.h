@@ -1,25 +1,17 @@
-/***************************************************************************
- *            instrument.h
- *
- *  Copyright  2006 - 2013 Florent Berthaut, 2019 Jean-Emmanuel Doucet & Aurélien Roux
- *  florentberthaut@no-log.org jean-emmanuel.doucet@groolot.net orl@ammd.net
- ****************************************************************************/
-
-/*
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
+// This file is part of tapeutape
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef _INSTRUMENT_H
 #define _INSTRUMENT_H
@@ -74,13 +66,10 @@ class instrument
         inline void setPolyphony(unsigned int p){polyphony=p;playingCount=0;};
         inline unsigned int getCut(){return cut;};
         inline void setCut(unsigned int c){cut=c;};
-        inline int addPlaying()
-        {
-            if(polyphony>0)
-            {
+        inline int addPlaying() {
+            if(polyphony>0) {
                 //if we are cutting voices
-                if(count)
-                {
+                if(count) {
                     return -1;
                 }
                 //else
@@ -92,12 +81,10 @@ class instrument
             return 0;
         };
         inline void removePlaying(){if(playingCount>0)--playingCount;};
-        inline bool isCut()
-        {
+        inline bool isCut() {
             bool ans=false;
             //if the cut process is started
-            if(count)
-            {
+            if(count) {
                 ans=true;
                 count=false;
             }
@@ -126,7 +113,4 @@ class instrument
         unsigned int polyphony;
         int cut;
 };
-
-
-
-#endif /* _INSTRUMENT_H */
+#endif

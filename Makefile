@@ -14,12 +14,12 @@ PREFIX = /usr/local
 
 .PHONY: all clean install uninstall
 
-all: src/$(BIN)
+all: $(BIN)
 
 bold := $(shell tput bold)
 sgr0 := $(shell tput sgr0)
 
-src/$(BIN): $(OBJ)
+$(BIN): $(OBJ)
 	@printf '\n$(bold)Linking$(sgr0)\n'
 	$(CXX) -o $@ $^ $(LDFLAGS)
 	@printf '\n'
@@ -31,7 +31,7 @@ src/$(BIN): $(OBJ)
 -include $(DEPENDS)
 
 clean:
-	@rm -f $(OBJ) $(DEPENDS) src/$(BIN)
+	@rm -f $(OBJ) $(DEPENDS) $(BIN)
 
 install: src/$(BIN)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
