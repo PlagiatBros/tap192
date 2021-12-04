@@ -24,7 +24,10 @@ variation::variation():minVeloc(0),maxVeloc(127),sound(NULL)
 {
 }
 
-variation::variation(const variation &var):sound(var.sound),minVeloc(var.minVeloc),maxVeloc(var.maxVeloc)
+variation::variation(const variation &var):
+    minVeloc(var.minVeloc),
+    maxVeloc(var.maxVeloc),
+    sound(var.sound)
 {
     if (sound != NULL) sound->addUser();
 }

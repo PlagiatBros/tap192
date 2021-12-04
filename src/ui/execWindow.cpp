@@ -436,7 +436,7 @@ void execWindow::init()
     fileSaved=true;
 
     //create the list of audio outputs
-    for(unsigned int i=0;i<tap->getNbJackStereoChannels();++i) {
+    for(int i=0;i<tap->getNbJackStereoChannels();++i) {
         setOutList->add(tap->getJackStereoChannelName(i).c_str());
         creaAudioOutput->add(tap->getJackStereoChannelName(i).c_str());
     }
@@ -612,7 +612,7 @@ void execWindow::cbSetOutNew(Fl_Widget*)
         oss << outputNb;
         outputName ="Output"+oss.str();
         outputCreated=true;
-        for(unsigned int i=0;i<tap->getNbJackStereoChannels();++i) {
+        for(int i=0;i<tap->getNbJackStereoChannels();++i) {
             if (tap->getJackStereoChannelName(i)==outputName) {
                 outputCreated=false;
             }
@@ -1643,7 +1643,7 @@ void execWindow::cbCreaSampleOpen(Fl_Widget*)
         }
         //if no sample in this variation
         //try the other variations
-        for(unsigned int i=0;i<tmpInst->getNbVariations() && previousDir=="";++i) {
+        for(int i=0;i<tmpInst->getNbVariations() && previousDir=="";++i) {
             if (tmpInst->getVariation(i)->getSample()) {
                 previousDir = tmpInst->getVariation(i)->getSample()->getAbsoluteName();
             }

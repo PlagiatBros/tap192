@@ -66,7 +66,7 @@ class sample
 enum { TABSIZE = 256 };
 
 /* cubic interpolation coefficient table for first tap */
-static float ct0[TABSIZE] =
+const float ct0[TABSIZE] =
 {
     0.000000, -0.001938, -0.003845, -0.005723,
     -0.007570, -0.009388, -0.011176, -0.012934,
@@ -135,7 +135,7 @@ static float ct0[TABSIZE] =
 };
 
 /* cubic interpolation coefficient table for second tap */
-static float ct1[TABSIZE] =
+const float ct1[TABSIZE] =
 {
     1.000000, 0.999962, 0.999848, 0.999659,
     0.999395, 0.999058, 0.998646, 0.998161,
@@ -204,7 +204,7 @@ static float ct1[TABSIZE] =
 };
 
 /* cubic interpolation coefficient table for third tap */
-static float ct2[TABSIZE] =
+const float ct2[TABSIZE] =
 {
     0.000000, 0.001984, 0.004028, 0.006132,
     0.008295, 0.010517, 0.012798, 0.015137,
@@ -273,7 +273,7 @@ static float ct2[TABSIZE] =
 };
 
 /* cubic interpolation coefficient table for fourth tap */
-static float ct3[TABSIZE] =
+const float ct3[TABSIZE] =
 {
     0.000000, -0.000008, -0.000030, -0.000068,
     -0.000120, -0.000187, -0.000268, -0.000364,
@@ -341,7 +341,7 @@ static float ct3[TABSIZE] =
     -0.007570, -0.005723, -0.003845, -0.001938
 };
 
-static float logvolct[TABSIZE] =
+const float logvolct[TABSIZE] =
 {
     0.000000, 0.000000, 0.000000, 0.000000,
     0.000001, 0.000002, 0.000004, 0.000007,

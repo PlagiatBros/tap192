@@ -84,7 +84,6 @@ int tapParser::parseCurrent(xmlNodePtr a_node)
     xmlNodePtr cur_node = NULL;
 
     for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
-        char* val = NULL;
         std::string nodeName((const char*)(cur_node->name));
         if (cur_node->type == XML_ELEMENT_NODE) {
             if (nodeName=="options") {
@@ -143,10 +142,8 @@ int tapParser::parseOptions(xmlNodePtr cur_node)
 
 int tapParser::parseCreation(xmlNodePtr cur_node)
 {
-    char* val=NULL;
     xmlNodePtr cNode = NULL;
     for (cNode = cur_node->children; cNode; cNode = cNode->next) {
-        val = NULL;
         std::string nodeName((const char*)(cNode->name));
         if (cNode->type == XML_ELEMENT_NODE) {
             if (nodeName=="setup")
@@ -208,7 +205,6 @@ int tapParser::parseSetup(xmlNodePtr cur_node)
 int tapParser::parseKit(xmlNodePtr cur_node,setup* s)
 {
     char* val=NULL;
-    float volume=1.0;
 
     //add a new kit
     kit* k = new kit();
