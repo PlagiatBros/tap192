@@ -13,9 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#define PACKAGE_NAME "Tapeutape"
-#define CLIENT_NAME "Tapeutape" // jack, alsa
-#define BINARY_NAME "tapeutape"
-#define XML_NAMESPACE "tapeutape"
+#define PACKAGE_NAME "Tapeutape"    // pretty app name
+#define CLIENT_NAME "Tapeutape"     // jack, alsa
+
+#define BINARY_NAME "tapeutape"     // executable name
+#define XML_NAMESPACE "tapeutape"   // root element in xml files 
 
 #define VERSION "1.0.0-alpha"
