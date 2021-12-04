@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = 	-I/usr/include/libxml2\
 			$(shell pkg-config --cflags alsa sndfile samplerate jack liblo)\
 			$(shell fltk-config --cxxflags)\
-			-g -O0 #-Wall
+			-g -O0 -Wall
 LDFLAGS =   -lxml2\
 			$(shell pkg-config --libs alsa sndfile samplerate jack liblo)\
 			$(shell fltk-config --libs --ldflags)
