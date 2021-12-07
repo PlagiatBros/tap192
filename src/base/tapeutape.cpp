@@ -470,24 +470,6 @@ int argc, void *data, void *user_data)
 
         t->parseOscSKI(&argv[0]->s, o_what);
 
-/*        // Setup
-        if (types[0] == 's') snc = &argv[0]->s;
-        else if (types[0] == 'i') sn = argv[0]->i;
-
-        // Kit
-        if (types[1] == 's') knc = &argv[1]->s;
-        else if (types[1] == 'i') kn = argv[1]->i;
-
-        if (argc > 2) {
-            // Instrument
-            if (o_what == INSTRUMENT) {
-                if (types[2] == 's') inc = &argv[2]->s;
-                else if (types[2] == 'i') in = argv[2]->i;
-            }
-            else {
-                address = &argv[2]->s;
-            }
-        }*/
         if (argc > 1) {
             address = &argv[1]->s;
         }
@@ -498,8 +480,8 @@ int argc, void *data, void *user_data)
 
         lo_add = lo_address_new_from_url(address);
         spath = path;
-        if (o_what == KIT) spath.replace(spath.find("kit/get"), 7, PACKAGE_NAME + '/kit');
-        else if (o_what == INSTRUMENT) spath.replace(spath.find("instrument/get"), 14, PACKAGE_NAME + '/instrument');
+        if (o_what == KIT) spath.replace(spath.find("kit/get"), 7, (string)BINARY_NAME + "/kit");
+        else if (o_what == INSTRUMENT) spath.replace(spath.find("instrument/get"), 14, (string)BINARY_NAME + "/instrument");
         if (by == "by_name") spath.erase(spath.find("/by_name"));
         lo_msg = lo_message_new();
 
