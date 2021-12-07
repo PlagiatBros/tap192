@@ -136,20 +136,21 @@ int argc, void *data, void *user_data)
     snc=""; knc=""; inc="";
 
     switch (command) {
-        // General OSC methods
+// General OSC methods
         case SET_GLOBAL_VOLUME:
-            // 'd' : global_volume
+            // global_volume (d, f, i)
             if (argc > 0) {
                 double gv;
                 if (types[0] == 'i')    gv = (double)(argv[0]->i);
-                else if (types[0] == 'f') gv = argv[0]->f;
+                else if (types[0] == 'f') gv = (double) argv[0]->f;
+                else if (types[0] == 'd') gv = argv[0]->d;
                 else break;
                 t->setGlobalVolume(gv);
             }
             break;
         case GET_GLOBAL_VOLUME:
             // noargs : message will be sent to sender's address
-            // 's' : address
+            // address (s)
             if (argc == 1) {
                 address = &argv[0]->s;
             }
@@ -168,163 +169,118 @@ int argc, void *data, void *user_data)
             }
             break;
 
-            // Kit OSC methods
+// Kit OSC methods
+// Set
         case KIT_SET_SELECTED:
         case KIT_SELECT:
             o_what = KIT; x_what = SELECT;
             break;
-        case KIT_GET_SELECTED_BYNAME:
-            by = "by_name";
-        case KIT_GET_SELECTED:
-            o_what = KIT; x_what = SELECT;
-            get = 1;
-/*            // noargs : message will be sent to the sender's address
-            // 's' : address
-            if (argc == 1) {
-                address = &argv[0]->s;
-            }
-            else {
-                address = lo_address_get_url(lo_message_get_source(data));
-            }
-
-            lo_add = lo_address_new_from_url(address);
-            if (lo_add != NULL) {
-                spath = path;
-                spath.replace(spath.find("kit/get"), 7, (string)BYNARY_NAME + "/kit");
-                lo_msg = lo_message_new();
-                for (int i=0;i<(int)t->setups.size();i++) {
-                    if (!by.compare("by_name")) {
-                        lo_message_add_string(lo_msg, t->setups[i]->getName().c_str());
-                        lo_message_add_string(lo_msg, t->setups[i]->getKit(t->setups[i]->getCurrentKit())->getName().c_str());
-                    }
-                    else {
-                        lo_message_add_int32(lo_msg, i);
-                        lo_message_add_int32(lo_msg, t->setups[i]->getCurrentKit());
-                    }
-                }
-                lo_send_message(lo_add, spath.c_str(), lo_msg);
-                lo_address_free(lo_add);
-                by = "";
-            }*/
-            break;
-
-        // Trig OSC Set Parameters Methods
         case KIT_SET_VOLUME:
             // "s:Setup/Kit" (s), Volume (d,f,i) || "i:Setup_id/Kit_id" (s), Volume (d,f,i)
             // "s:Kit" (s), Volume (d,f,i) || "i:Kit_id" (s), Volume (d,f,i)
             o_what = KIT; x_what = VOLUME;
             break;
-        case INSTRUMENT_SET_VOLUME:
-            // Setup (s,i), Kit (s,i), Instrument (s,i), Volume (d,f,i)
-            // Kit (s,i), Instrument (s,i), Volume (d,f,i)
-            // Instrument (s,i), Volume (d,f,i)
-            o_what = INSTRUMENT; x_what = VOLUME;
+// Get
+        case KIT_GET_SELECTED_BYNAME:
+            by = "by_name";
+        case KIT_GET_SELECTED:
+            // noargs : message will be sent to sender's address
+            // address (s)
+            o_what = KIT; x_what = SELECT;
+            get = 1;
             break;
-        case INSTRUMENT_SET_PAN:
-            // Setup (s,i), Kit (s,i), Instrument (s,i), Pan (d,f,i)
-            // Kit (s,i), Instrument (s,i), Pan (d,f,i)
-            // Instrument (s,i), Pan (d,f,i)
-            o_what = INSTRUMENT; x_what = PAN;
-            break;
-        case INSTRUMENT_SET_MIDITUNE:
-            // Setup (s,i), Kit (s,i), Instrument (s,i), Miditune (d,f,i)
-            // Kit (s,i), Instrument (s,i), Miditune (d,f,i)
-            // Instrument (s,i), Miditune (d,f,i)
-            o_what = INSTRUMENT; x_what = MIDITUNE;
-            break;
-        case INSTRUMENT_SET_PLAYMODE:
-            // Setup (s,i), Kit (s,i), Instrument (s,i), Playmode (d,f,i)
-            // Kit (s,i), Instrument (s,i), Playmode (d,f,i)
-            // Instrument (s,i), Playmode (d,f,i)
-            o_what = INSTRUMENT; x_what = PLAYMODE;
-            break;
-
-        case INSTRUMENT_PLAY:
-            // Setup (s,i), Kit (s,i), Instrument (s,i), Velocity (i), (Pitch (f))
-            o_what = INSTRUMENT; x_what = PLAY;
-            playstop = 1;
-            break;
-        case INSTRUMENT_STOP:
-            // Setup (s,i), Kit (s,i), Instrument (s,i)
-            o_what = INSTRUMENT; x_what = STOP;
-            playstop = 1;
-            break;
-
-        // Trig OSC Get Parameters Methods
         case KIT_GET_VOLUME_BYNAME:
             by = "by_name";
         case KIT_GET_VOLUME:
-            // Setup (s, i), Kit (s, i)
-            // Setup (s, i), Kit (s, i), Address (s)
+            // "s:Setup/Kit" (s), (address (s)) || "i:Setup_id/Kit_id" (s), (address (s))
             o_what = KIT; x_what = VOLUME;
             param_type = P_DOUBLE; get = 1;
             break;
 
+
+// Instruments OSC Methods
+// Set
+        case INSTRUMENT_SET_VOLUME:
+            // "s:Setup/Kit/Instrument" (s), Volume (d,f,i) || "i:Setup_id/Kit_id/Instrument_id" (s), Volume (d,f,i)
+            // "s:Kit/Instrument" (s), Volume (d,f,i) || "i:Kit_id/Instrument_id" (s), Volume (d,f,i)
+            // "s:Instrument" (s), Volume (d,f,i) || "i:Instrument_id" (s), Volume (d,f,i)
+            o_what = INSTRUMENT; x_what = VOLUME;
+            break;
+        case INSTRUMENT_SET_PAN:
+            // "s:Setup/Kit/Instrument" (s), Pan (d,f,i) || "i:Setup_id/Kit_id/Instrument_id" (s), Pan (d,f,i)
+            // "s:Kit/Instrument" (s), Pan (d,f,i) || "i:Kit_id/Instrument_id" (s), Pan (d,f,i)
+            // "s:Instrument" (s), Pan (d,f,i) || "i:Instrument_id" (s), Pan (d,f,i)
+            o_what = INSTRUMENT; x_what = PAN;
+            break;
+        case INSTRUMENT_SET_MIDITUNE:
+            // "s:Setup/Kit/Instrument" (s), Miditune (d,f,i) || "i:Setup_id/Kit_id/Instrument_id" (s), Miditune (d,f,i)
+            // "s:Kit/Instrument" (s), Miditune (d,f,i) || "i:Kit_id/Instrument_id" (s), Miditune (d,f,i)
+            // "s:Instrument" (s), Miditune (d,f,i) || "i:Instrument_id" (s), Miditune (d,f,i)
+            o_what = INSTRUMENT; x_what = MIDITUNE;
+            break;
+        case INSTRUMENT_SET_PLAYMODE:
+            // "s:Setup/Kit/Instrument" (s), Playmode (i) || "i:Setup_id/Kit_id/Instrument_id" (s), Playmode (i)
+            // "s:Kit/Instrument" (s), Playmode (i) || "i:Kit_id/Instrument_id" (s), Playmode (i)
+            // "s:Instrument" (s), Playmode (i) || "i:Instrument_id" (s), Playmode (i)
+            o_what = INSTRUMENT; x_what = PLAYMODE;
+            break;
+
+        case INSTRUMENT_PLAY:
+            // "s:Setup/Kit/Instrument" (s), Play (i) || "i:Setup_id/Kit_id/Instrument_id" (s), Play (i)
+            // "s:Kit/Instrument" (s), Play (i) || "i:Kit_id/Instrument_id" (s), Play (i)
+            // "s:Instrument" (s), Play (i) || "i:Instrument_id" (s), Play (i)
+            o_what = INSTRUMENT; x_what = PLAY;
+            playstop = 1;
+            break;
+        case INSTRUMENT_STOP:
+            // "s:Setup/Kit/Instrument" (s), Stop (i) || "i:Setup_id/Kit_id/Instrument_id" (s), Stop (i)
+            // "s:Kit/Instrument" (s), Stop (i) || "i:Kit_id/Instrument_id" (s), Stop (i)
+            // "s:Instrument" (s), Stop (i) || "i:Instrument_id" (s), Stop (i)
+            o_what = INSTRUMENT; x_what = STOP;
+            playstop = 1;
+            break;
+
+// Get
         case INSTRUMENT_GET_VOLUME_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_VOLUME:
-            // Setup (s, i), Kit (s, i), Instrument (s, i)
-            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
-            o_what = INSTRUMENT; x_what = VOLUME;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))
             param_type = P_DOUBLE; get = 1;
             break;
         case INSTRUMENT_GET_PAN_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PAN:
-            // Setup (s, i), Kit (s, i), Instrument (s, i)
-            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
-            o_what = INSTRUMENT; x_what = PAN;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PAN;
             param_type = P_DOUBLE; get = 1;
             break;
         case INSTRUMENT_GET_MIDITUNE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_MIDITUNE:
-            // Setup (s, i), Kit (s, i), Instrument (s, i)
-            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
-            o_what = INSTRUMENT; x_what = MIDITUNE;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = MIDITUNE;
             param_type = P_DOUBLE; get = 1;
             break;
-
-        /*
-        case INSTRUMENT_GET_OUTPUT_BYNAME:
-            by = "by_name";
-        case INSTRUMENT_GET_OUTPUT:
-            // Setup (s, i), Kit (s, i), Instrument (s, i)
-            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
-            o_what = INSTRUMENT; x_what = OUTPUT;
-            param_type = P_INT; get = 1;
-            break;
-        */
         case INSTRUMENT_GET_PLAYMODE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PLAYMODE:
-            // Setup (s, i), Kit (s, i), Instrument (s, i)
-            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
-            o_what = INSTRUMENT; x_what = PLAYMODE;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PLAYMODE;
             param_type = P_INT; get = 1;
             break;
         case INSTRUMENT_GET_PLAYLOOP_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PLAYLOOP:
-            // Setup (s, i), Kit (s, i), Instrument (s, i)
-            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
-            o_what = INSTRUMENT; x_what = PLAYLOOP;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PLAYLOOP;
             param_type = P_INT; get = 1;
             break;
         case INSTRUMENT_GET_PLAYREVERSE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PLAYREVERSE:
-            // Setup (s, i), Kit (s, i), Instrument (s, i)
-            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
-            o_what = INSTRUMENT; x_what = PLAYREVERSE;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PLAYREVERSE;
             param_type = P_INT; get = 1;
             break;
         case INSTRUMENT_GET_PITCHOVERRANGE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PITCHOVERRANGE:
-            // Setup (s, i), Kit (s, i), Instrument (s, i)
-            // Setup (s, i), Kit (s, i), Instrument (s, i), Address (s)
-            o_what = INSTRUMENT; x_what = PITCHOVERRANGE;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PITCHOVERRANGE;
             param_type = P_INT; get = 1;
             break;
     }
@@ -333,7 +289,6 @@ int argc, void *data, void *user_data)
     if (argc > 0 && !get) {
         double x;
         float p=1;
-        int argind=1;
 
         t->parseOscSKI(&argv[0]->s, o_what);
 
@@ -1211,7 +1166,7 @@ void tapeutape::parseOscSKI(string a, int ow)
         pos = 2;
     }
 
-    while (a.find(sep, pos+1) != -1) {
+    while (a.find(sep, pos+1) != string::npos) {
         pos = a.find(sep, pos+1);
         nb_args ++;
     }
