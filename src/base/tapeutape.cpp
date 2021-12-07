@@ -29,7 +29,9 @@ enum O_TYPES
 
 enum X_TYPES
 {
-    VOLUME = 0,
+    SELECT = 0,
+
+    VOLUME,
     PAN,
     MIDITUNE,
     //OUTPUT,
@@ -169,68 +171,14 @@ int argc, void *data, void *user_data)
             // Kit OSC methods
         case KIT_SET_SELECTED:
         case KIT_SELECT:
-            // 'ii', 'is', 'si', 'ss' : Setup, Kit
-            sn=-1; kn=-1;
-            snc=""; knc="";
-            if (argc > 1) {
-                if (types[0] == 'i') {
-                    sn = argv[0]->i;
-                    if (types[1] == 'i') kn = argv[1]->i;
-                    else if (types[1] == 's') knc = &argv[1]->s;
-                }
-                else if (types[0] == 's') {
-                    snc = &argv[0]->s;
-                    if (types[1] == 'i') kn = argv[1]->i;
-                    else if (types[1] == 's') knc = &argv[1]->s;
-                }
-                else break;
-            }
-            else if (argc > 0) {
-                if (types[0] == 'i') kn = argv[0]->i;
-                else if (types[0] == 's')    knc = &argv[0]->s;
-                else break;
-            }
-
-            if (snc != "") {
-                // setup(s) defined by name
-                sn = t->getSetupIdByName(snc);
-                // kit defined by number
-                if (kn !=-1) t->changeKit(sn, kn);
-                // kit(s) defined by name
-                else if (knc !="") {
-                    kn = t->getKitIdByName(knc, snc);
-                    if (kn != -1) t->changeKit(sn, kn);
-                }
-            }
-            // setup defined by number
-            else if (sn !=-1) {
-                // kit(s) defined by number
-                if (kn != -1) t->changeKit(sn,kn);
-                // kit defined by name
-                else if (knc != "") {
-                    kn = t->getKitIdByName(knc,snc,sn);
-                    if (kn != -1) t->changeKit(sn, kn);
-                }
-            }
-            // setup not defined (one arg only)
-            else if (sn == -1 && argc == 1) {
-                for (unsigned int i=0;i<t->setups.size();++i) {
-                    if (kn != -1 && kn < t->setups[i]->getNbKits()) {
-                        // kit(s) defined by number
-                        t->changeKit(i,kn);
-                    }
-                    // kit defined by name
-                    else if (knc != "") {
-                        kn = t->getKitIdByName(knc, snc, i);
-                        if (kn != -1) t->changeKit(i,kn);
-                    }
-                }
-            }
+            o_what = KIT; x_what = SELECT;
             break;
         case KIT_GET_SELECTED_BYNAME:
             by = "by_name";
         case KIT_GET_SELECTED:
-            // noargs : message will be sent to the sender's address
+            o_what = KIT; x_what = SELECT;
+            get = 1;
+/*            // noargs : message will be sent to the sender's address
             // 's' : address
             if (argc == 1) {
                 address = &argv[0]->s;
@@ -242,7 +190,7 @@ int argc, void *data, void *user_data)
             lo_add = lo_address_new_from_url(address);
             if (lo_add != NULL) {
                 spath = path;
-                spath.replace(spath.find("kit/get"), 7, "tapeutape/kit");
+                spath.replace(spath.find("kit/get"), 7, (string)BYNARY_NAME + "/kit");
                 lo_msg = lo_message_new();
                 for (int i=0;i<(int)t->setups.size();i++) {
                     if (!by.compare("by_name")) {
@@ -257,13 +205,13 @@ int argc, void *data, void *user_data)
                 lo_send_message(lo_add, spath.c_str(), lo_msg);
                 lo_address_free(lo_add);
                 by = "";
-            }
+            }*/
             break;
 
         // Trig OSC Set Parameters Methods
         case KIT_SET_VOLUME:
-            // Setup (s,i), Kit (s,i), Volume (d,f,i)
-            // Kit (s,i), Volume (d,f,i)
+            // "s:Setup/Kit" (s), Volume (d,f,i) || "i:Setup_id/Kit_id" (s), Volume (d,f,i)
+            // "s:Kit" (s), Volume (d,f,i) || "i:Kit_id" (s), Volume (d,f,i)
             o_what = KIT; x_what = VOLUME;
             break;
         case INSTRUMENT_SET_VOLUME:
@@ -452,13 +400,18 @@ int argc, void *data, void *user_data)
                 if (sn == -1) {
                     for(int i=0; i<(int)t->setups.size(); i++) {
                         if (knc != "") kn = t->getKitIdByName(knc, snc="", i);
-                        if(kn != -1 && kn < t->setups[i]->getNbKits())
-                            t->setups[i]->getKit(kn)->setVolume(x);
+                        if(kn != -1 && kn < t->setups[i]->getNbKits()) {
+                            if (x_what == SELECT) t->changeKit(i, kn);
+                            if (x_what == VOLUME) t->setups[i]->getKit(kn)->setVolume(x);
+                        }
                     }
                 }
                 else {
-                    if(kn != -1 && kn < t->setups[sn]->getNbKits())
-                        t->setups[sn]->getKit(kn)->setVolume(x);
+                    if (knc != "") kn = t->getKitIdByName(knc, snc="", sn);
+                    if(kn != -1 && kn < t->setups[sn]->getNbKits()) {
+                        if (x_what == SELECT) t->changeKit(sn, kn);
+                        if (x_what == VOLUME) t->setups[sn]->getKit(kn)->setVolume(x);
+                    }
                 }
                 break;
             case SETUP:
@@ -468,15 +421,15 @@ int argc, void *data, void *user_data)
     // OSC Get Methods
     else if (get) {
 
-        t->parseOscSKI(&argv[0]->s, o_what);
-
         if (argc > 1) {
+            t->parseOscSKI(&argv[0]->s, o_what);
             address = &argv[1]->s;
         }
-
-        if (address == NULL) {
-            address = lo_address_get_url(lo_message_get_source(data));
+        else if (argc > 0 && x_what == SELECT) {
+            address = &argv[0]->s;
         }
+
+        if (address == NULL) address = lo_address_get_url(lo_message_get_source(data));
 
         lo_add = lo_address_new_from_url(address);
         spath = path;
@@ -485,50 +438,62 @@ int argc, void *data, void *user_data)
         if (by == "by_name") spath.erase(spath.find("/by_name"));
         lo_msg = lo_message_new();
 
-        if (snc != "") {
-            // setup by name
-            sn = t->getSetupIdByName(snc);
-        }
-        if (sn < (int)t->setups.size() && sn != -1) {
-            snc = "";
-            if (knc != "") {
-                // kit by name
-                kn = t->getKitIdByName(knc, snc, sn);
-            }
-            if (o_what == INSTRUMENT) {
-                if (kn < t->setups[sn]->getNbKits() && kn != -1) {
-                    knc = "";
-                    // instrument by name
-                    if (inc !="") {
-                        in = t->getInstrumentIdByName(inc, snc, sn, knc, kn);
+        if (lo_add != NULL) {
+            if (x_what == SELECT) { // If get/selected
+                for (int i=0;i<(int)t->setups.size();i++) {
+                    if (!by.compare("by_name")) {
+                        lo_message_add_string(lo_msg, t->setups[i]->getName().c_str());
+                        lo_message_add_string(lo_msg, t->setups[i]->getKit(t->setups[i]->getCurrentKit())->getName().c_str());
+                    }
+                    else {
+                        lo_message_add_int32(lo_msg, i);
+                        lo_message_add_int32(lo_msg, t->setups[i]->getCurrentKit());
+                    }
+                }
+            } else { // If get parameters
+                if (snc != "") {
+                    // setup by name
+                    sn = t->getSetupIdByName(snc);
+                }
+                if (sn < (int)t->setups.size() && sn != -1) {
+                    snc = "";
+                    if (knc != "") {
+                        // kit by name
+                        kn = t->getKitIdByName(knc, snc, sn);
+                    }
+                    if (o_what == INSTRUMENT) {
+                        if (kn < t->setups[sn]->getNbKits() && kn != -1) {
+                            knc = "";
+                            // instrument by name
+                            if (inc !="") {
+                                in = t->getInstrumentIdByName(inc, snc, sn, knc, kn);
+                            }
+                        } else return -1;
                     }
                 } else return -1;
-            }
-        } else return -1;
 
-        if (o_what == INSTRUMENT && sn == -1) return -1;
+                if (o_what == INSTRUMENT && sn == -1) return -1;
 
-        if (lo_add != NULL) {
-            if (!by.compare("by_name")) {
-                lo_message_add_string(lo_msg, t->setups[sn]->getName().c_str());
-                lo_message_add_string(lo_msg, t->setups[sn]->getKit(kn)->getName().c_str());
-                if (o_what == INSTRUMENT) lo_message_add_string(lo_msg, t->setups[sn]->getKit(kn)->getInstrument(in)->getName().c_str());
-            }
-            else {
-                lo_message_add_int32(lo_msg, sn);
-                lo_message_add_int32(lo_msg, kn);
-                if (o_what == INSTRUMENT) lo_message_add_int32(lo_msg, in);
-            }
+                if (!by.compare("by_name")) {
+                    lo_message_add_string(lo_msg, t->setups[sn]->getName().c_str());
+                    lo_message_add_string(lo_msg, t->setups[sn]->getKit(kn)->getName().c_str());
+                    if (o_what == INSTRUMENT) lo_message_add_string(lo_msg, t->setups[sn]->getKit(kn)->getInstrument(in)->getName().c_str());
+                }
+                else {
+                    lo_message_add_int32(lo_msg, sn);
+                    lo_message_add_int32(lo_msg, kn);
+                    if (o_what == INSTRUMENT) lo_message_add_int32(lo_msg, in);
+                }
 
-            if (o_what == KIT) lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getVolume());
-            else if (o_what == INSTRUMENT) {
-                if (param_type == P_DOUBLE)
-                lo_message_add_double(lo_msg, t->getInstrumentParameter(sn, kn, in, x_what));
-                else if (param_type == P_INT) {
-                    lo_message_add_int32(lo_msg, (int) t->getInstrumentParameter(sn, kn, in, x_what));
+                if (o_what == KIT) lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getVolume());
+                else if (o_what == INSTRUMENT) {
+                    if (param_type == P_DOUBLE)
+                    lo_message_add_double(lo_msg, t->getInstrumentParameter(sn, kn, in, x_what));
+                    else if (param_type == P_INT) {
+                        lo_message_add_int32(lo_msg, (int) t->getInstrumentParameter(sn, kn, in, x_what));
+                    }
                 }
             }
-
             lo_send_message(lo_add, spath.c_str(), lo_msg);
             lo_address_free(lo_add);
             lo_message_free(lo_msg);
