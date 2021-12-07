@@ -224,6 +224,24 @@ int argc, void *data, void *user_data)
             // "s:Instrument" (s), Playmode (i) || "i:Instrument_id" (s), Playmode (i)
             o_what = INSTRUMENT; x_what = PLAYMODE;
             break;
+        case INSTRUMENT_SET_PLAYLOOP:
+            // "s:Setup/Kit/Instrument" (s), Playloop (i) || "i:Setup_id/Kit_id/Instrument_id" (s), Playloop (i)
+            // "s:Kit/Instrument" (s), Playloop (i) || "i:Kit_id/Instrument_id" (s), Playloop (i)
+            // "s:Instrument" (s), Playloop (i) || "i:Instrument_id" (s), Playloop (i)
+            o_what = INSTRUMENT; x_what = PLAYLOOP;
+            break;
+        case INSTRUMENT_SET_PLAYREVERSE:
+            // "s:Setup/Kit/Instrument" (s), Playreverse (i) || "i:Setup_id/Kit_id/Instrument_id" (s), Playreverse (i)
+            // "s:Kit/Instrument" (s), Playreverse (i) || "i:Kit_id/Instrument_id" (s), Playreverse (i)
+            // "s:Instrument" (s), Playreverse (i) || "i:Instrument_id" (s), Playreverse (i)
+            o_what = INSTRUMENT; x_what = PLAYREVERSE;
+            break;
+        case INSTRUMENT_SET_PITCHOVERRANGE:
+            // "s:Setup/Kit/Instrument" (s), PitchOverRange (i) || "i:Setup_id/Kit_id/Instrument_id" (s), PitchOverRange (i)
+            // "s:Kit/Instrument" (s), PitchOverRange (i) || "i:Kit_id/Instrument_id" (s), PitchOverRange (i)
+            // "s:Instrument" (s), PitchOverRange (i) || "i:Instrument_id" (s), PitchOverRange (i)
+            o_what = INSTRUMENT; x_what = PITCHOVERRANGE;
+            break;
 
         case INSTRUMENT_PLAY:
             // "s:Setup/Kit/Instrument" (s), Play (i) || "i:Setup_id/Kit_id/Instrument_id" (s), Play (i)
@@ -245,42 +263,49 @@ int argc, void *data, void *user_data)
             by = "by_name";
         case INSTRUMENT_GET_VOLUME:
             // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))
+            o_what = INSTRUMENT; x_what = VOLUME;
             param_type = P_DOUBLE; get = 1;
             break;
         case INSTRUMENT_GET_PAN_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PAN:
-            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PAN;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))
+            o_what = INSTRUMENT; x_what = PAN;
             param_type = P_DOUBLE; get = 1;
             break;
         case INSTRUMENT_GET_MIDITUNE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_MIDITUNE:
-            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = MIDITUNE;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))
+            o_what = INSTRUMENT; x_what = MIDITUNE;
             param_type = P_DOUBLE; get = 1;
             break;
         case INSTRUMENT_GET_PLAYMODE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PLAYMODE:
-            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PLAYMODE;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))
+            o_what = INSTRUMENT; x_what = PLAYMODE;
             param_type = P_INT; get = 1;
             break;
         case INSTRUMENT_GET_PLAYLOOP_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PLAYLOOP:
-            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PLAYLOOP;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))
+            o_what = INSTRUMENT; x_what = PLAYLOOP;
             param_type = P_INT; get = 1;
             break;
         case INSTRUMENT_GET_PLAYREVERSE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PLAYREVERSE:
-            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PLAYREVERSE;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))
+            o_what = INSTRUMENT; x_what = PLAYREVERSE;
             param_type = P_INT; get = 1;
             break;
         case INSTRUMENT_GET_PITCHOVERRANGE_BYNAME:
             by = "by_name";
         case INSTRUMENT_GET_PITCHOVERRANGE:
-            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))            o_what = INSTRUMENT; x_what = PITCHOVERRANGE;
+            // "s:Setup/Kit/Instrument" (s), (address (s)) || "i:Setup_id/Kit_id/Instrument_id" (s), (address (s))
+            o_what = INSTRUMENT; x_what = PITCHOVERRANGE;
             param_type = P_INT; get = 1;
             break;
     }
@@ -325,7 +350,7 @@ int argc, void *data, void *user_data)
                                     for (int k=0; k<t->setups[i]->getKit(j)->getNbInstruments(); k++){
                                         if (!inc.compare(t->setups[i]->getKit(j)->getInstrument(k)->getName())) {
                                             in = k;
-                                        } else in = -1;
+                                        } //else in = -1;
                                     }
                                 }
                                 if (in != -1 && in < t->setups[i]->getKit(j)->getNbInstruments()) {
@@ -439,11 +464,10 @@ int argc, void *data, void *user_data)
                     lo_message_add_int32(lo_msg, kn);
                     if (o_what == INSTRUMENT) lo_message_add_int32(lo_msg, in);
                 }
-
                 if (o_what == KIT) lo_message_add_double(lo_msg, t->setups[sn]->getKit(kn)->getVolume());
                 else if (o_what == INSTRUMENT) {
                     if (param_type == P_DOUBLE)
-                    lo_message_add_double(lo_msg, t->getInstrumentParameter(sn, kn, in, x_what));
+                        lo_message_add_double(lo_msg, t->getInstrumentParameter(sn, kn, in, x_what));
                     else if (param_type == P_INT) {
                         lo_message_add_int32(lo_msg, (int) t->getInstrumentParameter(sn, kn, in, x_what));
                     }
