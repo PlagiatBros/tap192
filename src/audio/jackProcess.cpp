@@ -65,7 +65,9 @@ int process(jack_nframes_t nframes, void *arg)
                 }
             }
         }
-        else {                   //if it's a noteOff
+        else {
+            // ORL Check around there if there's a way to use PITCHBEND events to modify the pitch, and then think about a tapestop/tapestart module
+            //if it's a noteOff
             //we go through all the events and stop the one with the same id , of course if the play mode is not "trigger"
             for(unsigned int a=0;a<proc->audioEvents.size();++a) {
                 if (proc->audioEvents[a].getID() == newEvent.getID() && newEvent.getInstrument()->getPlayMode()==0) {
