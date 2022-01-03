@@ -49,7 +49,7 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     Send setup's kits list on the specified osc_address. If osc_address is not defined, tapeutape will send the kits list back to the address from which it received the osc message.
 
 **Kit**
-* `/kit/select` (optional <int_or_string: setup>) <int_or_string: kit>:         
+* `/kit/select` (optional <int_or_string: setup>) <int_or_string: kit>:
     Select specified kit as current kit (Execution Window)
     ID or name can be used to defined setup and kit.
     If the setup is not defined, matching kit(s) will be selected in every setup(s) in which there is a matching kit.
