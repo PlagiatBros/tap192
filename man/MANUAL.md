@@ -59,13 +59,17 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
 
 * `/kit/get/selected` (optional: <string: osc_address>):
     Send selected kit ID for each setup on the specified osc_address. If osc_address is not defined, tapeutape will send the kits list back to the address from which it received the osc message.
-    Received message should look like:
-    /tapeutape/get/selected SETUP_ID_1 SELECTED_KIT_ID SETUP_ID_2 SELECTED_KIT_ID ...
+
+    Received message should look like this:
+
+    `/tapeutape/get/selected SETUP_ID_1 SELECTED_KIT_ID SETUP_ID_2 SELECTED_KIT_ID ...`
 
 * `/kit/get/selected/by_name` (optional: <string: osc_address>):
     Send selected kit name for each setup on the specified osc_address. If osc_address is not defined, tapeutape will send the kits list back to the address from which it received the osc message.
+
     Received message should look like:
-    /tapeutape/get/selected SETUP_NAME_1 SELECTED_KIT_NAME SETUP_NAME_2 SELECTED_KIT_NAME ...
+
+    `/tapeutape/get/selected SETUP_NAME_1 SELECTED_KIT_NAME SETUP_NAME_2 SELECTED_KIT_NAME ...`
 
 * `/kit/set/volume` (optional <int_or_string: setup>) <int_or_string: kit> <double_or_float_or_int: volume>:
     Set kit volume.
