@@ -82,6 +82,8 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     Send kit instruments list to the specified osc_address. If osc_address is not defined, tapeutape will send the instruments list back to the address from which it received the osc message.
     Not implemented yet.
 
+**Instrument**
+
 * `/instrument/set/volume` (optional <int_or_string: setup>) (<int_or_string: kit>) <int_or_string: instrument> <double_or_float_or_int: volume>:<br />
     Set instrument volume.<br />
     ID or name can be used to defined setup, kit and instrument.<br />
