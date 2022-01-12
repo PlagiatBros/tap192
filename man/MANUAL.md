@@ -1,13 +1,13 @@
-tapeutape(1) -- MIDI- & OSC-controlable audiosampler
+tap192(1) -- MIDI- & OSC-controlable audiosampler
 =============================
 
 ## SYNOPSIS
 
-`tapeutape` [OPTION...] filename.tap
+`tap192` [OPTION...] filename.tap
 
 ## DESCRIPTION
 
-tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampler.
+tap192 is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampler.
 
 ## OPTIONS
 
@@ -37,16 +37,16 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
 
 **Setup**
 * `/set/global_volume` <double_or_float_or_int: volume>:<br />
-    Set tapeutape global volume.
+    Set tap192 global volume.
 
 * `/get/global_volume` (optional: <string: osc_address>):<br />
-    Send tapeutape global volume to the specified osc_address. If osc_address is not defined, tapeutape will send the global volume back to the address from which it received the osc message.
+    Send tap192 global volume to the specified osc_address. If osc_address is not defined, tap192 will send the global volume back to the address from which it received the osc message.
 
 * `/get/setups_list` (optional: <string: osc_address>):<br />
-    Send current setups list to the specified osc_address. If osc_address is not defined, tapeutape will send the setups list back to the address from which it received the osc message.
+    Send current setups list to the specified osc_address. If osc_address is not defined, tap192 will send the setups list back to the address from which it received the osc message.
 
 * `/setup/get/kits_list` <string: setup> (optional: <string: osc_address>):<br />
-    Send setup's kits list to the specified osc_address. If osc_address is not defined, tapeutape will send the kits list back to the address from which it received the osc message.
+    Send setup's kits list to the specified osc_address. If osc_address is not defined, tap192 will send the kits list back to the address from which it received the osc message.
 
 **Kit**
 * `/kit/select` (optional <int_or_string: setup>) <int_or_string: kit>:<br />
@@ -58,14 +58,14 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     Same as `/kit/select`.
 
 * `/kit/get/selected` (optional: <string: osc_address>):<br />
-    Send selected kit ID for each setup to the specified osc_address. If osc_address is not defined, tapeutape will send the kits list back to the address from which it received the osc message.<br />
+    Send selected kit ID for each setup to the specified osc_address. If osc_address is not defined, tap192 will send the kits list back to the address from which it received the osc message.<br />
     Received message should look like this:<br />
-    `/tapeutape/get/selected` <int: SETUP_ID_1> <int: SELECTED_KIT_ID> <int: SETUP_ID_2> <int: SELECTED_KIT_ID> ...
+    `/tap192/get/selected` <int: SETUP_ID_1> <int: SELECTED_KIT_ID> <int: SETUP_ID_2> <int: SELECTED_KIT_ID> ...
 
 * `/kit/get/selected/by_name` (optional: <string: osc_address>):<br />
-    Send selected kit name for each setup to the specified osc_address. If osc_address is not defined, tapeutape will send the kits list back to the address from which it received the osc message.<br />
+    Send selected kit name for each setup to the specified osc_address. If osc_address is not defined, tap192 will send the kits list back to the address from which it received the osc message.<br />
     Received message should look like this:<br />
-    `/tapeutape/get/selected` <string: SETUP_NAME_1> <string: SELECTED_KIT_NAME> <string: SETUP_NAME_2> <string: SELECTED_KIT_NAME> ...
+    `/tap192/get/selected` <string: SETUP_NAME_1> <string: SELECTED_KIT_NAME> <string: SETUP_NAME_2> <string: SELECTED_KIT_NAME> ...
 
 * `/kit/set/volume` (optional <int_or_string: setup>) <int_or_string: kit> <double_or_float_or_int: volume>:<br />
     Set kit volume.<br />
@@ -73,13 +73,13 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     If the setup is not defined, volume will be set in any matching kit(s) in every setup(s).
 
 * `/kit/get/volume` <int_or_string: setup> <int_or_string kit> (optional <string: address>):<br />
-    Send kit volume to the specified osc_address. If osc_address is not defined, tapeutape will send the kit volume back to the address from which it received the osc message.
+    Send kit volume to the specified osc_address. If osc_address is not defined, tap192 will send the kit volume back to the address from which it received the osc message.
 
 * `/kit/get/volume/by_name` <int_or_string: setup> <int_or_string kit> (optional <string: address>):<br />
     Same as `/kit/get/volume`, except setup and kit names are used instead of IDs in the feedback message.
 
 * `/kit/get/instruments_list` <int_or_string: setup> <int_or_string kit> (optional <string: address>):<br />
-    Send kit instruments list to the specified osc_address. If osc_address is not defined, tapeutape will send the instruments list back to the address from which it received the osc message.
+    Send kit instruments list to the specified osc_address. If osc_address is not defined, tap192 will send the instruments list back to the address from which it received the osc message.
     Not implemented yet.
 
 **Instrument**
@@ -90,7 +90,7 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     Setup and kit are optional. If setup and/or kit is not defined, volume will be set for any matching instrument in every kit(s) and/or in every setup(s).
 
 * `/instrument/get/volume` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
-    Send instrument volume to the specified osc_address. If osc_address is not defined, tapeutape will send the instrument volume back to the address from which it received the osc message.
+    Send instrument volume to the specified osc_address. If osc_address is not defined, tap192 will send the instrument volume back to the address from which it received the osc message.
 
 * `/instrument/get/volume/by_name` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
     Same as `/instrument/get/volume`, except setup, kit and instrument names are used instead of IDs in the feedback message.
@@ -101,7 +101,7 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     Setup and kit are optional. If setup and/or kit is not defined, pan will be set for any matching instrument in every kit(s) and/or in every setup(s).
 
 * `/instrument/get/pan` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
-    Send instrument pan to the specified osc_address. If osc_address is not defined, tapeutape will send the instrument pan back to the address from which it received the osc message.
+    Send instrument pan to the specified osc_address. If osc_address is not defined, tap192 will send the instrument pan back to the address from which it received the osc message.
 
 * `/instrument/get/miditune/by_name` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
     Same as `/instrument/get/miditune`, except setup, kit and instrument names are used instead of IDs in the feedback message.
@@ -112,7 +112,7 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     Setup and kit are optional. If setup and/or kit is not defined, miditune will be set for any matching instrument in every kit(s) and/or in every setup(s).
 
 * `/instrument/get/miditune` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
-    Send instrument miditune to the specified osc_address. If osc_address is not defined, tapeutape will send the instrument miditune back to the address from which it received the osc message.
+    Send instrument miditune to the specified osc_address. If osc_address is not defined, tap192 will send the instrument miditune back to the address from which it received the osc message.
 
 * `/instrument/get/miditune/by_name` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
     Same as `/instrument/get/miditune`, except setup, kit and instrument names are used instead of IDs in the feedback message.
@@ -123,7 +123,7 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     Setup and kit are optional. If setup and/or kit is not defined, playmode will be set for any matching instrument in every kit(s) and/or in every setup(s).
 
 * `/instrument/get/playmode` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
-    Send instrument playmode to the specified osc_address. If osc_address is not defined, tapeutape will send the instrument playmode back to the address from which it received the osc message.
+    Send instrument playmode to the specified osc_address. If osc_address is not defined, tap192 will send the instrument playmode back to the address from which it received the osc message.
 
 * `/instrument/get/playmode/by_name` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
     Same as `/instrument/get/playmode`, except setup, kit and instrument names are used instead of IDs in the feedback message.
@@ -134,7 +134,7 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     Setup and kit are optional. If setup and/or kit is not defined, playloop will be set for any matching instrument in every kit(s) and/or in every setup(s).
 
 * `/instrument/get/playloop` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
-    Send instrument playloop to the specified osc_address. If osc_address is not defined, tapeutape will send the instrument playloop back to the address from which it received the osc message.
+    Send instrument playloop to the specified osc_address. If osc_address is not defined, tap192 will send the instrument playloop back to the address from which it received the osc message.
 
 * `/instrument/get/playloop/by_name` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
     Same as `/instrument/get/playloop`, except setup, kit and instrument names are used instead of IDs in the feedback message.
@@ -145,7 +145,7 @@ tapeutape is a lightweight, MIDI- and OSC-controlable, NSM-compatible audiosampl
     Setup and kit are optional. If setup and/or kit is not defined, playreverse will be set for any matching instrument in every kit(s) and/or in every setup(s).
 
 * `/instrument/get/playreverse` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
-    Send instrument playreverse to the specified osc_address. If osc_address is not defined, tapeutape will send the instrument playreverse back to the address from which it received the osc message.
+    Send instrument playreverse to the specified osc_address. If osc_address is not defined, tap192 will send the instrument playreverse back to the address from which it received the osc message.
 
 * `/instrument/get/playreverse/by_name` <int_or_string: setup> <int_or_string: kit> <int_or_string: instrument> (optional <string: address>):<br />
     Same as `/instrument/get/playreverse`, except setup, kit and instrument names are used instead of IDs in the feedback message.
@@ -177,7 +177,7 @@ see README.md
 
 ## LINKS
 
-Sources: <a href="https://github.com/PlagiatBros/tapeutape">https://github.com/PlagiatBros/tapeutape</a>
+Sources: <a href="https://github.com/PlagiatBros/tap192">https://github.com/PlagiatBros/tap192</a>
 
 <style type='text/css' media='all'>
 /* style: toc */

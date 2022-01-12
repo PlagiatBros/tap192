@@ -52,7 +52,7 @@ execWindow::execWindow(const char* titre,tapeutape *t):
     Fl::visual(FL_DOUBLE|FL_RGB);
 
     //window class
-    this->iconlabel(std::string("/usr/local/share/pixmaps/tapeutape.png").c_str());
+    this->iconlabel(std::string("/usr/local/share/pixmaps/tap192.png").c_str());
 
     //callback
     this->callback(statWindow,this);

@@ -9,7 +9,7 @@ LDFLAGS =   -lxml2\
 SOURCES = 	$(wildcard src/*/*.cpp) src/main.cpp
 OBJ = $(SOURCES:.cpp=.o)
 DEPENDS := $(SOURCES:.cpp=.d)
-BIN = tapeutape
+BIN = tap192
 PREFIX = /usr/local
 
 .PHONY: all clean install uninstall
@@ -38,10 +38,10 @@ install: $(BIN)
 	mkdir -p $(DESTDIR)$(PREFIX)/share/pixmaps
 	mkdir -p $(DESTDIR)$(PREFIX)/share/applications
 	cp $< $(DESTDIR)$(PREFIX)/bin/$(BIN)
-	cp data/tapeutape.png $(DESTDIR)$(PREFIX)/share/pixmaps/tapeutape.png
-	cp data/tapeutape.desktop $(DESTDIR)$(PREFIX)/share/applications/tapeutape.desktop
+	cp data/tap192.png $(DESTDIR)$(PREFIX)/share/pixmaps/tap192.png
+	cp data/tap192.desktop $(DESTDIR)$(PREFIX)/share/applications/tap192.desktop
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/$(BIN)
-	rm -f $(DESTDIR)$(PREFIX)/share/pixmaps/tapeutape.png
-	rm -f $(DESTDIR)$(PREFIX)/share/applications/tapeutape.desktop
+	rm -f $(DESTDIR)$(PREFIX)/share/pixmaps/tap192.png
+	rm -f $(DESTDIR)$(PREFIX)/share/applications/tap192.desktop

@@ -244,16 +244,16 @@ int argc, void *data, void *user_data)
             break;
 
         case INSTRUMENT_PLAY:
-            // "s:Setup/Kit/Instrument" (s), Play (i) || "i:Setup_id/Kit_id/Instrument_id" (s), Play (i)
-            // "s:Kit/Instrument" (s), Play (i) || "i:Kit_id/Instrument_id" (s), Play (i)
-            // "s:Instrument" (s), Play (i) || "i:Instrument_id" (s), Play (i)
+            // "s:Setup/Kit/Instrument" (s), (Velocity (i), Pitch (d||f||i)) || "i:Setup_id/Kit_id/Instrument_id" (s), (Velocity (i), Pitch (d||f||i))
+            // "s:Kit/Instrument" (s), Play (i) || "i:Kit_id/Instrument_id" (s), (Velocity (i), Pitch (d||f||i))
+            // "s:Instrument" (s), (Velocity (i), Pitch (d||f||i)) || "i:Instrument_id" (s), (Velocity (i), Pitch (d||f||i))
             o_what = INSTRUMENT; x_what = PLAY;
             playstop = 1;
             break;
         case INSTRUMENT_STOP:
-            // "s:Setup/Kit/Instrument" (s), Stop (i) || "i:Setup_id/Kit_id/Instrument_id" (s), Stop (i)
-            // "s:Kit/Instrument" (s), Stop (i) || "i:Kit_id/Instrument_id" (s), Stop (i)
-            // "s:Instrument" (s), Stop (i) || "i:Instrument_id" (s), Stop (i)
+            // "s:Setup/Kit/Instrument" (s) || "i:Setup_id/Kit_id/Instrument_id" (s)
+            // "s:Kit/Instrument" (s) || "i:Kit_id/Instrument_id" (s)
+            // "s:Instrument" (s) || "i:Instrument_id" (s)
             o_what = INSTRUMENT; x_what = STOP;
             playstop = 1;
             break;
@@ -593,7 +593,7 @@ int tapeutape::start()
     //(re)init the gui
     Fl::lock();
     execWin->init();
-    execWin->setTitle("Tapeutape : "+getFileName());
+    execWin->setTitle(PACKAGE_NAME+" : "+getFileName());
     Fl::unlock();
 
     return 0;
@@ -607,7 +607,7 @@ void tapeutape::save(char* f)
     if (!tap.saveToFile(f)) {
 
         Fl::lock();
-        execWin->setTitle("Tapeutape : "+getFileName());
+        execWin->setTitle(PACKAGE_NAME+" : "+getFileName());
         Fl::unlock();
         for(unsigned int s=0;s<samples.size();++s) {
             samples[s]->processFileName(samples[s]->getAbsoluteName(),fileName);
@@ -1234,5 +1234,5 @@ bool tapeutape::isVisible()
 void tapeutape::setVisible(bool v)
 {
     execWin->setVisible(v);
-    if (v) execWin->setTitle("Tapeutape : "+getFileName());
+    if (v) execWin->setTitle(PACKAGE_NAME+" : "+getFileName());
 }

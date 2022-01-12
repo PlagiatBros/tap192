@@ -169,7 +169,7 @@ class tapeutape
             {"/get/global_volume",  GET_GLOBAL_VOLUME},
             {"/get/setups_list", GET_SETUPS_LIST},
 
-            {"/setup/get/kit_lists", SETUP_GET_KITS_LIST},
+            {"/setup/get/kits_list", SETUP_GET_KITS_LIST},
 
             {"/kit/select",         KIT_SELECT},
             {"/kit/set/selected",     KIT_SET_SELECTED},
