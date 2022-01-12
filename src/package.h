@@ -18,6 +18,6 @@
 
 #define BINARY_NAME "tap192"     // executable name
 #define XML_NAMESPACE "tap192"   // root element in xml files
-#define XML_OLDNAMESPACE "tapeutape"   // root element in xml files 
+#define XML_OLDNAMESPACE "tapeutape"   // root element in legacy xml files 
 
 #define VERSION "1.0.0-alpha"

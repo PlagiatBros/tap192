@@ -47,8 +47,8 @@ int tapParser::createTree(char* f)
         return -1;
     }
 
-    if (xmlStrcmp(root_element->name, (const xmlChar *) XML_NAMESPACE)) {
-        tap->showMessage(true,"Document of the wrong type, root node != tapeutape");
+    if (xmlStrcmp(root_element->name, (const xmlChar *) XML_NAMESPACE) && xmlStrcmp(root_element->name, (const xmlChar *) XML_OLDNAMESPACE)) {
+        tap->showMessage(true,"Document of the wrong type, root node != (tap192 || tapeutape)");
         xmlFreeDoc(doc);
         return -1;
     }
