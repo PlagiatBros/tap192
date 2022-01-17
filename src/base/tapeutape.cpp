@@ -593,7 +593,7 @@ int tapeutape::start()
     //(re)init the gui
     Fl::lock();
     execWin->init();
-    execWin->setTitle(PACKAGE_NAME+" : "+getFileName());
+    execWin->setTitle((string)PACKAGE_NAME+" : "+getFileName());
     Fl::unlock();
 
     return 0;
@@ -607,7 +607,7 @@ void tapeutape::save(char* f)
     if (!tap.saveToFile(f)) {
 
         Fl::lock();
-        execWin->setTitle(PACKAGE_NAME+" : "+getFileName());
+        execWin->setTitle((string)PACKAGE_NAME+" : "+getFileName());
         Fl::unlock();
         for(unsigned int s=0;s<samples.size();++s) {
             samples[s]->processFileName(samples[s]->getAbsoluteName(),fileName);
@@ -650,7 +650,7 @@ void tapeutape::saveWithSamples(char* f,const char* cpath)
     if (!tap.saveToFile(f)) {
         //set the new name
         Fl::lock();
-        execWin->setTitle("Tapeutape : "+getFileName());
+        execWin->setTitle((string)PACKAGE_NAME+" : "+getFileName());
         Fl::unlock();
     }
 }
@@ -1234,5 +1234,5 @@ bool tapeutape::isVisible()
 void tapeutape::setVisible(bool v)
 {
     execWin->setVisible(v);
-    if (v) execWin->setTitle(PACKAGE_NAME+" : "+getFileName());
+    if (v) execWin->setTitle((string)PACKAGE_NAME+" : "+getFileName());
 }
