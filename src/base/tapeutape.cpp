@@ -168,6 +168,37 @@ int argc, void *data, void *user_data)
                 lo_address_free(lo_add);
             }
             break;
+        case SETUP_GET_KITS_LIST:
+        // "s:Setup" (s) (address (s))
+        if (argc == 2) {
+            address = &argv[1]->s;
+        }
+        else {
+            address = lo_address_get_url(lo_message_get_source(data));
+        }
+
+        if (types[0] == 'i')
+            sn = argv[0]->i;
+        else if (types[0] == 's'){
+            sn = t->getSetupIdByName(&argv[0]->s);
+            snc = &argv[0]->s;
+        }
+        else
+            break;
+
+        lo_add = lo_address_new_from_url(address);
+        if (lo_add != NULL) {
+            spath = path;
+            spath.replace(spath.find("get"), 3, BINARY_NAME);
+            lo_msg = lo_message_new();
+            lo_message_add_string(lo_msg, snc.c_str());
+            for (int i=0; i<t->setups[sn]->getNbKits(); i++)
+                lo_message_add_string(lo_msg, t->setups[sn]->getKit(i)->getName().c_str());
+            lo_send_message(lo_add, spath.c_str(), lo_msg);
+            lo_address_free(lo_add);
+        }
+        break;
+
 
 // Kit OSC methods
 // Set
