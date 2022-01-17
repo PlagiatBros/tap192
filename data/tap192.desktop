@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Tap192
+Comment=Midi- and OSC- Controllable Sample Player
+Icon=tape192.png
+Type=Application
+Exec=tap192
+Terminal=false
+StartupNotify=true
+Encoding=UTF-8
+Categories=Audio;AudioVideo;Application;
+GenericName=Sample Player
