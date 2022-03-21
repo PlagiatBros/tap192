@@ -204,6 +204,8 @@ int argc, void *data, void *user_data)
 // Set
         case KIT_SET_SELECTED:
         case KIT_SELECT:
+            // "s:Setup/Kit" || "i:Setup_id/Kit_id"
+            // "s:Kit" || "i:Kit_id"
             o_what = KIT; x_what = SELECT;
             break;
         case KIT_SET_VOLUME:
