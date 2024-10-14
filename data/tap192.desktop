@@ -9,3 +9,5 @@ StartupNotify=true
 Encoding=UTF-8
 Categories=Audio;AudioVideo;Application;
 GenericName=Sample Player
+X-NSM-Capable=true
+X-NSM-Exec=tap192
