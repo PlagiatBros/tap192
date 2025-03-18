@@ -1,3 +1,5 @@
+Moved to Framagit: https://framagit.org/orlammd/tap192
+
 # Tap192
 
 This is a fork of the legacy Tapeutape with some bug fixes and additional features, including OSC control.
